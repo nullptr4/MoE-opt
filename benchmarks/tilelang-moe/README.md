@@ -36,3 +36,13 @@ bash run.sh
 torch \
 tilelang \
 apache-tvm-ffi
+
+## 4. 本仓库优化版本
+
+当前文件已固化经过 C500 实测的 `FullRow + stage-1 row8 / stage-2 row16` 和 gate/up 单 shared weight buffer 策略。完整实验记录见仓库根目录 `reports/` 与 `logs/moe-tuning.md`。
+
+OJ 独立提交文件为 `submission.py`，本地 ABI 对拍：
+
+```bash
+python test_moe_submission.py --public-shape
+```

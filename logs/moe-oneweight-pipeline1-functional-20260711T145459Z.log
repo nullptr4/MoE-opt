@@ -1,0 +1,133 @@
+Loading tilelang libs from dev root: /data/metax-race/tilelang-metax/build
+CANDIDATE block_token=128 block_dhidden=128 block_dexpert=128 threads=256 num_stages=1 num_stages_down=1 swizzle=row16 swizzle_down=row16 gemm_policy=full_row gemm_policy_down=full_row single_weight_buffer=True min_blocks_per_sm=None
+
+=== functional ===
+[14:55:30] /data/metax-race/tilelang-metax/src/transform/pipeline_planning.cc:817: Fatal: Pipeline planning error: Multiple writes to overlapping buffer regions detected. Stage 1 and stage 3 are both writing to buffer 'routed_expert_up_shared' with overlapping regions. This is not supported in pipeline planning.
+2026-07-11 14:55:30  [TileLang:tilelang.jit.kernel:INFO] (kernel.py:133): TileLang begins to compile kernel `kernel` with `out_idx=None`
+Traceback (most recent call last):
+  File "/data/metax-race/tools/tune_moe.py", line 98, in <module>
+    main()
+  File "/data/metax-race/tools/tune_moe.py", line 94, in main
+    benchmark.run_moe_test(config, mode)
+  File "/data/metax-race/tilelang-metax/race_tests/moe/fusedmoe_benchmark.py", line 299, in run_moe_test
+    tilelang_output = custom_kernel(clone_data(data)).to(torch.float32)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/metax-race/tools/tune_moe.py", line 62, in candidate_kernel
+    routed_kernel = RoutedMoEKernel(
+                    ^^^^^^^^^^^^^^^^
+  File "/data/metax-race/tilelang-metax/race_tests/moe/custom_fusedmoe.py", line 291, in __init__
+    self.impl = moe_forward_tilelang_routed(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/metax-race/tilelang-metax/tilelang/jit/__init__.py", line 465, in __call__
+    kernel = self.compile(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/metax-race/tilelang-metax/tilelang/jit/__init__.py", line 395, in compile
+    kernel_result = compile(
+                    ^^^^^^^^
+  File "/data/metax-race/tilelang-metax/tilelang/jit/__init__.py", line 115, in compile
+    return cached(
+           ^^^^^^^
+  File "/data/metax-race/tilelang-metax/tilelang/cache/__init__.py", line 74, in cached
+    return _dispatch_map[execution_backend].cached(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/metax-race/tilelang-metax/tilelang/cache/kernel_cache.py", line 345, in cached
+    kernel = JITKernel(
+             ^^^^^^^^^^
+  File "/data/metax-race/tilelang-metax/tilelang/jit/kernel.py", line 136, in __init__
+    adapter = self._compile_and_create_adapter(func, out_idx)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/metax-race/tilelang-metax/tilelang/jit/kernel.py", line 247, in _compile_and_create_adapter
+    artifact = tilelang.lower(
+               ^^^^^^^^^^^^^^^
+  File "/data/metax-race/tilelang-metax/tilelang/engine/lower.py", line 362, in lower
+    mod = LowerAndLegalize(mod, target)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/metax-race/tilelang-metax/tilelang/engine/phase.py", line 188, in LowerAndLegalize
+    mod = tilelang.transform.PipelinePlanning()(mod)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/metax-race/tilelang-metax/3rdparty/tvm/python/tvm/ir/transform.py", line 167, in __call__
+    return _ffi_transform_api.RunPass(self, mod)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "python/tvm_ffi/cython/function.pxi", line 904, in tvm_ffi.core.Function.__call__
+  File "<unknown>", line 0, in tvm::transform::Pass::operator()(tvm::IRModule) const
+  File "<unknown>", line 0, in tvm::transform::Pass::operator()(tvm::IRModule, tvm::transform::PassContext const&) const
+  File "<unknown>", line 0, in tvm::tir::transform::PrimFuncPassNode::operator()(tvm::IRModule, tvm::transform::PassContext const&) const
+  File "<unknown>", line 0, in std::_Function_handler<tvm::tir::PrimFunc (tvm::tir::PrimFunc, tvm::IRModule, tvm::transform::PassContext), tvm::tl::PipelinePlanning()::{lambda(tvm::tir::PrimFunc, tvm::IRModule const&, tvm::transform::PassContext)#1}>::_M_invoke(std::_Any_data const&, tvm::tir::PrimFunc&&, tvm::IRModule&&, tvm::transform::PassContext&&)
+  File "<unknown>", line 0, in tvm::tl::PipelinePlanning()::{lambda(tvm::tir::PrimFunc, tvm::IRModule const&, tvm::transform::PassContext)#1}::operator()(tvm::tir::PrimFunc, tvm::IRModule const&, tvm::transform::PassContext) const [clone .isra.0]
+  File "<unknown>", line 0, in tvm::tl::PipelinePlanner::Substitute(tvm::tir::PrimFunc const&, bool)
+  File "<unknown>", line 0, in tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>::VisitStmt(tvm::tir::Stmt const&)
+  File "<unknown>", line 0, in tvm::NodeFunctor<tvm::tir::Stmt (tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)>::operator()(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*) const
+  File "<unknown>", line 0, in tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>::InitVTable()::{lambda(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)#15}::_FUN(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)
+  File "<unknown>", line 0, in tvm::tir::StmtMutator::VisitStmt_(tvm::tir::BlockRealizeNode const*)
+  File "<unknown>", line 0, in tvm::tir::StmtMutator::VisitStmt(tvm::tir::Stmt const&)
+  File "<unknown>", line 0, in tvm::NodeFunctor<tvm::tir::Stmt (tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)>::operator()(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*) const
+  File "<unknown>", line 0, in tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>::InitVTable()::{lambda(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)#14}::_FUN(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)
+  File "<unknown>", line 0, in tvm::tl::PipelinePlanner::VisitStmt_(tvm::tir::BlockNode const*)
+  File "<unknown>", line 0, in tvm::tir::StmtMutator::VisitStmt_(tvm::tir::BlockNode const*)
+  File "<unknown>", line 0, in tvm::tir::StmtMutator::VisitStmt(tvm::tir::Stmt const&)
+  File "<unknown>", line 0, in tvm::NodeFunctor<tvm::tir::Stmt (tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)>::operator()(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*) const
+  File "<unknown>", line 0, in tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>::InitVTable()::{lambda(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)#10}::_FUN(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)
+  File "<unknown>", line 0, in tvm::tir::StmtMutator::VisitStmt_(tvm::tir::SeqStmtNode const*)
+  File "<unknown>", line 0, in tvm::ffi::ObjectPtr<tvm::ffi::Object> tvm::ffi::Array<tvm::tir::Stmt, void>::MapHelper<tvm::tir::StmtMutator::Internal::Mutate(tvm::tir::StmtMutator*, tvm::ffi::Array<tvm::tir::Stmt, void> const&)::{lambda(tvm::tir::Stmt const&)#1}, tvm::tir::Stmt>(tvm::ffi::ObjectPtr<tvm::ffi::Object>, tvm::tir::StmtMutator::Internal::Mutate(tvm::tir::StmtMutator*, tvm::ffi::Array<tvm::tir::Stmt, void> const&)::{lambda(tvm::tir::Stmt const&)#1})
+  File "<unknown>", line 0, in tvm::tir::StmtMutator::VisitStmt(tvm::tir::Stmt const&)
+  File "<unknown>", line 0, in tvm::NodeFunctor<tvm::tir::Stmt (tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)>::operator()(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*) const
+  File "<unknown>", line 0, in tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>::InitVTable()::{lambda(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)#2}::_FUN(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)
+  File "<unknown>", line 0, in tvm::tir::StmtMutator::VisitStmt_(tvm::tir::AttrStmtNode const*)
+  File "<unknown>", line 0, in tvm::tir::StmtMutator::VisitStmt(tvm::tir::Stmt const&)
+  File "<unknown>", line 0, in tvm::NodeFunctor<tvm::tir::Stmt (tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)>::operator()(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*) const
+  File "<unknown>", line 0, in tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>::InitVTable()::{lambda(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)#2}::_FUN(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)
+  File "<unknown>", line 0, in tvm::tir::StmtMutator::VisitStmt_(tvm::tir::AttrStmtNode const*)
+  File "<unknown>", line 0, in tvm::tir::StmtMutator::VisitStmt(tvm::tir::Stmt const&)
+  File "<unknown>", line 0, in tvm::NodeFunctor<tvm::tir::Stmt (tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)>::operator()(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*) const
+  File "<unknown>", line 0, in tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>::InitVTable()::{lambda(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)#2}::_FUN(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)
+  File "<unknown>", line 0, in tvm::tir::StmtMutator::VisitStmt_(tvm::tir::AttrStmtNode const*)
+  File "<unknown>", line 0, in tvm::tir::StmtMutator::VisitStmt(tvm::tir::Stmt const&)
+  File "<unknown>", line 0, in tvm::NodeFunctor<tvm::tir::Stmt (tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)>::operator()(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*) const
+  File "<unknown>", line 0, in tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>::InitVTable()::{lambda(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)#2}::_FUN(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)
+  File "<unknown>", line 0, in tvm::tir::StmtMutator::VisitStmt_(tvm::tir::AttrStmtNode const*)
+  File "<unknown>", line 0, in tvm::tir::StmtMutator::VisitStmt(tvm::tir::Stmt const&)
+  File "<unknown>", line 0, in tvm::NodeFunctor<tvm::tir::Stmt (tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)>::operator()(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*) const
+  File "<unknown>", line 0, in tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>::InitVTable()::{lambda(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)#2}::_FUN(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)
+  File "<unknown>", line 0, in tvm::tir::StmtMutator::VisitStmt_(tvm::tir::AttrStmtNode const*)
+  File "<unknown>", line 0, in tvm::tir::StmtMutator::VisitStmt(tvm::tir::Stmt const&)
+  File "<unknown>", line 0, in tvm::NodeFunctor<tvm::tir::Stmt (tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)>::operator()(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*) const
+  File "<unknown>", line 0, in tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>::InitVTable()::{lambda(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)#15}::_FUN(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)
+  File "<unknown>", line 0, in tvm::tir::StmtMutator::VisitStmt_(tvm::tir::BlockRealizeNode const*)
+  File "<unknown>", line 0, in tvm::tir::StmtMutator::VisitStmt(tvm::tir::Stmt const&)
+  File "<unknown>", line 0, in tvm::NodeFunctor<tvm::tir::Stmt (tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)>::operator()(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*) const
+  File "<unknown>", line 0, in tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>::InitVTable()::{lambda(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)#14}::_FUN(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)
+  File "<unknown>", line 0, in tvm::tl::PipelinePlanner::VisitStmt_(tvm::tir::BlockNode const*)
+  File "<unknown>", line 0, in tvm::tir::StmtMutator::VisitStmt_(tvm::tir::BlockNode const*)
+  File "<unknown>", line 0, in tvm::tir::StmtMutator::VisitStmt(tvm::tir::Stmt const&)
+  File "<unknown>", line 0, in tvm::NodeFunctor<tvm::tir::Stmt (tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)>::operator()(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*) const
+  File "<unknown>", line 0, in tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>::InitVTable()::{lambda(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)#2}::_FUN(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)
+  File "<unknown>", line 0, in tvm::tir::StmtMutator::VisitStmt_(tvm::tir::AttrStmtNode const*)
+  File "<unknown>", line 0, in tvm::tir::StmtMutator::VisitStmt(tvm::tir::Stmt const&)
+  File "<unknown>", line 0, in tvm::NodeFunctor<tvm::tir::Stmt (tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)>::operator()(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*) const
+  File "<unknown>", line 0, in tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>::InitVTable()::{lambda(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)#1}::_FUN(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)
+  File "<unknown>", line 0, in tvm::tir::StmtMutator::VisitStmt_(tvm::tir::LetStmtNode const*)
+  File "<unknown>", line 0, in tvm::tir::StmtMutator::VisitStmt(tvm::tir::Stmt const&)
+  File "<unknown>", line 0, in tvm::NodeFunctor<tvm::tir::Stmt (tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)>::operator()(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*) const
+  File "<unknown>", line 0, in tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>::InitVTable()::{lambda(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)#1}::_FUN(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)
+  File "<unknown>", line 0, in tvm::tir::StmtMutator::VisitStmt_(tvm::tir::LetStmtNode const*)
+  File "<unknown>", line 0, in tvm::tir::StmtMutator::VisitStmt(tvm::tir::Stmt const&)
+  File "<unknown>", line 0, in tvm::NodeFunctor<tvm::tir::Stmt (tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)>::operator()(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*) const
+  File "<unknown>", line 0, in tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>::InitVTable()::{lambda(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)#1}::_FUN(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)
+  File "<unknown>", line 0, in tvm::tir::StmtMutator::VisitStmt_(tvm::tir::LetStmtNode const*)
+  File "<unknown>", line 0, in tvm::tir::StmtMutator::VisitStmt(tvm::tir::Stmt const&)
+  File "<unknown>", line 0, in tvm::NodeFunctor<tvm::tir::Stmt (tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)>::operator()(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*) const
+  File "<unknown>", line 0, in tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>::InitVTable()::{lambda(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)#1}::_FUN(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)
+  File "<unknown>", line 0, in tvm::tir::StmtMutator::VisitStmt_(tvm::tir::LetStmtNode const*)
+  File "<unknown>", line 0, in tvm::tir::StmtMutator::VisitStmt(tvm::tir::Stmt const&)
+  File "<unknown>", line 0, in tvm::NodeFunctor<tvm::tir::Stmt (tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)>::operator()(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*) const
+  File "<unknown>", line 0, in tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>::InitVTable()::{lambda(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)#10}::_FUN(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)
+  File "<unknown>", line 0, in tvm::tir::StmtMutator::VisitStmt_(tvm::tir::SeqStmtNode const*)
+  File "<unknown>", line 0, in tvm::ffi::ObjectPtr<tvm::ffi::Object> tvm::ffi::Array<tvm::tir::Stmt, void>::MapHelper<tvm::tir::StmtMutator::Internal::Mutate(tvm::tir::StmtMutator*, tvm::ffi::Array<tvm::tir::Stmt, void> const&)::{lambda(tvm::tir::Stmt const&)#1}, tvm::tir::Stmt>(tvm::ffi::ObjectPtr<tvm::ffi::Object>, tvm::tir::StmtMutator::Internal::Mutate(tvm::tir::StmtMutator*, tvm::ffi::Array<tvm::tir::Stmt, void> const&)::{lambda(tvm::tir::Stmt const&)#1})
+  File "<unknown>", line 0, in tvm::tir::StmtMutator::VisitStmt(tvm::tir::Stmt const&)
+  File "<unknown>", line 0, in tvm::NodeFunctor<tvm::tir::Stmt (tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)>::operator()(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*) const
+  File "<unknown>", line 0, in tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>::InitVTable()::{lambda(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)#4}::_FUN(tvm::ffi::ObjectRef const&, tvm::tir::StmtFunctor<tvm::tir::Stmt (tvm::tir::Stmt const&)>*)
+  File "<unknown>", line 0, in tvm::tl::PipelinePlanner::VisitStmt_(tvm::tir::ForNode const*)
+  File "<unknown>", line 0, in tvm::tl::PipelinePlanner::AnalyzeCopyLastUse(std::vector<tvm::tl::PipelinePlanner::PipelineStageInfo, std::allocator<tvm::tl::PipelinePlanner::PipelineStageInfo> >*) const [clone .isra.0]
+  File "<unknown>", line 0, in tvm::runtime::detail::LogFatal::~LogFatal()
+  File "<unknown>", line 0, in tvm::runtime::detail::LogFatalImpl(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, int, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+tvm.error.InternalError: Pipeline planning error: Multiple writes to overlapping buffer regions detected. Stage 1 and stage 3 are both writing to buffer 'routed_expert_up_shared' with overlapping regions. This is not supported in pipeline planning.

@@ -1,0 +1,4 @@
+name: local-gpu
+peak_bandwidth_gb_s: 1000
+notes: "Placeholder profile. Replace with a measured HBM microbenchmark value."
+

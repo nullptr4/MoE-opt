@@ -1,0 +1,76 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 22,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "base",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_CXX_STANDARD": "17",
+        "CMAKE_CUDA_STANDARD": "17"
+      }
+    },
+    {
+      "name": "nvidia-debug",
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CAMP_ENABLE_NVIDIA": "ON",
+        "CAMP_ENABLE_METAX": "OFF",
+        "CAMP_ENABLE_CUTE": "AUTO",
+        "CMAKE_CUDA_ARCHITECTURES": "native"
+      }
+    },
+    {
+      "name": "nvidia-release",
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CAMP_ENABLE_NVIDIA": "ON",
+        "CAMP_ENABLE_METAX": "OFF",
+        "CAMP_ENABLE_CUTE": "AUTO",
+        "CMAKE_CUDA_ARCHITECTURES": "native"
+      }
+    },
+    {
+      "name": "nvidia-cute",
+      "inherits": "nvidia-release",
+      "cacheVariables": {
+        "CAMP_ENABLE_CUTE": "ON"
+      }
+    },
+    {
+      "name": "metax-release",
+      "inherits": "base",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CAMP_ENABLE_NVIDIA": "OFF",
+        "CAMP_ENABLE_METAX": "ON"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "nvidia-debug",
+      "configurePreset": "nvidia-debug"
+    },
+    {
+      "name": "nvidia-release",
+      "configurePreset": "nvidia-release"
+    },
+    {
+      "name": "nvidia-cute",
+      "configurePreset": "nvidia-cute"
+    },
+    {
+      "name": "metax-release",
+      "configurePreset": "metax-release"
+    }
+  ]
+}
