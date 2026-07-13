@@ -26,6 +26,9 @@
 - [模力方舟快速使用 SOP](../materials/op_optimization/%E6%A8%A1%E5%8A%9B%E6%96%B9%E8%88%9F%E5%BF%AB%E9%80%9F%E4%BD%BF%E7%94%A8SOP.md)
 - [算子优化课程整理](../materials/op_optimization/%E7%AE%97%E5%AD%90%E4%BC%98%E5%8C%96%E7%9B%B8%E5%85%B3%E8%AF%BE%E7%A8%8B%E6%95%B4%E7%90%86.md)
 - [MoE TileLang 基准与测试代码](../benchmarks/tilelang-moe/)
+- [优化报告与实验日志](../reports/2026-07-11-moe-optimization-report.md)
+- [OJ ABI 对拍脚本](../benchmarks/tilelang-moe/test_moe_submission.py)
+- [双 C500 实验数据同步](../data/README.md)
 - [MACA 环境脚本](../scripts/)
 
 ## 4. 任务包
