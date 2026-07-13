@@ -1,0 +1,10 @@
+# Repository governance and maintained implementation
+* @nullptr4
+
+# Performance-sensitive and data-governance paths
+/benchmarks/ @nullptr4
+/config/ @nullptr4
+/data/ @nullptr4
+/scripts/ @nullptr4
+/reports/ @nullptr4
+/.github/ @nullptr4
