@@ -1,0 +1,14 @@
+build/
+build-*/
+*.egg-info/
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.pyc
+*.so
+*.o
+*.a
+*.log
+/generated/
+/third_party/

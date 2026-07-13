@@ -1,0 +1,3 @@
+Loading tilelang libs from dev root: /data/metax-race/tilelang-metax/build
+PASS uneven-smoke: H=256 I=128 groups=[129, 17, 0] padded=384 blocks=3
+PASS public-small-shape: H=3584 I=1024 groups=[129, 64, 3, 0] padded=512 blocks=4

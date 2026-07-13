@@ -1,0 +1,9 @@
+$:
+  vscode:
+    - docker:
+        image: docker.cnb.cool/yutianyu.yi/image/ncu
+      runner:
+        tags: cnb:arch:amd64:gpu
+      services:
+        - vscode
+        - docker

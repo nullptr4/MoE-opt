@@ -1,0 +1,22 @@
+Loading tilelang libs from dev root: /data/metax-race/tilelang-metax/build
+CANDIDATE block_token=128 block_dhidden=64 block_dexpert=128 threads=256 num_stages=1
+
+=== functional ===
+2026-07-11 09:53:07  [TileLang:tilelang.jit.kernel:INFO] (kernel.py:133): TileLang begins to compile kernel `kernel` with `out_idx=None`
+2026-07-11 09:53:11  [TileLang:tilelang:WARNING] (phase.py:274): Should support PDL for maca target
+2026-07-11 09:53:14  [TileLang:tilelang.jit.kernel:INFO] (kernel.py:141): TileLang completes to compile kernel `kernel`
+✅ Functional test passed for config: {'dhidden': 7168, 'dexpert': 2048, 'nroutedexperts': 8, 'nexpertspertoken': 4, 'bs': 1, 'seqlen': 8192, 'seed': 81394}
+2026-07-11 09:53:16  [TileLang:tilelang.jit.kernel:INFO] (kernel.py:133): TileLang begins to compile kernel `kernel` with `out_idx=None`
+2026-07-11 09:53:19  [TileLang:tilelang:WARNING] (phase.py:274): Should support PDL for maca target
+2026-07-11 09:53:22  [TileLang:tilelang.jit.kernel:INFO] (kernel.py:141): TileLang completes to compile kernel `kernel`
+✅ Functional test passed for config: {'dhidden': 3584, 'dexpert': 1024, 'nroutedexperts': 4, 'nexpertspertoken': 2, 'bs': 2, 'seqlen': 4096, 'seed': 81394}
+
+=== performance ===
+2026-07-11 09:53:24  [TileLang:tilelang.jit.kernel:INFO] (kernel.py:133): TileLang begins to compile kernel `kernel` with `out_idx=None`
+2026-07-11 09:53:27  [TileLang:tilelang:WARNING] (phase.py:274): Should support PDL for maca target
+2026-07-11 09:53:31  [TileLang:tilelang.jit.kernel:INFO] (kernel.py:141): TileLang completes to compile kernel `kernel`
+⏱ Performance test: 491.57949219ms for config: {'dhidden': 7168, 'dexpert': 2048, 'nroutedexperts': 8, 'nexpertspertoken': 4, 'bs': 4, 'seqlen': 8192, 'seed': 81394}
+2026-07-11 09:54:26  [TileLang:tilelang.jit.kernel:INFO] (kernel.py:133): TileLang begins to compile kernel `kernel` with `out_idx=None`
+2026-07-11 09:54:29  [TileLang:tilelang:WARNING] (phase.py:274): Should support PDL for maca target
+2026-07-11 09:54:32  [TileLang:tilelang.jit.kernel:INFO] (kernel.py:141): TileLang completes to compile kernel `kernel`
+⏱ Performance test: 68.65500977ms for config: {'dhidden': 3584, 'dexpert': 1024, 'nroutedexperts': 4, 'nexpertspertoken': 2, 'bs': 8, 'seqlen': 4096, 'seed': 81394}

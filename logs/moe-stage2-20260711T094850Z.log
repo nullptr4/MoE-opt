@@ -1,0 +1,52 @@
+Loading tilelang libs from dev root: /data/metax-race/tilelang-metax/build
+no tilelang cache found
+
+=== Running functional tests ===
+2026-07-11 09:49:22  [TileLang:tilelang.jit.kernel:INFO] (kernel.py:133): TileLang begins to compile kernel `kernel` with `out_idx=None`
+2026-07-11 09:49:27  [TileLang:tilelang:WARNING] (phase.py:274): Should support PDL for maca target
+2026-07-11 09:49:31  [TileLang:tilelang.jit.kernel:INFO] (kernel.py:141): TileLang completes to compile kernel `kernel`
+[09:49:33.382][MCR][E]mc_platform.cpp          :938 : Shared memory size error, Kernel name kernel_kernel, shared memory size in kernel 0 from user 131072 in device 65536
+[09:49:33.382][MCR][E]mc_runtime_api.cpp       :513 : 16774: [7fa4af577740] mcModuleLaunchKernel: Returned mcErrorInvalidValue
+[09:49:33] /data/metax-race/tilelang-metax/src/target/maca_module.cc:254: Fatal: MACALaunch Error: mcErrorInvalidValue
+ grid=(264,16,1),  block=(256,1,1) dyn_smem_bytes=131072
+Traceback (most recent call last):
+  File "/data/metax-race/tilelang-metax/race_tests/moe/fusedmoe_benchmark.py", line 353, in <module>
+    run_from_config_file(config_file)
+  File "/data/metax-race/tilelang-metax/race_tests/moe/fusedmoe_benchmark.py", line 338, in run_from_config_file
+    run_moe_test(cfg, test_type)
+  File "/data/metax-race/tilelang-metax/race_tests/moe/fusedmoe_benchmark.py", line 299, in run_moe_test
+    tilelang_output = custom_kernel(clone_data(data)).to(torch.float32)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/metax-race/tilelang-metax/race_tests/moe/fusedmoe_benchmark.py", line 215, in custom_kernel
+    output = moe(input_tensor)
+             ^^^^^^^^^^^^^^^^^
+  File "/data/metax-race/.conda/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1773, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/metax-race/.conda/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1784, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/metax-race/.conda/lib/python3.12/site-packages/torch/utils/_contextlib.py", line 120, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/data/metax-race/tilelang-metax/race_tests/moe/fusedmoe_benchmark.py", line 159, in forward
+    self.routed_kernel(
+  File "/data/metax-race/tilelang-metax/race_tests/moe/custom_fusedmoe.py", line 199, in __call__
+    return self.impl(
+           ^^^^^^^^^^
+  File "/data/metax-race/tilelang-metax/tilelang/jit/kernel.py", line 206, in __call__
+    return self.torch_function(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/data/metax-race/tilelang-metax/tilelang/jit/adapter/tvm_ffi.py", line 248, in func
+    executable(*tensor_list)
+  File "/data/metax-race/tilelang-metax/3rdparty/tvm/python/tvm/runtime/executable.py", line 42, in __call__
+    return self.jit().main(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "python/tvm_ffi/cython/function.pxi", line 904, in tvm_ffi.core.Function.__call__
+  File "src/ffi/extra/library_module.cc", line 54, in tvm::ffi::LibraryModuleObj::GetFunction(tvm::ffi::String const&)::{lambda(tvm::ffi::PackedArgs, tvm::ffi::Any*)#1}::operator()(tvm::ffi::PackedArgs, tvm::ffi::Any*) const
+  File "<unknown>", line 0, in tvm::runtime::detail::PackFuncPackedArgAligned_<0, tvm::runtime::MACAWrappedFunc>(tvm::runtime::MACAWrappedFunc, std::vector<tvm::runtime::detail::ArgConvertCode, std::allocator<tvm::runtime::detail::ArgConvertCode> > const&)::{lambda(tvm::ffi::PackedArgs, tvm::ffi::Any*)#1}::operator()(tvm::ffi::PackedArgs, tvm::ffi::Any*) const [clone .isra.0]
+  File "<unknown>", line 0, in tvm::runtime::MACAWrappedFunc::operator()(tvm::ffi::PackedArgs, tvm::ffi::Any*, void*, unsigned long) const [clone .isra.0]
+  File "<unknown>", line 0, in tvm::runtime::detail::LogFatal::~LogFatal()
+  File "<unknown>", line 0, in tvm::runtime::detail::LogFatalImpl(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&, int, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> > const&)
+RuntimeError: MACALaunch mcErrorInvalidValue
+ grid=(264,16,1),  block=(256,1,1) dyn_smem_bytes=131072

@@ -1,0 +1,84 @@
+#include "operator_runtime/ops/relu.h"
+
+#include "ops/common/elementwise/nvidia/elementwise_nvidia.cuh"
+#include "ops/elementwise/relu/relu_common.h"
+
+#include <array>
+
+namespace {
+
+struct ReluOp {
+    template <typename T>
+    __device__ T operator()(T value, float negative_slope) const {
+        T zero = oprt::elementwise::nvidia::cast_scalar<T>(0.0f);
+        T slope = oprt::elementwise::nvidia::cast_scalar<T>(negative_slope);
+        return value > zero ? value : value * slope;
+    }
+};
+
+template <>
+__device__ half ReluOp::operator()<half>(half value, float negative_slope) const {
+    half zero = __float2half(0.0f);
+    half slope = __float2half(negative_slope);
+    return __hgt(value, zero) ? value : __hmul(value, slope);
+}
+
+template <typename T>
+oprt_status_t launch_relu(const oprt::elementwise::ReluDescriptor *desc,
+                          void *workspace,
+                          void *out,
+                          const void *in,
+                          oprt_stream_t stream) {
+    return oprt::elementwise::nvidia::launch<T, 1>(
+        desc->info,
+        workspace,
+        out,
+        std::array<const void *, 1>{in},
+        stream,
+        ReluOp{},
+        desc->negative_slope);
+}
+
+} // namespace
+
+extern "C" OPRT_EXPORT oprt_status_t oprt_create_relu_descriptor(
+    oprt_operator_descriptor_t *desc,
+    const oprt_tensor_view_t *out,
+    const oprt_tensor_view_t *in,
+    float negative_slope) {
+    return oprt::elementwise::create_relu_descriptor_common(desc, out, in, negative_slope);
+}
+
+extern "C" OPRT_EXPORT oprt_status_t oprt_get_relu_workspace_size(
+    oprt_operator_descriptor_t desc,
+    size_t *size) {
+    return oprt::elementwise::get_relu_workspace_size_common(desc, size);
+}
+
+extern "C" OPRT_EXPORT oprt_status_t oprt_execute_relu(
+    oprt_operator_descriptor_t desc,
+    void *workspace,
+    size_t workspace_size,
+    void *out,
+    const void *in,
+    oprt_stream_t stream) {
+    auto status = oprt::elementwise::validate_relu_execute_args(desc, workspace_size, out, in);
+    if (status != OPRT_SUCCESS) {
+        return status;
+    }
+
+    auto *typed = static_cast<const oprt::elementwise::ReluDescriptor *>(desc);
+    switch (typed->out_view.dtype) {
+    case OPRT_DTYPE_F16:
+        return launch_relu<half>(typed, workspace, out, in, stream);
+    case OPRT_DTYPE_F32:
+        return launch_relu<float>(typed, workspace, out, in, stream);
+    default:
+        return OPRT_ERR_UNSUPPORTED_DTYPE;
+    }
+}
+
+extern "C" OPRT_EXPORT oprt_status_t oprt_destroy_relu_descriptor(
+    oprt_operator_descriptor_t desc) {
+    return oprt::elementwise::destroy_relu_descriptor_common(desc);
+}

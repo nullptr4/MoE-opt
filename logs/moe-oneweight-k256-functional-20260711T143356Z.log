@@ -1,0 +1,12 @@
+Loading tilelang libs from dev root: /data/metax-race/tilelang-metax/build
+CANDIDATE block_token=128 block_dhidden=256 block_dexpert=128 threads=256 num_stages=1 num_stages_down=1 swizzle=row16 swizzle_down=row16 gemm_policy=full_row gemm_policy_down=full_row single_weight_buffer=True min_blocks_per_sm=None
+
+=== functional ===
+2026-07-11 14:34:27  [TileLang:tilelang.jit.kernel:INFO] (kernel.py:133): TileLang begins to compile kernel `kernel` with `out_idx=None`
+2026-07-11 14:34:30  [TileLang:tilelang:WARNING] (phase.py:274): Should support PDL for maca target
+2026-07-11 14:34:34  [TileLang:tilelang.jit.kernel:INFO] (kernel.py:141): TileLang completes to compile kernel `kernel`
+✅ Functional test passed for config: {'dhidden': 7168, 'dexpert': 2048, 'nroutedexperts': 8, 'nexpertspertoken': 4, 'bs': 1, 'seqlen': 8192, 'seed': 81394}
+2026-07-11 14:34:36  [TileLang:tilelang.jit.kernel:INFO] (kernel.py:133): TileLang begins to compile kernel `kernel` with `out_idx=None`
+2026-07-11 14:34:39  [TileLang:tilelang:WARNING] (phase.py:274): Should support PDL for maca target
+2026-07-11 14:34:43  [TileLang:tilelang.jit.kernel:INFO] (kernel.py:141): TileLang completes to compile kernel `kernel`
+✅ Functional test passed for config: {'dhidden': 3584, 'dexpert': 1024, 'nroutedexperts': 4, 'nexpertspertoken': 2, 'bs': 2, 'seqlen': 4096, 'seed': 81394}

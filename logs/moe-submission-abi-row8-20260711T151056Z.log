@@ -1,0 +1,9 @@
+Loading tilelang libs from dev root: /data/metax-race/tilelang-metax/build
+2026-07-11 15:11:24  [TileLang:tilelang.jit.kernel:INFO] (kernel.py:133): TileLang begins to compile kernel `kernel` with `out_idx=None`
+2026-07-11 15:11:26  [TileLang:tilelang:WARNING] (phase.py:274): Should support PDL for maca target
+2026-07-11 15:11:29  [TileLang:tilelang.jit.kernel:INFO] (kernel.py:141): TileLang completes to compile kernel `kernel`
+PASS uneven-smoke: H=256 I=128 groups=[129, 17, 0] padded=384 blocks=3
+2026-07-11 15:11:30  [TileLang:tilelang.jit.kernel:INFO] (kernel.py:133): TileLang begins to compile kernel `kernel` with `out_idx=None`
+2026-07-11 15:11:33  [TileLang:tilelang:WARNING] (phase.py:274): Should support PDL for maca target
+2026-07-11 15:11:36  [TileLang:tilelang.jit.kernel:INFO] (kernel.py:141): TileLang completes to compile kernel `kernel`
+PASS public-small-shape: H=3584 I=1024 groups=[129, 64, 3, 0] padded=512 blocks=4
