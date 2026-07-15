@@ -21,6 +21,7 @@ data/
   autoheuristic/dataset.jsonl               merged observations
   autoheuristic/index.json                  generated best-config index
   profiler/<host-id>/<run-id>/metadata.json profiler manifest
+  benchmarks/<host-id>/<run-id>.json        formal benchmark summary (median/MAD/P95)
 ```
 
 Each autotune observation records the workload, complete schedule, measured

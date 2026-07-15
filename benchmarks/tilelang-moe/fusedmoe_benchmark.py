@@ -1,7 +1,6 @@
 import math
 import torch
 import torch.nn as nn
-from torch.profiler import profile, record_function, ProfilerActivity
 import json
 from typing import Dict, Tuple, Optional
 import tilelang
@@ -298,6 +297,7 @@ def run_moe_test(config: dict, test_type: str, warm_up=10, iteration=100):
     data = generate_input(**config)
 
     if test_type == "functional":
+        result = {"test_type": test_type, "config": config, "correct": False}
         try:
             ref_output = ref_kernel(clone_data(data)).to(torch.float32)
             tilelang_output = custom_kernel(clone_data(data)).to(torch.float32)
@@ -306,14 +306,16 @@ def run_moe_test(config: dict, test_type: str, warm_up=10, iteration=100):
             if routed_kernel is not None:
                 routed_kernel.record_validation(True)
             print(f"✅ Functional test passed for config: {config}")
+            result["correct"] = True
         except AssertionError as e:
             routed_kernel = getattr(custom_kernel, "last_routed_kernel", None)
             if routed_kernel is not None:
                 routed_kernel.record_validation(False)
             print(f"❌ Functional test failed for config: {config}")
             print("error msg: ", str(e))
+            result["error"] = str(e)
+        return result
     elif test_type == "performance":
-        import time
         for i in range(warm_up):
             _ = custom_kernel(clone_data(data))
         start_event = torch.cuda.Event(enable_timing=True)
@@ -326,15 +328,13 @@ def run_moe_test(config: dict, test_type: str, warm_up=10, iteration=100):
         elapsed_ms = start_event.elapsed_time(end_event)
         elapsed_ms = elapsed_ms / iteration
         print(f"⏱ Performance test: {elapsed_ms:.8f}ms for config: {config}")
-        # with torch.profiler.profile(
-        #     activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA],
-        #     record_shapes=True,
-        #     with_stack=False
-        # ) as prof:
-        #     with torch.profiler.record_function("routed_kernel"):
-        #         _ = custom_kernel(clone_data(data))
-        # prof_results = prof.key_averages().table(sort_by="cuda_time_total", row_limit=10)
-        # print(prof_results)
+        return {
+            "test_type": test_type,
+            "config": config,
+            "warmup": warm_up,
+            "iteration": iteration,
+            "latency_ms": elapsed_ms,
+        }
     else:
         raise ValueError(f"Unknown test type {test_type}")
 

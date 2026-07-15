@@ -36,6 +36,7 @@ def probe_python_packages() -> dict[str, Any]:
         import torch
 
         result["torch"] = torch.__version__
+        result["maca"] = getattr(torch.version, "maca", None)
         result["cuda_available"] = bool(torch.cuda.is_available())
         if torch.cuda.is_available():
             device = torch.cuda.get_device_properties(0)
@@ -62,7 +63,8 @@ def collect(root: Path, host_id: str) -> dict[str, Any]:
         "TORCHINDUCTOR_MAX_AUTOTUNE",
         "TORCHINDUCTOR_AUTOHEURISTIC_USE",
     )
-    return {
+    tilelang_home = os.environ.get("TILELANG_HOME")
+    profile = {
         "schema_version": 1,
         "host_id": host_id,
         "collected_at": datetime.now(timezone.utc).isoformat(),
@@ -75,6 +77,9 @@ def collect(root: Path, host_id: str) -> dict[str, Any]:
             "mx_smi": run_command(["mx-smi"]),
         },
     }
+    if tilelang_home:
+        profile["tilelang_git_commit"] = git_value(Path(tilelang_home), "rev-parse", "HEAD")
+    return profile
 
 
 def main() -> None:

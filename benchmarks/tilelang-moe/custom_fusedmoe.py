@@ -11,6 +11,7 @@ from typing import Dict, Tuple, Optional
 import tilelang
 import tilelang.language as T
 from tilelang.autotuner import set_autotune_inputs
+from moe_schedule import resolve_stage_schedule, validate_stage_schedule
 
 
 def _env_bool(name: str, default: bool) -> bool:
@@ -103,6 +104,12 @@ def _moe_autoheuristic_configs(
     gemm_policy_down=None,
     single_weight_buffer=True,
     min_blocks_per_sm=None,
+    s1_bn=None,
+    s1_bk=None,
+    s1_stages=None,
+    s2_bn=None,
+    s2_bk=None,
+    s2_stages=None,
 ):
     """Build a safe tuning set from the C500 report's validated schedule family.
 
@@ -111,11 +118,13 @@ def _moe_autoheuristic_configs(
     TileLang autotune measures the selected small set on the actual tensors.
     """
     common = {
-        "block_dhidden": 128,
-        "block_dexpert": 128,
+        "s1_bn": 128,
+        "s1_bk": 128,
+        "s2_bn": 128,
+        "s2_bk": 128,
         "threads": 256,
-        "num_stages": 1,
-        "num_stages_down": 1,
+        "s1_stages": 1,
+        "s2_stages": 1,
         "swizzle_order": "row",
         "swizzle_order_down": "row",
         "gemm_policy": "full_row",
@@ -167,6 +176,12 @@ def _moe_forward_tilelang_routed(
     gemm_policy_down=None,
     single_weight_buffer=True,
     min_blocks_per_sm=None,
+    s1_bn=None,
+    s1_bk=None,
+    s1_stages=None,
+    s2_bn=None,
+    s2_bk=None,
+    s2_stages=None,
 ):
     scale = 1.44269504  # log2(e)
     dtype = T.float16
@@ -176,9 +191,27 @@ def _moe_forward_tilelang_routed(
     dexpert = d_expert
     n_routed_experts = n_routed_experts
 
-    # These are compile-time schedule constants.  Keeping the two kernels
-    # independently configurable lets us tune their distinct reuse patterns
-    # without changing the external RoutedMoEKernel interface.
+    stage_schedule = resolve_stage_schedule(
+        block_dhidden=block_dhidden,
+        block_dexpert=block_dexpert,
+        num_stages=num_stages,
+        num_stages_down=num_stages_down,
+        s1_bn=s1_bn,
+        s1_bk=s1_bk,
+        s1_stages=s1_stages,
+        s2_bn=s2_bn,
+        s2_bk=s2_bk,
+        s2_stages=s2_stages,
+    )
+    s1_bn = stage_schedule["s1_bn"]
+    s1_bk = stage_schedule["s1_bk"]
+    s1_stages = stage_schedule["s1_stages"]
+    s2_bn = stage_schedule["s2_bn"]
+    s2_bk = stage_schedule["s2_bk"]
+    s2_stages = stage_schedule["s2_stages"]
+    validate_stage_schedule(stage_schedule, d_hidden=dhidden, d_expert=dexpert)
+
+    # Existing swizzle and warp-policy parameters are already stage-specific.
     if swizzle_panel_down is None:
         swizzle_panel_down = swizzle_panel
     if swizzle_order_down is None:
@@ -196,8 +229,8 @@ def _moe_forward_tilelang_routed(
         gemm_policy_stage2 = warp_policies[gemm_policy_down]
     except KeyError as exc:
         raise ValueError(f"unsupported GEMM warp policy: {exc.args[0]}") from exc
-    if single_weight_buffer and num_stages != 1:
-        raise ValueError("single_weight_buffer currently requires num_stages=1")
+    if single_weight_buffer and s1_stages != 1:
+        raise ValueError("single_weight_buffer currently requires s1_stages=1")
 
     # The public benchmark builds routing metadata in fixed 128-token units.
     # A smaller compute tile therefore needs multiple CTAs per metadata entry
@@ -233,16 +266,16 @@ def _moe_forward_tilelang_routed(
         output: T.Tensor(input_shape, dtype),  # type: ignore
     ):
         # Step 1: Compute gate and up logits
-        with T.Kernel(M, T.ceildiv(dexpert, block_dexpert), threads=threads) as (bx, by):
-            input_shared = T.alloc_fragment((block_token, block_dhidden), dtype=dtype)
-            routed_expert_gate_shared = T.alloc_shared((block_dexpert, block_dhidden), dtype=dtype)
+        with T.Kernel(M, T.ceildiv(dexpert, s1_bn), threads=threads) as (bx, by):
+            input_shared = T.alloc_fragment((block_token, s1_bk), dtype=dtype)
+            routed_expert_gate_shared = T.alloc_shared((s1_bn, s1_bk), dtype=dtype)
             if single_weight_buffer:
                 routed_expert_up_shared = routed_expert_gate_shared
             else:
-                routed_expert_up_shared = T.alloc_shared((block_dexpert, block_dhidden), dtype=dtype)
+                routed_expert_up_shared = T.alloc_shared((s1_bn, s1_bk), dtype=dtype)
 
-            gate_logits_local = T.alloc_fragment((block_token, block_dexpert), dtype=accum_dtype)
-            up_logits_local = T.alloc_fragment((block_token, block_dexpert), dtype=accum_dtype)
+            gate_logits_local = T.alloc_fragment((block_token, s1_bn), dtype=accum_dtype)
+            up_logits_local = T.alloc_fragment((block_token, s1_bn), dtype=accum_dtype)
 
             T.use_swizzle(panel_size=swizzle_panel, order=swizzle_order)
             if min_blocks_per_sm is not None:
@@ -263,14 +296,14 @@ def _moe_forward_tilelang_routed(
             if single_weight_buffer:
                 # The two copies alias by design, so this loop must remain
                 # serialized rather than use TileLang's copy pipeline.
-                for k in T.serial(T.ceildiv(dhidden, block_dhidden)):
+                for k in T.serial(T.ceildiv(dhidden, s1_bk)):
                     T.copy(
-                        input[m_start : m_start + block_token, k * block_dhidden : (k + 1) * block_dhidden],
+                        input[m_start : m_start + block_token, k * s1_bk : (k + 1) * s1_bk],
                         input_shared,
                     )
                     T.copy(
                         routed_expert_gate[
-                            cur_group_idx, by * block_dexpert : (by + 1) * block_dexpert, k * block_dhidden : (k + 1) * block_dhidden
+                            cur_group_idx, by * s1_bn : (by + 1) * s1_bn, k * s1_bk : (k + 1) * s1_bk
                         ],
                         routed_expert_gate_shared,
                     )
@@ -283,7 +316,7 @@ def _moe_forward_tilelang_routed(
                     )
                     T.copy(
                         routed_expert_up[
-                            cur_group_idx, by * block_dexpert : (by + 1) * block_dexpert, k * block_dhidden : (k + 1) * block_dhidden
+                            cur_group_idx, by * s1_bn : (by + 1) * s1_bn, k * s1_bk : (k + 1) * s1_bk
                         ],
                         routed_expert_up_shared,
                     )
@@ -295,14 +328,14 @@ def _moe_forward_tilelang_routed(
                         policy=gemm_policy_stage1,
                     )
             else:
-                for k in T.Pipelined(T.ceildiv(dhidden, block_dhidden), num_stages=num_stages):
+                for k in T.Pipelined(T.ceildiv(dhidden, s1_bk), num_stages=s1_stages):
                     T.copy(
-                        input[m_start : m_start + block_token, k * block_dhidden : (k + 1) * block_dhidden],
+                        input[m_start : m_start + block_token, k * s1_bk : (k + 1) * s1_bk],
                         input_shared,
                     )
                     T.copy(
                         routed_expert_gate[
-                            cur_group_idx, by * block_dexpert : (by + 1) * block_dexpert, k * block_dhidden : (k + 1) * block_dhidden
+                            cur_group_idx, by * s1_bn : (by + 1) * s1_bn, k * s1_bk : (k + 1) * s1_bk
                         ],
                         routed_expert_gate_shared,
                     )
@@ -315,7 +348,7 @@ def _moe_forward_tilelang_routed(
                     )
                     T.copy(
                         routed_expert_up[
-                            cur_group_idx, by * block_dexpert : (by + 1) * block_dexpert, k * block_dhidden : (k + 1) * block_dhidden
+                            cur_group_idx, by * s1_bn : (by + 1) * s1_bn, k * s1_bk : (k + 1) * s1_bk
                         ],
                         routed_expert_up_shared,
                     )
@@ -327,19 +360,19 @@ def _moe_forward_tilelang_routed(
                         policy=gemm_policy_stage1,
                     )
 
-            for i, j in T.Parallel(block_token, block_dexpert):
+            for i, j in T.Parallel(block_token, s1_bn):
                 gate_logits_local[i, j] = gate_logits_local[i, j] * (1.0 / (1.0 + T.exp2(-gate_logits_local[i, j] * scale)))
                 up_logits_local[i, j] = up_logits_local[i, j] * gate_logits_local[i, j]
 
-            for i, j in T.Parallel(block_token, block_dexpert):
+            for i, j in T.Parallel(block_token, s1_bn):
                 if i < actual_rows:
-                    up_logits[m_start + i, by * block_dexpert + j] = up_logits_local[i, j]
+                    up_logits[m_start + i, by * s1_bn + j] = up_logits_local[i, j]
 
         # Step 2: Compute down logits
-        with T.Kernel(M, T.ceildiv(dhidden, block_dhidden), threads=threads) as (bx, by):
-            up_logits_shared = T.alloc_fragment((block_token, block_dexpert), dtype=dtype)
-            routed_expert_down_shared = T.alloc_shared((block_dhidden, block_dexpert), dtype=dtype)
-            output_local = T.alloc_fragment((block_token, block_dhidden), dtype=accum_dtype)
+        with T.Kernel(M, T.ceildiv(dhidden, s2_bn), threads=threads) as (bx, by):
+            up_logits_shared = T.alloc_fragment((block_token, s2_bk), dtype=dtype)
+            routed_expert_down_shared = T.alloc_shared((s2_bn, s2_bk), dtype=dtype)
+            output_local = T.alloc_fragment((block_token, s2_bn), dtype=accum_dtype)
 
             T.use_swizzle(panel_size=swizzle_panel_down, order=swizzle_order_down)
 
@@ -354,14 +387,14 @@ def _moe_forward_tilelang_routed(
 
             T.clear(output_local)
 
-            for k in T.Pipelined(T.ceildiv(dexpert, block_dexpert), num_stages=num_stages_down):
+            for k in T.Pipelined(T.ceildiv(dexpert, s2_bk), num_stages=s2_stages):
                 T.copy(
-                    up_logits[m_start : m_start + block_token, k * block_dexpert : (k + 1) * block_dexpert],
+                    up_logits[m_start : m_start + block_token, k * s2_bk : (k + 1) * s2_bk],
                     up_logits_shared,
                 )
                 T.copy(
                     routed_expert_down[
-                        cur_group_idx, by * block_dhidden : (by + 1) * block_dhidden, k * block_dexpert : (k + 1) * block_dexpert
+                        cur_group_idx, by * s2_bn : (by + 1) * s2_bn, k * s2_bk : (k + 1) * s2_bk
                     ],
                     routed_expert_down_shared,
                 )
@@ -373,9 +406,9 @@ def _moe_forward_tilelang_routed(
                     policy=gemm_policy_stage2,
                 )
 
-            for i, j in T.Parallel(block_token, block_dhidden):
+            for i, j in T.Parallel(block_token, s2_bn):
                 if i < actual_rows:
-                    output[m_start + i, by * block_dhidden + j] = output_local[i, j] * routed_expert_weights[m_start + i]
+                    output[m_start + i, by * s2_bn + j] = output_local[i, j] * routed_expert_weights[m_start + i]
 
     return kernel
 
@@ -422,6 +455,12 @@ class RoutedMoEKernel:
         gemm_policy_down: Optional[str] = None,
         single_weight_buffer: bool = True,
         min_blocks_per_sm: Optional[int] = None,
+        s1_bn: Optional[int] = None,
+        s1_bk: Optional[int] = None,
+        s1_stages: Optional[int] = None,
+        s2_bn: Optional[int] = None,
+        s2_bk: Optional[int] = None,
+        s2_stages: Optional[int] = None,
     ):
         self.d_hidden = d_hidden
         self.d_expert = d_expert
@@ -434,12 +473,31 @@ class RoutedMoEKernel:
         self.threads = threads
         self.num_stages = num_stages
         self.num_stages_down = num_stages_down
+        stage_schedule = resolve_stage_schedule(
+            block_dhidden=block_dhidden,
+            block_dexpert=block_dexpert,
+            num_stages=num_stages,
+            num_stages_down=num_stages_down,
+            s1_bn=s1_bn,
+            s1_bk=s1_bk,
+            s1_stages=s1_stages,
+            s2_bn=s2_bn,
+            s2_bk=s2_bk,
+            s2_stages=s2_stages,
+        )
+        self.s1_bn = stage_schedule["s1_bn"]
+        self.s1_bk = stage_schedule["s1_bk"]
+        self.s1_stages = stage_schedule["s1_stages"]
+        self.s2_bn = stage_schedule["s2_bn"]
+        self.s2_bk = stage_schedule["s2_bk"]
+        self.s2_stages = stage_schedule["s2_stages"]
+        validate_stage_schedule(stage_schedule, d_hidden=d_hidden, d_expert=d_expert)
         self.swizzle_panel = swizzle_panel
         self.swizzle_order = swizzle_order
-        self.swizzle_panel_down = swizzle_panel_down
-        self.swizzle_order_down = swizzle_order_down
+        self.swizzle_panel_down = swizzle_panel if swizzle_panel_down is None else swizzle_panel_down
+        self.swizzle_order_down = swizzle_order if swizzle_order_down is None else swizzle_order_down
         self.gemm_policy = gemm_policy
-        self.gemm_policy_down = gemm_policy_down
+        self.gemm_policy_down = gemm_policy if gemm_policy_down is None else gemm_policy_down
         self.single_weight_buffer = single_weight_buffer
         self.min_blocks_per_sm = min_blocks_per_sm
         self.backend = backend
@@ -465,12 +523,19 @@ class RoutedMoEKernel:
         except (FileNotFoundError, OSError, json.JSONDecodeError):
             profile = {}
         packages = profile.get("packages", {})
-        config = tuner_result.get("config") or {
+        config = {
+            "block_token": self.block_token,
             "block_dhidden": self.block_dhidden,
             "block_dexpert": self.block_dexpert,
-            "threads": self.threads,
             "num_stages": self.num_stages,
             "num_stages_down": self.num_stages_down,
+            "s1_bn": self.s1_bn,
+            "s1_bk": self.s1_bk,
+            "s1_stages": self.s1_stages,
+            "s2_bn": self.s2_bn,
+            "s2_bk": self.s2_bk,
+            "s2_stages": self.s2_stages,
+            "threads": self.threads,
             "swizzle_panel": self.swizzle_panel,
             "swizzle_order": self.swizzle_order,
             "swizzle_panel_down": self.swizzle_panel_down,
@@ -480,8 +545,10 @@ class RoutedMoEKernel:
             "single_weight_buffer": self.single_weight_buffer,
             "min_blocks_per_sm": self.min_blocks_per_sm,
         }
+        config.update(tuner_result.get("config") or {})
         record = {
             "schema_version": 1,
+            "schedule_schema_version": 2,
             "record_type": "autotune",
             "record_id": None,
             "recorded_at": datetime.now(timezone.utc).isoformat(),
@@ -570,11 +637,13 @@ class RoutedMoEKernel:
                 "block_token": self.block_token,
             }
             manual_schedule = {
-                "block_dhidden": self.block_dhidden,
-                "block_dexpert": self.block_dexpert,
+                "s1_bn": self.s1_bn,
+                "s1_bk": self.s1_bk,
+                "s1_stages": self.s1_stages,
+                "s2_bn": self.s2_bn,
+                "s2_bk": self.s2_bk,
+                "s2_stages": self.s2_stages,
                 "threads": self.threads,
-                "num_stages": self.num_stages,
-                "num_stages_down": self.num_stages_down,
                 "swizzle_panel": self.swizzle_panel,
                 "swizzle_order": self.swizzle_order,
                 "swizzle_panel_down": self.swizzle_panel_down,
@@ -585,17 +654,19 @@ class RoutedMoEKernel:
                 "min_blocks_per_sm": self.min_blocks_per_sm,
             }
             default_schedule = {
-                "block_dhidden": 128,
-                "block_dexpert": 128,
+                "s1_bn": 128,
+                "s1_bk": 128,
+                "s1_stages": 1,
+                "s2_bn": 128,
+                "s2_bk": 128,
+                "s2_stages": 1,
                 "threads": 256,
-                "num_stages": 1,
-                "num_stages_down": 1,
                 "swizzle_panel": 8,
                 "swizzle_order": "row",
                 "swizzle_panel_down": 16,
-                "swizzle_order_down": None,
+                "swizzle_order_down": "row",
                 "gemm_policy": "full_row",
-                "gemm_policy_down": None,
+                "gemm_policy_down": "full_row",
                 "single_weight_buffer": True,
                 "min_blocks_per_sm": None,
             }

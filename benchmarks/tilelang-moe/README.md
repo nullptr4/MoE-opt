@@ -71,3 +71,37 @@ functional test 独立验证。
 C500 已经上传过相同 workload 的结果，autoheuristic 会优先排列该机器
 记录中的最佳 swizzle 候选，再由本机 autotune 实测确认。两台机器的
 `MOE_HOST_ID` 必须不同，不能共用同一个结果文件。
+
+## 5. FC1/FC2 解耦实验
+
+新 schedule 在内部使用六个独立字段：`s1_bn`、`s1_bk`、
+`s1_stages`、`s2_bn`、`s2_bk`、`s2_stages`。旧的
+`block_dhidden` / `block_dexpert` / `num_stages*` 参数保留为兼容入口；
+新实验应使用显式阶段参数或固定 preset，避免 FC1/FC2 变量混杂。
+
+| 编号 | 相对 E0 的唯一变化 |
+|---|---|
+| E0 | FC1/FC2 均为 BN128 / BK128 / stage1 |
+| E1 | FC1 BK64 |
+| E2 | FC1 BN64 |
+| E3 | FC2 BK64 / stage1 |
+| E4 | FC2 BK64 / stage2 |
+| E5 | FC2 BN256 |
+
+单组功能对拍：
+
+```bash
+python tune_moe.py --experiment E4 --mode functional --warmup 0 --iteration 1
+```
+
+硬件 profiler 需要隔离某个规格时，增加 `--shape large` 或 `--shape small`。
+
+六组正式实验（每组 3 个独立性能进程，输出 median/MAD/P95）：
+
+```bash
+python ../../scripts/run_moe_stage1_experiments.py --host-id "${MOE_HOST_ID}"
+```
+
+runner 只在单组 functional 通过后启动该组性能进程，并校验 JSON 中的
+schedule 与 E0–E5 canonical preset 完全一致。当前 kernel 的 N/K 读取没有
+tail mask，所以 tile 必须 16 对齐且整除对应维度。

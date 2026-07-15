@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "record_type": "moe-stage1-resource-comparison",
+  "host_id": "c500-32g",
+  "workload": "config/moe_stage1_profiler_large_workload.json",
+  "benchmark_artifacts": [
+    "data/benchmarks/c500-32g/stage1-20260715T141647Z.json",
+    "data/benchmarks/c500-32g/stage1-confirm-20260715T150421Z.json"
+  ],
+  "profiles": {
+    "E0": {
+      "fc1": "data/profiler/c500-32g/stage1-E0-large-fc1/metadata.json",
+      "fc2": "data/profiler/c500-32g/stage1-E0-large-fc2/metadata.json"
+    },
+    "E3": {
+      "fc1": "data/profiler/c500-32g/stage1-E3-large-fc1/metadata.json",
+      "fc2": "data/profiler/c500-32g/stage1-E3-large-fc2/metadata.json"
+    }
+  },
+  "generated_device_code": {
+    "E0": {
+      "sha256": "ebbb4bb7ef09576f7fb20a6bfed3809721ab3c397e0eb1a2e7c4082ba64a976b",
+      "fc1": {
+        "dynamic_shared_bytes": 32768,
+        "mt_registers": 256,
+        "st_registers": 38,
+        "stack_frame_bytes": 28,
+        "static_max_warps_per_peu": 2
+      },
+      "fc2": {
+        "dynamic_shared_bytes": 32768,
+        "mt_registers": 194,
+        "st_registers": 30,
+        "stack_frame_bytes": 0,
+        "static_max_warps_per_peu": 2
+      }
+    },
+    "E3": {
+      "sha256": "c5fac6d45437e145e6cf500db61d07cebf553c70414cbab84e52d1f745851bc3",
+      "fc1": {
+        "dynamic_shared_bytes": 32768,
+        "mt_registers": 256,
+        "st_registers": 38,
+        "stack_frame_bytes": 28,
+        "static_max_warps_per_peu": 2
+      },
+      "fc2": {
+        "dynamic_shared_bytes": 16384,
+        "mt_registers": 142,
+        "st_registers": 30,
+        "stack_frame_bytes": 0,
+        "static_max_warps_per_peu": 3
+      }
+    }
+  },
+  "mcprofiler_fc2": {
+    "E0": {
+      "total_instructions": 2013218204,
+      "total_kcycles": 92604.21,
+      "ap_mma_duty_pct": 19.91,
+      "vl1_hit_rate_pct": 79.74,
+      "l2_hit_rate_pct": 94.13,
+      "global_memory_read_bytes": 7357646848,
+      "private_read_instructions": 0,
+      "private_write_instructions": 0,
+      "shared_memory_access_efficiency_pct": 55.56
+    },
+    "E3": {
+      "total_instructions": 1751776390,
+      "total_kcycles": 90411.86,
+      "ap_mma_duty_pct": 20.46,
+      "vl1_hit_rate_pct": 79.73,
+      "l2_hit_rate_pct": 87.70,
+      "global_memory_read_bytes": 17538830336,
+      "private_read_instructions": 0,
+      "private_write_instructions": 0,
+      "shared_memory_access_efficiency_pct": 55.56
+    }
+  },
+  "interpretation": {
+    "new_spill_detected": false,
+    "fc1_changed": false,
+    "fc2_resource_pressure_improved": true,
+    "promotion_threshold_met_in_interleaved_confirmation": false
+  }
+}
