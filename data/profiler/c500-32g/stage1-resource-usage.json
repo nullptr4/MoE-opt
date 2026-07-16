@@ -1,0 +1,156 @@
+{
+  "schema_version": 2,
+  "record_type": "moe-stage1-resource-comparison",
+  "host_id": "c500-32g",
+  "workload": "config/moe_stage1_profiler_large_workload.json",
+  "benchmark_artifacts": [
+    "data/benchmarks/c500-32g/stage1-20260715T141647Z.json",
+    "data/benchmarks/c500-32g/stage1-confirm-20260715T152651Z.json"
+  ],
+  "generated_code_archive": {
+    "metadata": "data/profiler/c500-32g/stage1-generated-code/metadata.json",
+    "metadata_sha256": "91d0f262ab0e4c8211606b6da7c2b22b03e513bdf61592a758340932a23c3c3a",
+    "contains": "E0-E5 generated device_kernel.cu and host_kernel.cu"
+  },
+  "method": {
+    "changed_stage_only": true,
+    "counter_mode": "mcProfiler single-pass, one kernel invocation",
+    "static_resources": "mxcc -resource-usage on generated device_kernel.cu",
+    "dynamic_shared": "generated host_kernel.cu launch argument",
+    "stage_reuse_rule": "reuse a profile only when the generated stage function SHA256 is identical"
+  },
+  "stage_function_sha256": {
+    "E0": {
+      "fc1": "a4c3faf6596230c6ccdfae673916106034959007059c7ad241f1568f0bf4ec78",
+      "fc2": "b37354771e9b7dd8eab00c4cc4d766221a9a547738233e64ceeabbd1cb4e18fd"
+    },
+    "E1": {
+      "fc1": "cff239e33e7ecf3df965d1cb5396196babffeae46633d0282810008c614e93ef",
+      "fc2": "b37354771e9b7dd8eab00c4cc4d766221a9a547738233e64ceeabbd1cb4e18fd"
+    },
+    "E2": {
+      "fc1": "94b3c0578bbbd3f66af56e5a2529a3715fe5d85f5beee6e4d777576d5d52eaff",
+      "fc2": "b37354771e9b7dd8eab00c4cc4d766221a9a547738233e64ceeabbd1cb4e18fd"
+    },
+    "E3": {
+      "fc1": "a4c3faf6596230c6ccdfae673916106034959007059c7ad241f1568f0bf4ec78",
+      "fc2": "51b9e083842a4ae5fdbc7ce4a68ce99099d531536aeab335ff6f0924162f9f12"
+    },
+    "E4": {
+      "fc1": "a4c3faf6596230c6ccdfae673916106034959007059c7ad241f1568f0bf4ec78",
+      "fc2": "2be09c78dd966ebbeef4bbe2ae77e66cf9d00cde8e8727bc8aa1dfa1c8db3216"
+    },
+    "E5": {
+      "fc1": "a4c3faf6596230c6ccdfae673916106034959007059c7ad241f1568f0bf4ec78",
+      "fc2": "6c072edc1d382814e673d706431f70476a39e29d62456429c0232142d96fff37"
+    }
+  },
+  "profile_matrix": {
+    "E0": {
+      "fc1": {
+        "metadata": "data/profiler/c500-32g/stage1-E0-large-fc1/metadata.json",
+        "counter_reference": "data/profiler/c500-32g/stage1-E3-large-fc1/metadata.json",
+        "note": "E0 raw counters were archived before report generation completed; E3 FC1 is byte-identical and supplies the complete counter report"
+      },
+      "fc2": {
+        "metadata": "data/profiler/c500-32g/stage1-E0-large-fc2/metadata.json"
+      }
+    },
+    "E1": {
+      "fc1": {
+        "metadata": "data/profiler/c500-32g/stage1-E1-large-fc1/metadata.json"
+      },
+      "fc2": {
+        "reused_from": "E0",
+        "metadata": "data/profiler/c500-32g/stage1-E0-large-fc2/metadata.json"
+      }
+    },
+    "E2": {
+      "fc1": {
+        "metadata": "data/profiler/c500-32g/stage1-E2-large-fc1/metadata.json"
+      },
+      "fc2": {
+        "reused_from": "E0",
+        "metadata": "data/profiler/c500-32g/stage1-E0-large-fc2/metadata.json"
+      }
+    },
+    "E3": {
+      "fc1": {
+        "reused_from": "E0",
+        "metadata": "data/profiler/c500-32g/stage1-E3-large-fc1/metadata.json"
+      },
+      "fc2": {
+        "metadata": "data/profiler/c500-32g/stage1-E3-large-fc2/metadata.json"
+      }
+    },
+    "E4": {
+      "fc1": {
+        "reused_from": "E0",
+        "metadata": "data/profiler/c500-32g/stage1-E3-large-fc1/metadata.json"
+      },
+      "fc2": {
+        "metadata": "data/profiler/c500-32g/stage1-E4-large-fc2/metadata.json"
+      }
+    },
+    "E5": {
+      "fc1": {
+        "reused_from": "E0",
+        "metadata": "data/profiler/c500-32g/stage1-E3-large-fc1/metadata.json"
+      },
+      "fc2": {
+        "metadata": "data/profiler/c500-32g/stage1-E5-large-fc2/metadata.json"
+      }
+    }
+  },
+  "generated_device_code": {
+    "E0": {
+      "sha256": "ebbb4bb7ef09576f7fb20a6bfed3809721ab3c397e0eb1a2e7c4082ba64a976b",
+      "fc1": {"dynamic_shared_bytes": 32768, "mt_registers": 256, "st_registers": 38, "stack_frame_bytes": 28, "static_max_warps_per_peu": 2},
+      "fc2": {"dynamic_shared_bytes": 32768, "mt_registers": 194, "st_registers": 30, "stack_frame_bytes": 0, "static_max_warps_per_peu": 2}
+    },
+    "E1": {
+      "sha256": "30a8967b5d5c57441c5db7aeab9a1d43931e65275a7ea24ccd1b8adc4f225fd8",
+      "fc1": {"dynamic_shared_bytes": 16384, "mt_registers": 208, "st_registers": 30, "stack_frame_bytes": 0, "static_max_warps_per_peu": 2},
+      "fc2": {"dynamic_shared_bytes": 32768, "mt_registers": 194, "st_registers": 30, "stack_frame_bytes": 0, "static_max_warps_per_peu": 2}
+    },
+    "E2": {
+      "sha256": "4ad03c3f7fa457f4b0b970063b8163a41ca77107b1daef1713022833d94db33c",
+      "fc1": {"dynamic_shared_bytes": 16384, "mt_registers": 158, "st_registers": 30, "stack_frame_bytes": 0, "static_max_warps_per_peu": 3},
+      "fc2": {"dynamic_shared_bytes": 32768, "mt_registers": 194, "st_registers": 30, "stack_frame_bytes": 0, "static_max_warps_per_peu": 2}
+    },
+    "E3": {
+      "sha256": "c5fac6d45437e145e6cf500db61d07cebf553c70414cbab84e52d1f745851bc3",
+      "fc1": {"dynamic_shared_bytes": 32768, "mt_registers": 256, "st_registers": 38, "stack_frame_bytes": 28, "static_max_warps_per_peu": 2},
+      "fc2": {"dynamic_shared_bytes": 16384, "mt_registers": 142, "st_registers": 30, "stack_frame_bytes": 0, "static_max_warps_per_peu": 3}
+    },
+    "E4": {
+      "sha256": "ca9ee99e318a8681740b967d23ad3332a4f73f0f5462bc9ef9507e3e980e1a02",
+      "fc1": {"dynamic_shared_bytes": 32768, "mt_registers": 256, "st_registers": 38, "stack_frame_bytes": 28, "static_max_warps_per_peu": 2},
+      "fc2": {"dynamic_shared_bytes": 32768, "mt_registers": 138, "st_registers": 30, "stack_frame_bytes": 0, "static_max_warps_per_peu": 3}
+    },
+    "E5": {
+      "sha256": "eef0c0ff0960362c05cfb091c55de4f3decee4499a705e483c9bef52f9c4ff32",
+      "fc1": {"dynamic_shared_bytes": 32768, "mt_registers": 256, "st_registers": 38, "stack_frame_bytes": 28, "static_max_warps_per_peu": 2},
+      "fc2": {"dynamic_shared_bytes": 65536, "mt_registers": 256, "st_registers": 38, "stack_frame_bytes": 340, "static_max_warps_per_peu": 2}
+    }
+  },
+  "mcprofiler_changed_stage": {
+    "E0_fc1_reference": {"total_instructions": 2469442257, "total_kcycles": 128635.81, "ap_mma_duty_pct": 28.79, "vl1_hit_rate_pct": 81.26, "l2_hit_rate_pct": 64.87, "global_memory_read_bytes": 63754004480, "private_read_instructions": 330240, "private_write_instructions": 330240, "shared_memory_access_efficiency_pct": 55.56},
+    "E0_fc2": {"total_instructions": 2013218204, "total_kcycles": 92604.21, "ap_mma_duty_pct": 19.91, "vl1_hit_rate_pct": 79.74, "l2_hit_rate_pct": 94.13, "global_memory_read_bytes": 7357646848, "private_read_instructions": 0, "private_write_instructions": 0, "shared_memory_access_efficiency_pct": 55.56},
+    "E1_fc1": {"total_instructions": 3143766530, "total_kcycles": 137458.68, "ap_mma_duty_pct": 27.11, "vl1_hit_rate_pct": 81.20, "l2_hit_rate_pct": 64.38, "global_memory_read_bytes": 64631275520, "private_read_instructions": 0, "private_write_instructions": 0, "shared_memory_access_efficiency_pct": 55.56},
+    "E2_fc1": {"total_instructions": 3756952944, "total_kcycles": 187449.16, "ap_mma_duty_pct": 19.68, "vl1_hit_rate_pct": 79.15, "l2_hit_rate_pct": 70.53, "global_memory_read_bytes": 88961994752, "private_read_instructions": 0, "private_write_instructions": 0, "shared_memory_access_efficiency_pct": 55.56},
+    "E3_fc2": {"total_instructions": 1751776390, "total_kcycles": 90411.86, "ap_mma_duty_pct": 20.46, "vl1_hit_rate_pct": 79.73, "l2_hit_rate_pct": 87.70, "global_memory_read_bytes": 17538830336, "private_read_instructions": 0, "private_write_instructions": 0, "shared_memory_access_efficiency_pct": 55.56},
+    "E4_fc2": {"total_instructions": 2828491784, "total_kcycles": 96729.56, "ap_mma_duty_pct": 19.14, "vl1_hit_rate_pct": 79.75, "l2_hit_rate_pct": 86.06, "global_memory_read_bytes": 20072013824, "private_read_instructions": 0, "private_write_instructions": 0, "shared_memory_access_efficiency_pct": 50.00},
+    "E5_fc2": {"total_instructions": 1957670451, "total_kcycles": 119048.79, "ap_mma_duty_pct": 15.45, "vl1_hit_rate_pct": 91.88, "l2_hit_rate_pct": 79.35, "global_memory_read_bytes": 23528853504, "private_read_instructions": 130725504, "private_write_instructions": 9246720, "shared_memory_access_efficiency_pct": 55.56}
+  },
+  "interpretation": {
+    "all_e0_e5_stages_covered": true,
+    "unchanged_stages_reused_by_function_hash": true,
+    "e1_resource_pressure_improved_but_k_loop_cost_dominated": true,
+    "e2_occupancy_improved_but_instruction_and_memory_cost_dominated": true,
+    "e3_fc2_resource_pressure_improved": true,
+    "e4_pipeline_overhead_dominated": true,
+    "e5_new_spill_detected": true,
+    "promotion_threshold_met_in_interleaved_confirmation": false
+  }
+}

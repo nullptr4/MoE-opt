@@ -46,7 +46,14 @@ class PaddedCase:
     group_idx_for_bx: torch.Tensor
 
 
-def make_case(name: str, hidden: int, intermediate: int, group_sizes_list: list[int], seed: int) -> PaddedCase:
+def make_case(
+    name: str,
+    hidden: int,
+    intermediate: int,
+    group_sizes_list: list[int],
+    seed: int,
+    route_weights_mode: str = "random",
+) -> PaddedCase:
     device = torch.device("cuda")
     experts = len(group_sizes_list)
     generator = torch.Generator(device=device)
@@ -74,7 +81,16 @@ def make_case(name: str, hidden: int, intermediate: int, group_sizes_list: list[
     gate = torch.randn((experts, intermediate, hidden), device=device, dtype=torch.float16, generator=generator) / math.sqrt(hidden)
     up = torch.randn((experts, intermediate, hidden), device=device, dtype=torch.float16, generator=generator) / math.sqrt(hidden)
     down = torch.randn((experts, hidden, intermediate), device=device, dtype=torch.float16, generator=generator) / math.sqrt(intermediate)
-    route_weights = torch.rand((total_valid,), device=device, dtype=torch.float32, generator=generator)
+    if route_weights_mode == "random":
+        route_weights = torch.rand((total_valid,), device=device, dtype=torch.float32, generator=generator)
+    elif route_weights_mode == "zero":
+        route_weights = torch.zeros((total_valid,), device=device, dtype=torch.float32)
+    elif route_weights_mode == "one":
+        route_weights = torch.ones((total_valid,), device=device, dtype=torch.float32)
+    elif route_weights_mode == "tiny":
+        route_weights = torch.full((total_valid,), 2**-10, device=device, dtype=torch.float32)
+    else:
+        raise ValueError(f"unsupported route_weights_mode: {route_weights_mode}")
 
     return PaddedCase(
         name=name,
@@ -159,22 +175,62 @@ def check_case(case: PaddedCase) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--public-shape", action="store_true", help="also run the public small H/I/E shape with uneven routing")
+    parser.add_argument("--fuzz", action="store_true", help="also run deterministic boundary and skewed-routing cases")
+    parser.add_argument("--fuzz-only", action="store_true", help="run only deterministic fuzz cases")
     args = parser.parse_args()
 
     if not torch.cuda.is_available():
         raise RuntimeError("the submission ABI test requires an active C500")
 
-    check_case(make_case("uneven-smoke", hidden=256, intermediate=128, group_sizes_list=[129, 17, 0], seed=20260711))
-    if args.public_shape:
-        check_case(
-            make_case(
-                "public-small-shape",
-                hidden=3584,
-                intermediate=1024,
-                group_sizes_list=[129, 64, 3, 0],
-                seed=20260712,
+    if not args.fuzz_only:
+        check_case(make_case("uneven-smoke", hidden=256, intermediate=128, group_sizes_list=[129, 17, 0], seed=20260711))
+        if args.public_shape:
+            check_case(
+                make_case(
+                    "public-small-shape",
+                    hidden=3584,
+                    intermediate=1024,
+                    group_sizes_list=[129, 64, 3, 0],
+                    seed=20260712,
+                )
             )
+
+    if args.fuzz or args.fuzz_only:
+        fuzz_cases = (
+            make_case(
+                "fuzz-boundary-random",
+                hidden=256,
+                intermediate=128,
+                group_sizes_list=[127, 128, 129, 0],
+                seed=20260713,
+            ),
+            make_case(
+                "fuzz-exact-one",
+                hidden=256,
+                intermediate=128,
+                group_sizes_list=[255, 256, 257, 1],
+                seed=20260714,
+                route_weights_mode="one",
+            ),
+            make_case(
+                "fuzz-skew-tiny",
+                hidden=256,
+                intermediate=128,
+                group_sizes_list=[513, 1, 0, 0],
+                seed=20260715,
+                route_weights_mode="tiny",
+            ),
+            make_case(
+                "fuzz-tail-zero",
+                hidden=256,
+                intermediate=128,
+                group_sizes_list=[1, 63, 64, 127],
+                seed=20260716,
+                route_weights_mode="zero",
+            ),
         )
+        for case in fuzz_cases:
+            check_case(case)
 
 
 if __name__ == "__main__":

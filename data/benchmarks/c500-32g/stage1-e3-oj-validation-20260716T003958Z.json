@@ -1,0 +1,60 @@
+{
+  "schema_version": 2,
+  "record_type": "moe-stage1-oj-candidate-validation",
+  "recorded_at": "2026-07-16T00:39:58Z",
+  "host_id": "c500-32g",
+  "git_commit": "f0dd3e3ff0821ca392a23de4be16eaa06bccb3da",
+  "git_branch": "agent/shared-c500-data-sync",
+  "candidate": {
+    "experiment": "E3",
+    "description": "OJ submission with FC2 BK64/stage1; all other E0 fields unchanged",
+    "base_git_commit": "f0dd3e3ff0821ca392a23de4be16eaa06bccb3da",
+    "base_submission_sha256": "74b765a2e257c51e24392f25ee0136c4154561b33011ac9efbdc7e4acbe79672",
+    "submission_sha256": "9faf99e7592575a556df71b99c0a71380eab6e6690ad8e17f4315fb855c42211",
+    "test_harness_sha256": "b17633a03d77f48627d06648bdaed505e3baecc16801e4aa911374be8fe429f7",
+    "replay_patch": {
+      "path": "data/benchmarks/c500-32g/stage1-e3-submission.patch",
+      "sha256": "dffd42b52782a4516dab299b01b4dbe2268254c82d04ab80e75e9e2da9f8409a",
+      "apply_command": "git apply data/benchmarks/c500-32g/stage1-e3-submission.patch"
+    }
+  },
+  "evidence_log": {
+    "path": "data/benchmarks/c500-32g/stage1-e3-oj-validation-20260716T003958Z.log",
+    "sha256": "e802563abda024444657c12f9cdcdca3012490588187cbafc52fc2d320058bf1",
+    "log_type": "consolidated captured stdout transcript",
+    "replay_verified_at": "2026-07-16T00:59:57Z"
+  },
+  "commands": [
+    {
+      "argv": ["/data/metax-race/.conda/bin/python", "benchmarks/tilelang-moe/test_moe_submission.py", "--public-shape"],
+      "returncode": 0,
+      "passed_cases": ["uneven-smoke", "public-small-shape"]
+    },
+    {
+      "argv": ["/data/metax-race/.conda/bin/python", "benchmarks/tilelang-moe/test_moe_submission.py", "--fuzz-only"],
+      "returncode": 0,
+      "passed_cases": ["fuzz-boundary-random", "fuzz-exact-one", "fuzz-skew-tiny", "fuzz-tail-zero"]
+    }
+  ],
+  "summary": {
+    "public_abi_passed": "2/2",
+    "fuzz_passed": "4/4",
+    "all_passed": true
+  },
+  "restoration": {
+    "default_experiment": "E0",
+    "restored_submission_sha256": "74b765a2e257c51e24392f25ee0136c4154561b33011ac9efbdc7e4acbe79672",
+    "matches_checkpoint_head": true
+  },
+  "final_default_validation": {
+    "validated_at": "2026-07-16T00:42:04Z",
+    "submission_sha256": "74b765a2e257c51e24392f25ee0136c4154561b33011ac9efbdc7e4acbe79672",
+    "commands": [
+      ["/data/metax-race/.conda/bin/python", "benchmarks/tilelang-moe/test_moe_submission.py", "--public-shape"],
+      ["/data/metax-race/.conda/bin/python", "benchmarks/tilelang-moe/test_moe_submission.py", "--fuzz-only"]
+    ],
+    "public_abi_passed": "2/2",
+    "fuzz_passed": "4/4",
+    "all_passed": true
+  }
+}

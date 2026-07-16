@@ -1,7 +1,6 @@
 import math
 import torch
 import torch.nn as nn
-from torch.profiler import profile, record_function, ProfilerActivity
 import json
 from typing import Dict, Tuple, Optional
 import tilelang
@@ -200,6 +199,7 @@ def custom_kernel(data: Tuple[torch.Tensor, Dict, Dict]) -> torch.Tensor:
         Tuple containing:
             - output: Processed tensor [batch_size, seq_len, d_model]
     """
+    custom_kernel.last_routed_kernel = None
     input_tensor, weights, config = data
 
     routed_kernel = RoutedMoEKernel(
@@ -213,6 +213,9 @@ def custom_kernel(data: Tuple[torch.Tensor, Dict, Dict]) -> torch.Tensor:
     moe = MoE(config, routed_kernel, weights, padding_M=128)
 
     output = moe(input_tensor)
+    # Expose the selected schedule to the functional gate so the shared
+    # JSONL record receives a correctness verdict after the reference check.
+    custom_kernel.last_routed_kernel = routed_kernel
 
     return output
 
@@ -294,16 +297,25 @@ def run_moe_test(config: dict, test_type: str, warm_up=10, iteration=100):
     data = generate_input(**config)
 
     if test_type == "functional":
+        result = {"test_type": test_type, "config": config, "correct": False}
         try:
             ref_output = ref_kernel(clone_data(data)).to(torch.float32)
             tilelang_output = custom_kernel(clone_data(data)).to(torch.float32)
             torch.testing.assert_close(ref_output, tilelang_output, atol=1e-2, rtol=1e-2)
+            routed_kernel = getattr(custom_kernel, "last_routed_kernel", None)
+            if routed_kernel is not None:
+                routed_kernel.record_validation(True)
             print(f"✅ Functional test passed for config: {config}")
+            result["correct"] = True
         except AssertionError as e:
+            routed_kernel = getattr(custom_kernel, "last_routed_kernel", None)
+            if routed_kernel is not None:
+                routed_kernel.record_validation(False)
             print(f"❌ Functional test failed for config: {config}")
             print("error msg: ", str(e))
+            result["error"] = str(e)
+        return result
     elif test_type == "performance":
-        import time
         for i in range(warm_up):
             _ = custom_kernel(clone_data(data))
         start_event = torch.cuda.Event(enable_timing=True)
@@ -316,15 +328,13 @@ def run_moe_test(config: dict, test_type: str, warm_up=10, iteration=100):
         elapsed_ms = start_event.elapsed_time(end_event)
         elapsed_ms = elapsed_ms / iteration
         print(f"⏱ Performance test: {elapsed_ms:.8f}ms for config: {config}")
-        # with torch.profiler.profile(
-        #     activities=[ProfilerActivity.CPU, ProfilerActivity.CUDA],
-        #     record_shapes=True,
-        #     with_stack=False
-        # ) as prof:
-        #     with torch.profiler.record_function("routed_kernel"):
-        #         _ = custom_kernel(clone_data(data))
-        # prof_results = prof.key_averages().table(sort_by="cuda_time_total", row_limit=10)
-        # print(prof_results)
+        return {
+            "test_type": test_type,
+            "config": config,
+            "warmup": warm_up,
+            "iteration": iteration,
+            "latency_ms": elapsed_ms,
+        }
     else:
         raise ValueError(f"Unknown test type {test_type}")
 
@@ -340,9 +350,13 @@ def run_from_config_file(config_file: str):
 def clear_caches():
     import os
     import shutil
-    cache_dir = os.path.expanduser("~/.tilelang/cache")
+    cache_dir = os.environ.get("TILELANG_CACHE_DIR", os.path.expanduser("~/.tilelang/cache"))
+    if os.environ.get("MOE_CLEAR_CACHE", "0").lower() not in {"1", "true", "yes", "on"}:
+        print(f"keeping tilelang cache at {cache_dir} (set MOE_CLEAR_CACHE=1 to clear)")
+        return
     if os.path.exists(cache_dir):
         shutil.rmtree(cache_dir)
+        print(f"cleared tilelang cache at {cache_dir}")
     else:
         print("no tilelang cache found")
 
