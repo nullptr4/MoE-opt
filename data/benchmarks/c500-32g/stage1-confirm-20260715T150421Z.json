@@ -2,7 +2,10 @@
   "schema_version": 1,
   "record_type": "moe-stage1-winner-confirmation",
   "run_id": "stage1-confirm-20260715T150421Z",
-  "status": "passed",
+  "status": "superseded",
+  "promotion_status": "rejected",
+  "superseded_by": "data/benchmarks/c500-32g/stage1-confirm-20260715T152651Z.json",
+  "source_reproducibility": "legacy artifact without an embedded source snapshot",
   "recorded_at": "2026-07-15T15:04:21.984544+00:00",
   "host_id": "c500-32g",
   "source": {

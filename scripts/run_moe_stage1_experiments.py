@@ -33,8 +33,77 @@ from run_moe_baseline import (  # noqa: E402
 )
 
 
+STAGE1_ORCHESTRATION_SOURCE_PATHS = (
+    "scripts/run_moe_stage1_experiments.py",
+    "scripts/confirm_moe_stage1_winner.py",
+)
+
+
+def stage1_source_snapshot() -> list[dict[str, str]]:
+    """Snapshot measured kernel inputs plus the Stage1 orchestration code."""
+    snapshot = _source_snapshot(ROOT)
+    for relative_path in STAGE1_ORCHESTRATION_SOURCE_PATHS:
+        path = ROOT / relative_path
+        snapshot.append(
+            {
+                "path": relative_path,
+                "sha256": _sha256(path),
+                "content": path.read_text(),
+            }
+        )
+    return snapshot
+
+
 def expected_schedule(experiment: str) -> dict[str, Any]:
     return canonical_experiment_schedule(experiment)
+
+
+def expected_functional_workload_keys() -> set[str]:
+    configs = json.loads((MOE_DIR / "moe_test_configs.json").read_text())
+    return {
+        json.dumps(config, sort_keys=True, separators=(",", ":"))
+        for config in configs["functional"]
+    }
+
+
+def expected_performance_workload_keys() -> set[str]:
+    configs = json.loads((MOE_DIR / "moe_test_configs.json").read_text())
+    return {
+        json.dumps(config, sort_keys=True, separators=(",", ":"))
+        for config in configs["performance"]
+    }
+
+
+def validate_functional_record(
+    experiment: str,
+    record: dict[str, Any],
+) -> list[dict[str, Any]]:
+    """Require each official functional workload exactly once and correct."""
+    if record.get("experiment") != experiment:
+        raise ValueError(f"functional record is not labeled {experiment}")
+    if record.get("schedule") != expected_schedule(experiment):
+        raise ValueError(f"{experiment} functional record does not use its canonical schedule")
+
+    expected_workloads = expected_functional_workload_keys()
+    seen_workloads: set[str] = set()
+    results = record.get("results", [])
+    if not isinstance(results, list):
+        raise ValueError(f"{experiment} functional results must be a list")
+    for result in results:
+        if result.get("test_type") != "functional":
+            raise ValueError(f"{experiment} functional record contains a non-functional result")
+        config = result.get("config")
+        if not isinstance(config, dict):
+            raise ValueError(f"{experiment} functional result is missing its workload config")
+        key = json.dumps(config, sort_keys=True, separators=(",", ":"))
+        if key in seen_workloads:
+            raise ValueError(f"{experiment} functional record contains a duplicate workload")
+        seen_workloads.add(key)
+        if result.get("correct") is not True:
+            raise ValueError(f"{experiment} functional workload failed correctness")
+    if seen_workloads != expected_workloads:
+        raise ValueError(f"{experiment} functional workload set does not match the official configs")
+    return results
 
 
 def aggregate_performance_records(
@@ -44,9 +113,9 @@ def aggregate_performance_records(
     if not records:
         raise ValueError(f"{experiment} requires at least one performance process record")
     expected = expected_schedule(experiment)
+    expected_workloads = expected_performance_workload_keys()
     grouped: dict[str, list[float]] = defaultdict(list)
     configs: dict[str, dict[str, Any]] = {}
-    expected_workloads: set[str] | None = None
     for record_index, record in enumerate(records, start=1):
         if record.get("experiment") != experiment:
             raise ValueError(f"record is not labeled {experiment}")
@@ -71,11 +140,9 @@ def aggregate_performance_records(
             raise ValueError(
                 f"{experiment} process record {record_index} contains no performance workloads"
             )
-        if expected_workloads is None:
-            expected_workloads = record_workloads
-        elif record_workloads != expected_workloads:
+        if record_workloads != expected_workloads:
             raise ValueError(
-                f"{experiment} process record {record_index} workload set does not match the other processes"
+                f"{experiment} process record {record_index} workload set does not match the official configs"
             )
 
     summaries = []
@@ -236,13 +303,20 @@ def main() -> None:
                 label=f"{experiment}/functional",
             )
             functional_record, functional_error = _load_record(functional_json)
-            functional_results = (functional_record or {}).get("results", [])
+            functional_results = []
+            functional_validation_error = None
+            if functional_record is not None:
+                try:
+                    functional_results = validate_functional_record(
+                        experiment,
+                        functional_record,
+                    )
+                except ValueError as exc:
+                    functional_validation_error = str(exc)
             functional_passed = (
                 functional_returncode == 0
                 and functional_record is not None
-                and functional_record.get("schedule") == expected_schedule(experiment)
-                and len(functional_results) > 0
-                and all(result.get("correct") is True for result in functional_results)
+                and functional_validation_error is None
             )
 
             process_records = []
@@ -300,7 +374,7 @@ def main() -> None:
                     "functional": {
                         "passed": functional_passed,
                         "returncode": functional_returncode,
-                        "result_error": functional_error,
+                        "result_error": functional_error or functional_validation_error,
                         "log": _display_path(functional_log, ROOT),
                         "results": functional_results,
                     },
@@ -339,7 +413,7 @@ def main() -> None:
             "git_branch": _git(ROOT, "branch", "--show-current"),
             "git_dirty": bool(git_status),
             "kernel_sha256": _sha256(MOE_DIR / "custom_fusedmoe.py"),
-            "snapshot": _source_snapshot(ROOT),
+            "snapshot": stage1_source_snapshot(),
         },
         "benchmark": {
             "independent_performance_processes": args.runs,

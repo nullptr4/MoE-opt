@@ -13,12 +13,55 @@ from run_moe_stage1_experiments import (  # noqa: E402
     aggregate_performance_records,
     compare_with_e0,
     expected_schedule,
+    expected_functional_workload_keys,
+    expected_performance_workload_keys,
+    stage1_source_snapshot,
+    validate_functional_record,
 )
 
 
 class Stage1AggregateTest(unittest.TestCase):
+    def functional_record(self, configs):
+        return {
+            "experiment": "E0",
+            "schedule": expected_schedule("E0"),
+            "results": [
+                {
+                    "test_type": "functional",
+                    "config": config,
+                    "correct": True,
+                }
+                for config in configs
+            ],
+        }
+
+    def official_functional_configs(self):
+        import json
+
+        return [json.loads(key) for key in expected_functional_workload_keys()]
+
+    def test_functional_record_requires_each_official_workload_once(self):
+        configs = self.official_functional_configs()
+        results = validate_functional_record("E0", self.functional_record(configs))
+        self.assertEqual(len(results), len(configs))
+
+    def test_functional_record_rejects_missing_workload(self):
+        configs = self.official_functional_configs()
+        with self.assertRaisesRegex(ValueError, "official configs"):
+            validate_functional_record("E0", self.functional_record(configs[:1]))
+
+    def test_functional_record_rejects_duplicate_workload(self):
+        configs = self.official_functional_configs()
+        with self.assertRaisesRegex(ValueError, "duplicate workload"):
+            validate_functional_record(
+                "E0",
+                self.functional_record([configs[0], configs[0]]),
+            )
+
     def test_three_processes_are_summarized_for_a_canonical_experiment(self):
-        config = {"dhidden": 7168, "dexpert": 2048, "bs": 1}
+        import json
+
+        configs = [json.loads(key) for key in expected_performance_workload_keys()]
         records = [
             {
                 "experiment": "E1",
@@ -27,16 +70,21 @@ class Stage1AggregateTest(unittest.TestCase):
                     {
                         "test_type": "performance",
                         "config": config,
-                        "latency_ms": latency,
+                        "latency_ms": latency + config_index,
                     }
+                    for config_index, config in enumerate(configs)
                 ],
             }
             for latency in (9.0, 10.0, 12.0)
         ]
         summary = aggregate_performance_records("E1", records)
-        self.assertEqual(summary[0]["median_latency_ms"], 10.0)
-        self.assertEqual(summary[0]["mad_latency_ms"], 1.0)
-        self.assertTrue(summary[0]["complete"])
+        self.assertEqual(len(summary), len(configs))
+        self.assertEqual(
+            sorted(item["median_latency_ms"] for item in summary),
+            [10.0, 11.0],
+        )
+        self.assertTrue(all(item["mad_latency_ms"] == 1.0 for item in summary))
+        self.assertTrue(all(item["complete"] for item in summary))
 
     def test_noncanonical_schedule_is_rejected(self):
         schedule = expected_schedule("E4")
@@ -71,8 +119,9 @@ class Stage1AggregateTest(unittest.TestCase):
             )
 
     def test_missing_workload_in_one_process_is_rejected(self):
-        large = {"shape": "large"}
-        small = {"shape": "small"}
+        import json
+
+        large, small = [json.loads(key) for key in expected_performance_workload_keys()]
 
         def record(configs):
             return {
@@ -93,6 +142,24 @@ class Stage1AggregateTest(unittest.TestCase):
                 "E0",
                 [record((large, small)), record((large,))],
             )
+
+    def test_all_processes_missing_the_same_workload_are_rejected(self):
+        import json
+
+        config = json.loads(next(iter(expected_performance_workload_keys())))
+        record = {
+            "experiment": "E0",
+            "schedule": expected_schedule("E0"),
+            "results": [
+                {
+                    "test_type": "performance",
+                    "config": config,
+                    "latency_ms": 1.0,
+                }
+            ],
+        }
+        with self.assertRaisesRegex(ValueError, "official configs"):
+            aggregate_performance_records("E0", [record, record, record])
 
     def test_comparison_enforces_one_percent_and_regression_limit(self):
         config_a = {"shape": "large"}
@@ -140,6 +207,11 @@ class Stage1CliTest(unittest.TestCase):
             'os.environ["MOE_RECORD_RESULTS"] = "0"',
         ):
             self.assertLess(source.index(assignment), kernel_import)
+
+    def test_stage1_snapshot_includes_both_orchestration_runners(self):
+        paths = {item["path"] for item in stage1_source_snapshot()}
+        self.assertIn("scripts/run_moe_stage1_experiments.py", paths)
+        self.assertIn("scripts/confirm_moe_stage1_winner.py", paths)
 
 
 if __name__ == "__main__":

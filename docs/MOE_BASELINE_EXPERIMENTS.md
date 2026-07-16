@@ -66,3 +66,16 @@ python scripts/run_moe_stage1_experiments.py \
 每组先运行一个 functional 进程，通过后再运行 3 个独立性能进程。产物默认位于
 `data/benchmarks/<host-id>/stage1-<timestamp>.json`，包含每组原始进程记录、
 median/MAD/P95、相对 E0 的逐 workload 变化与晋级门槛判定。
+
+边界候选使用交错顺序确认：
+
+```bash
+python scripts/confirm_moe_stage1_winner.py \
+  --host-id c500-32g \
+  --runs 3 --warmup 10 --iteration 100
+```
+
+confirmation schema v2 用 `status` 表示测量是否完整，用 `promotion_status` 表示候选
+是否晋级，并内嵌源码快照。runner 会要求每个官方 functional workload 恰好出现一次，
+并拒绝空性能结果、进程内重复 workload、跨进程缺失 workload，以及带 E0–E5 标签
+但偏离完整 canonical schedule 的记录。

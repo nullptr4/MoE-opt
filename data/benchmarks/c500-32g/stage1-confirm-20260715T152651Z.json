@@ -11,6 +11,20 @@
     "git_branch": "agent/shared-c500-data-sync",
     "git_dirty": true,
     "kernel_sha256": "99588a2dc83249ce43751282ac00a51702f01194c6cef6f37a3fbc2bea5e78ae",
+    "orchestration_checkpoint": {
+      "git_commit": "f0dd3e3ff0821ca392a23de4be16eaa06bccb3da",
+      "snapshot_paths_match_checkpoint": true,
+      "files": [
+        {
+          "path": "scripts/run_moe_stage1_experiments.py",
+          "sha256": "a3b716cb3464f018e8126911edfd41934e8a4532541992f83e1c8b846f335176"
+        },
+        {
+          "path": "scripts/confirm_moe_stage1_winner.py",
+          "sha256": "21068cadba22dd4d759237b7512297260a3e692548139074d925695ab16977c3"
+        }
+      ]
+    },
     "snapshot": [
       {
         "path": "benchmarks/tilelang-moe/custom_fusedmoe.py",

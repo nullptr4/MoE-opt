@@ -26,8 +26,9 @@ from run_moe_stage1_experiments import (  # noqa: E402
     aggregate_performance_records,
     compare_with_e0,
     expected_schedule,
+    stage1_source_snapshot,
+    validate_functional_record,
 )
-from run_moe_baseline import _source_snapshot  # noqa: E402
 
 
 EXPERIMENTS = ("E0", "E3")
@@ -103,17 +104,21 @@ def main() -> None:
                 label=f"{experiment}/functional",
             )
             record, error = _load_record(result_json)
-            results = (record or {}).get("results", [])
+            results = []
+            validation_error = None
+            if record is not None:
+                try:
+                    results = validate_functional_record(experiment, record)
+                except ValueError as exc:
+                    validation_error = str(exc)
             functional[experiment] = {
                 "passed": (
                     returncode == 0
                     and record is not None
-                    and record.get("schedule") == expected_schedule(experiment)
-                    and bool(results)
-                    and all(result.get("correct") is True for result in results)
+                    and validation_error is None
                 ),
                 "returncode": returncode,
-                "error": error,
+                "error": error or validation_error,
                 "results": results,
                 "log": _display_path(log_path, ROOT),
             }
@@ -202,7 +207,7 @@ def main() -> None:
             "git_branch": _git(ROOT, "branch", "--show-current"),
             "git_dirty": bool(git_status),
             "kernel_sha256": _sha256(MOE_DIR / "custom_fusedmoe.py"),
-            "snapshot": _source_snapshot(ROOT),
+            "snapshot": stage1_source_snapshot(),
         },
         "benchmark": {
             "independent_processes_per_experiment": args.runs,

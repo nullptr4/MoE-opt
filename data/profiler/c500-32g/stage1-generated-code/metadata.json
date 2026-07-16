@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "record_type": "moe-stage1-generated-code-archive",
+  "host_id": "c500-32g",
+  "archived_at": "2026-07-16T00:55:43.577937+00:00",
+  "git_commit": "f0dd3e3ff0821ca392a23de4be16eaa06bccb3da",
+  "cache_root": "/data/metax-race/.cache/moe-stage1-prof",
+  "compiler_replay": "mxcc -x maca -device-obj -O3 -lineinfo --offload-arch=xcore1000 -std=c++17 -I${TILELANG_HOME}/src -I${TILELANG_HOME}/src/tl_templates -D__FAST_HALF_CVT__ -w -resource-usage -o /dev/null device_kernel.cu",
+  "experiments": [
+    {
+      "experiment": "E0",
+      "schedule": "config/moe_baseline_schedule.json",
+      "source_cache": "/data/metax-race/.cache/moe-stage1-prof/E0-large/0.1.9_maca_gitee6db437-x86_64/kernels/4c2a6e6d05736914664c456ead9315420c686dfab21d3bb99058e0750a436337",
+      "device_kernel": {
+        "path": "E0/device_kernel.cu",
+        "sha256": "ebbb4bb7ef09576f7fb20a6bfed3809721ab3c397e0eb1a2e7c4082ba64a976b",
+        "bytes": 20347,
+        "stage_function_sha256": {
+          "fc1": "a4c3faf6596230c6ccdfae673916106034959007059c7ad241f1568f0bf4ec78",
+          "fc2": "b37354771e9b7dd8eab00c4cc4d766221a9a547738233e64ceeabbd1cb4e18fd"
+        }
+      },
+      "host_kernel": {
+        "path": "E0/host_kernel.cu",
+        "sha256": "b5ea72854b310d76f184e9467f3a0ea060b9421b401c980db4a2180b0c0afd73",
+        "bytes": 211810
+      }
+    },
+    {
+      "experiment": "E1",
+      "schedule": "config/moe_stage1_e1_schedule.json",
+      "source_cache": "/data/metax-race/.cache/moe-stage1-prof/E1-large/0.1.9_maca_gitee6db437-x86_64/kernels/564d77d26f4adddce75bfc2d613d35ce073672fbbf17a80881c310c31c81be46",
+      "device_kernel": {
+        "path": "E1/device_kernel.cu",
+        "sha256": "30a8967b5d5c57441c5db7aeab9a1d43931e65275a7ea24ccd1b8adc4f225fd8",
+        "bytes": 20188,
+        "stage_function_sha256": {
+          "fc1": "cff239e33e7ecf3df965d1cb5396196babffeae46633d0282810008c614e93ef",
+          "fc2": "b37354771e9b7dd8eab00c4cc4d766221a9a547738233e64ceeabbd1cb4e18fd"
+        }
+      },
+      "host_kernel": {
+        "path": "E1/host_kernel.cu",
+        "sha256": "ba33d1fe7c55c0896a1db22671f3565f5224bffc055ddc1048c187a067eae14a",
+        "bytes": 211810
+      }
+    },
+    {
+      "experiment": "E2",
+      "schedule": "config/moe_stage1_e2_schedule.json",
+      "source_cache": "/data/metax-race/.cache/moe-stage1-prof/E2-large/0.1.9_maca_gitee6db437-x86_64/kernels/bc85a170befbf36f7942e6954890d995af5d484708b2aec81643323764db3ba8",
+      "device_kernel": {
+        "path": "E2/device_kernel.cu",
+        "sha256": "4ad03c3f7fa457f4b0b970063b8163a41ca77107b1daef1713022833d94db33c",
+        "bytes": 20343,
+        "stage_function_sha256": {
+          "fc1": "94b3c0578bbbd3f66af56e5a2529a3715fe5d85f5beee6e4d777576d5d52eaff",
+          "fc2": "b37354771e9b7dd8eab00c4cc4d766221a9a547738233e64ceeabbd1cb4e18fd"
+        }
+      },
+      "host_kernel": {
+        "path": "E2/host_kernel.cu",
+        "sha256": "3b1c9edac71ab43af04c7847c6f1c72e0ec878e1fe7ad6505392c1dd5862e109",
+        "bytes": 211810
+      }
+    },
+    {
+      "experiment": "E3",
+      "schedule": "config/moe_stage1_e3_schedule.json",
+      "source_cache": "/data/metax-race/.cache/moe-stage1-prof/E3-large/0.1.9_maca_gitee6db437-x86_64/kernels/59a8cb4c2b46e28d1ea7140054adba5f11bc12e2f4965aac4d8fbc7605cbb779",
+      "device_kernel": {
+        "path": "E3/device_kernel.cu",
+        "sha256": "c5fac6d45437e145e6cf500db61d07cebf553c70414cbab84e52d1f745851bc3",
+        "bytes": 20186,
+        "stage_function_sha256": {
+          "fc1": "a4c3faf6596230c6ccdfae673916106034959007059c7ad241f1568f0bf4ec78",
+          "fc2": "51b9e083842a4ae5fdbc7ce4a68ce99099d531536aeab335ff6f0924162f9f12"
+        }
+      },
+      "host_kernel": {
+        "path": "E3/host_kernel.cu",
+        "sha256": "d7e8208bc2b6c5f001c8958b431b3b28f3edca660de0545ca4f6a10999ef933a",
+        "bytes": 211810
+      }
+    },
+    {
+      "experiment": "E4",
+      "schedule": "config/moe_stage1_e4_schedule.json",
+      "source_cache": "/data/metax-race/.cache/moe-stage1-prof/E4-large/0.1.9_maca_gitee6db437-x86_64/kernels/054532bf146653af4a1b4f0afc48c8e129a5e6eeb849f85eca0448b51153e5d4",
+      "device_kernel": {
+        "path": "E4/device_kernel.cu",
+        "sha256": "ca9ee99e318a8681740b967d23ad3332a4f73f0f5462bc9ef9507e3e980e1a02",
+        "bytes": 20224,
+        "stage_function_sha256": {
+          "fc1": "a4c3faf6596230c6ccdfae673916106034959007059c7ad241f1568f0bf4ec78",
+          "fc2": "2be09c78dd966ebbeef4bbe2ae77e66cf9d00cde8e8727bc8aa1dfa1c8db3216"
+        }
+      },
+      "host_kernel": {
+        "path": "E4/host_kernel.cu",
+        "sha256": "b5ea72854b310d76f184e9467f3a0ea060b9421b401c980db4a2180b0c0afd73",
+        "bytes": 211810
+      }
+    },
+    {
+      "experiment": "E5",
+      "schedule": "config/moe_stage1_e5_schedule.json",
+      "source_cache": "/data/metax-race/.cache/moe-stage1-prof/E5-large/0.1.9_maca_gitee6db437-x86_64/kernels/0d41c51089293ad3de54bbb72d47679d9f17ef327c744cace43c99999b96a12d",
+      "device_kernel": {
+        "path": "E5/device_kernel.cu",
+        "sha256": "eef0c0ff0960362c05cfb091c55de4f3decee4499a705e483c9bef52f9c4ff32",
+        "bytes": 20363,
+        "stage_function_sha256": {
+          "fc1": "a4c3faf6596230c6ccdfae673916106034959007059c7ad241f1568f0bf4ec78",
+          "fc2": "6c072edc1d382814e673d706431f70476a39e29d62456429c0232142d96fff37"
+        }
+      },
+      "host_kernel": {
+        "path": "E5/host_kernel.cu",
+        "sha256": "3de077a3e9fcfd1fcb730bef8406aa465268071e80da6bd6f2717ea5866f3519",
+        "bytes": 211810
+      }
+    }
+  ]
+}
