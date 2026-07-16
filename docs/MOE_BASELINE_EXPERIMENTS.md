@@ -79,3 +79,19 @@ confirmation schema v2 用 `status` 表示测量是否完整，用 `promotion_st
 是否晋级，并内嵌源码快照。runner 会要求每个官方 functional workload 恰好出现一次，
 并拒绝空性能结果、进程内重复 workload、跨进程缺失 workload，以及带 E0–E5 标签
 但偏离完整 canonical schedule 的记录。
+
+## 阶段 2 Profiler 决策表
+
+Stage 2 从目标 kernel 的 single-pass mcProfiler 报告生成统一决策表：
+
+```bash
+python scripts/build_moe_stage2_profiler_table.py
+python scripts/validate_moe_stage2_profiler.py \
+  --table data/profiler/c500-32g/stage2-decision-table.json
+```
+
+生成器只接受 metadata 清单中的 `1_kernel_kernel*.txt.json`，不会把全进程
+`report.txt.json` 当成目标 kernel。`Total Cycles` 保持 Kcycles 单位，不换算成毫秒；
+active blocks/SM、动态 active warps、VGPR/SGPR 映射、barrier stall 和 tail/empty CTA
+等未采集字段必须显式标为 unavailable。版本分类由机器可读阈值规则生成，验证器会
+重建全部指标、核验源文件 SHA，并确认默认 E0 与 autotune 数据未改变。

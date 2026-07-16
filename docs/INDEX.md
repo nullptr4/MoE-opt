@@ -28,6 +28,7 @@
 - [MoE TileLang 基准与测试代码](../benchmarks/tilelang-moe/)
 - [MoE 基线实验规范](MOE_BASELINE_EXPERIMENTS.md)
 - [MoE 阶段 1：FC1/FC2 解耦结果](../reports/2026-07-15-moe-stage1-decoupling-results.md)
+- [MoE 阶段 2：Profiler 决策表](../reports/2026-07-16-moe-stage2-profiler-decision-table.md)
 - [优化报告与实验日志](../reports/2026-07-11-moe-optimization-report.md)
 - [OJ ABI 对拍脚本](../benchmarks/tilelang-moe/test_moe_submission.py)
 - [双 C500 实验数据同步](../data/README.md)

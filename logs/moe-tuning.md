@@ -50,3 +50,4 @@
 | Stage1 E5: FC2 BN256 only (3-process median) | pass (2/2) | 266.42359375 ms | 41.58349609 ms | rejected: combined -9.10% |
 | Stage1 E3 interleaved confirmation (3-process median) | pass (2/2), OJ trial pass (2/2 + fuzz 4/4) | 241.75939453 ms | 38.06101807 ms | not promoted: +0.70% / +1.21%, combined +0.768% below 1% policy |
 | Stage1 E3 final source-snapshotted confirmation (3-process median) | completed, promotion rejected | 241.45742188 ms | 38.02514648 ms | not promoted: +0.79% / +1.47%, combined +0.882% below 1% policy |
+| Stage2 targeted-profiler decision table | E0 retained; source hashes verified | 243.68445313 ms | 38.61989258 ms | tile search stopped; FC1 async pipeline gate not met, proceed to epilogue/full-tail-empty work |
