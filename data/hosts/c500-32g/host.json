@@ -1,0 +1,9 @@
+{
+  "host_id": "c500-32g",
+  "host_type": "c500",
+  "memory": "32GB",
+  "sync_target": "agent/shared-c500-data-sync",
+  "source_path": "/data",
+  "generated_at": "2026-07-13T00:00:00Z",
+  "notes": "Synced from local curated directories: mcProfiler, autotune, autoheuristic, output archives."
+}

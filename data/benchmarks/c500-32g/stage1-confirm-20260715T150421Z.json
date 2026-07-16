@@ -1,0 +1,823 @@
+{
+  "schema_version": 1,
+  "record_type": "moe-stage1-winner-confirmation",
+  "run_id": "stage1-confirm-20260715T150421Z",
+  "status": "superseded",
+  "promotion_status": "rejected",
+  "superseded_by": "data/benchmarks/c500-32g/stage1-confirm-20260715T152651Z.json",
+  "source_reproducibility": "legacy artifact without an embedded source snapshot",
+  "recorded_at": "2026-07-15T15:04:21.984544+00:00",
+  "host_id": "c500-32g",
+  "source": {
+    "git_commit": "b05f720de2bbeccabc7d4b8d9549935883fc9695",
+    "git_branch": "agent/shared-c500-data-sync",
+    "kernel_sha256": "ec2ff23f29dfd680c486b7628319bd6e30dc1d8cadb4e62a44107ed432cf621d"
+  },
+  "benchmark": {
+    "independent_processes_per_experiment": 3,
+    "order": "alternating E0/E3 by round",
+    "warmup": 10,
+    "iteration": 100
+  },
+  "functional": {
+    "E0": {
+      "passed": true,
+      "returncode": 0,
+      "error": null,
+      "results": [
+        {
+          "test_type": "functional",
+          "config": {
+            "dhidden": 7168,
+            "dexpert": 2048,
+            "nroutedexperts": 8,
+            "nexpertspertoken": 4,
+            "bs": 1,
+            "seqlen": 8192,
+            "seed": 81394
+          },
+          "correct": true
+        },
+        {
+          "test_type": "functional",
+          "config": {
+            "dhidden": 3584,
+            "dexpert": 1024,
+            "nroutedexperts": 4,
+            "nexpertspertoken": 2,
+            "bs": 2,
+            "seqlen": 4096,
+            "seed": 81394
+          },
+          "correct": true
+        }
+      ],
+      "log": "logs/moe-stage1-confirm-20260715T150421Z-E0-functional.log"
+    },
+    "E3": {
+      "passed": true,
+      "returncode": 0,
+      "error": null,
+      "results": [
+        {
+          "test_type": "functional",
+          "config": {
+            "dhidden": 7168,
+            "dexpert": 2048,
+            "nroutedexperts": 8,
+            "nexpertspertoken": 4,
+            "bs": 1,
+            "seqlen": 8192,
+            "seed": 81394
+          },
+          "correct": true
+        },
+        {
+          "test_type": "functional",
+          "config": {
+            "dhidden": 3584,
+            "dexpert": 1024,
+            "nroutedexperts": 4,
+            "nexpertspertoken": 2,
+            "bs": 2,
+            "seqlen": 4096,
+            "seed": 81394
+          },
+          "correct": true
+        }
+      ],
+      "log": "logs/moe-stage1-confirm-20260715T150421Z-E3-functional.log"
+    }
+  },
+  "experiments": {
+    "E0": {
+      "schedule": {
+        "block_token": 128,
+        "block_dhidden": 128,
+        "block_dexpert": 128,
+        "threads": 256,
+        "num_stages": 1,
+        "num_stages_down": 1,
+        "s1_bn": 128,
+        "s1_bk": 128,
+        "s1_stages": 1,
+        "s2_bn": 128,
+        "s2_bk": 128,
+        "s2_stages": 1,
+        "swizzle_panel": 8,
+        "swizzle_order": "row",
+        "swizzle_panel_down": 16,
+        "swizzle_order_down": "row",
+        "gemm_policy": "full_row",
+        "gemm_policy_down": "full_row",
+        "single_weight_buffer": true,
+        "min_blocks_per_sm": null
+      },
+      "runs": [
+        {
+          "round_index": 1,
+          "order_index": 1,
+          "returncode": 0,
+          "result_recorded": true,
+          "result_error": null,
+          "log": "logs/moe-stage1-confirm-20260715T150421Z-round-1-E0.log",
+          "command": [
+            "/data/metax-race/.conda/bin/python",
+            "/data/MoE-opt/benchmarks/tilelang-moe/tune_moe.py",
+            "--experiment",
+            "E0",
+            "--mode",
+            "performance",
+            "--warmup",
+            "10",
+            "--iteration",
+            "100",
+            "--result-json",
+            "/tmp/moe-stage1-confirm-wrzp5ofa/round-1-E0.json"
+          ]
+        },
+        {
+          "round_index": 2,
+          "order_index": 2,
+          "returncode": 0,
+          "result_recorded": true,
+          "result_error": null,
+          "log": "logs/moe-stage1-confirm-20260715T150421Z-round-2-E0.log",
+          "command": [
+            "/data/metax-race/.conda/bin/python",
+            "/data/MoE-opt/benchmarks/tilelang-moe/tune_moe.py",
+            "--experiment",
+            "E0",
+            "--mode",
+            "performance",
+            "--warmup",
+            "10",
+            "--iteration",
+            "100",
+            "--result-json",
+            "/tmp/moe-stage1-confirm-wrzp5ofa/round-2-E0.json"
+          ]
+        },
+        {
+          "round_index": 3,
+          "order_index": 1,
+          "returncode": 0,
+          "result_recorded": true,
+          "result_error": null,
+          "log": "logs/moe-stage1-confirm-20260715T150421Z-round-3-E0.log",
+          "command": [
+            "/data/metax-race/.conda/bin/python",
+            "/data/MoE-opt/benchmarks/tilelang-moe/tune_moe.py",
+            "--experiment",
+            "E0",
+            "--mode",
+            "performance",
+            "--warmup",
+            "10",
+            "--iteration",
+            "100",
+            "--result-json",
+            "/tmp/moe-stage1-confirm-wrzp5ofa/round-3-E0.json"
+          ]
+        }
+      ],
+      "records": [
+        {
+          "schema_version": 1,
+          "record_type": "moe-benchmark-process",
+          "recorded_at": "2026-07-15T15:06:45.038992+00:00",
+          "pid": 52441,
+          "experiment": "E0",
+          "schedule": {
+            "block_token": 128,
+            "block_dhidden": 128,
+            "block_dexpert": 128,
+            "threads": 256,
+            "num_stages": 1,
+            "num_stages_down": 1,
+            "s1_bn": 128,
+            "s1_bk": 128,
+            "s1_stages": 1,
+            "s2_bn": 128,
+            "s2_bk": 128,
+            "s2_stages": 1,
+            "swizzle_panel": 8,
+            "swizzle_order": "row",
+            "swizzle_panel_down": 16,
+            "swizzle_order_down": "row",
+            "gemm_policy": "full_row",
+            "gemm_policy_down": "full_row",
+            "single_weight_buffer": true,
+            "min_blocks_per_sm": null
+          },
+          "benchmark": {
+            "warmup": 10,
+            "iteration": 100,
+            "shape": "all"
+          },
+          "results": [
+            {
+              "test_type": "performance",
+              "config": {
+                "dhidden": 7168,
+                "dexpert": 2048,
+                "nroutedexperts": 8,
+                "nexpertspertoken": 4,
+                "bs": 4,
+                "seqlen": 8192,
+                "seed": 81394
+              },
+              "warmup": 10,
+              "iteration": 100,
+              "latency_ms": 242.859296875
+            },
+            {
+              "test_type": "performance",
+              "config": {
+                "dhidden": 3584,
+                "dexpert": 1024,
+                "nroutedexperts": 4,
+                "nexpertspertoken": 2,
+                "bs": 8,
+                "seqlen": 4096,
+                "seed": 81394
+              },
+              "warmup": 10,
+              "iteration": 100,
+              "latency_ms": 38.4444775390625
+            }
+          ],
+          "round_index": 1,
+          "order_index": 1
+        },
+        {
+          "schema_version": 1,
+          "record_type": "moe-benchmark-process",
+          "recorded_at": "2026-07-15T15:10:12.187675+00:00",
+          "pid": 52953,
+          "experiment": "E0",
+          "schedule": {
+            "block_token": 128,
+            "block_dhidden": 128,
+            "block_dexpert": 128,
+            "threads": 256,
+            "num_stages": 1,
+            "num_stages_down": 1,
+            "s1_bn": 128,
+            "s1_bk": 128,
+            "s1_stages": 1,
+            "s2_bn": 128,
+            "s2_bk": 128,
+            "s2_stages": 1,
+            "swizzle_panel": 8,
+            "swizzle_order": "row",
+            "swizzle_panel_down": 16,
+            "swizzle_order_down": "row",
+            "gemm_policy": "full_row",
+            "gemm_policy_down": "full_row",
+            "single_weight_buffer": true,
+            "min_blocks_per_sm": null
+          },
+          "benchmark": {
+            "warmup": 10,
+            "iteration": 100,
+            "shape": "all"
+          },
+          "results": [
+            {
+              "test_type": "performance",
+              "config": {
+                "dhidden": 7168,
+                "dexpert": 2048,
+                "nroutedexperts": 8,
+                "nexpertspertoken": 4,
+                "bs": 4,
+                "seqlen": 8192,
+                "seed": 81394
+              },
+              "warmup": 10,
+              "iteration": 100,
+              "latency_ms": 243.6711328125
+            },
+            {
+              "test_type": "performance",
+              "config": {
+                "dhidden": 3584,
+                "dexpert": 1024,
+                "nroutedexperts": 4,
+                "nexpertspertoken": 2,
+                "bs": 8,
+                "seqlen": 4096,
+                "seed": 81394
+              },
+              "warmup": 10,
+              "iteration": 100,
+              "latency_ms": 38.55376708984375
+            }
+          ],
+          "round_index": 2,
+          "order_index": 2
+        },
+        {
+          "schema_version": 1,
+          "record_type": "moe-benchmark-process",
+          "recorded_at": "2026-07-15T15:11:21.420057+00:00",
+          "pid": 53129,
+          "experiment": "E0",
+          "schedule": {
+            "block_token": 128,
+            "block_dhidden": 128,
+            "block_dexpert": 128,
+            "threads": 256,
+            "num_stages": 1,
+            "num_stages_down": 1,
+            "s1_bn": 128,
+            "s1_bk": 128,
+            "s1_stages": 1,
+            "s2_bn": 128,
+            "s2_bk": 128,
+            "s2_stages": 1,
+            "swizzle_panel": 8,
+            "swizzle_order": "row",
+            "swizzle_panel_down": 16,
+            "swizzle_order_down": "row",
+            "gemm_policy": "full_row",
+            "gemm_policy_down": "full_row",
+            "single_weight_buffer": true,
+            "min_blocks_per_sm": null
+          },
+          "benchmark": {
+            "warmup": 10,
+            "iteration": 100,
+            "shape": "all"
+          },
+          "results": [
+            {
+              "test_type": "performance",
+              "config": {
+                "dhidden": 7168,
+                "dexpert": 2048,
+                "nroutedexperts": 8,
+                "nexpertspertoken": 4,
+                "bs": 4,
+                "seqlen": 8192,
+                "seed": 81394
+              },
+              "warmup": 10,
+              "iteration": 100,
+              "latency_ms": 243.46046875
+            },
+            {
+              "test_type": "performance",
+              "config": {
+                "dhidden": 3584,
+                "dexpert": 1024,
+                "nroutedexperts": 4,
+                "nexpertspertoken": 2,
+                "bs": 8,
+                "seqlen": 4096,
+                "seed": 81394
+              },
+              "warmup": 10,
+              "iteration": 100,
+              "latency_ms": 38.52618896484375
+            }
+          ],
+          "round_index": 3,
+          "order_index": 1
+        }
+      ],
+      "performance": [
+        {
+          "samples": 3,
+          "latency_samples_ms": [
+            242.859296875,
+            243.6711328125,
+            243.46046875
+          ],
+          "median_latency_ms": 243.46046875,
+          "mad_latency_ms": 0.21066406250000114,
+          "p95_latency_ms": 243.65006640624998,
+          "min_latency_ms": 242.859296875,
+          "max_latency_ms": 243.6711328125,
+          "config": {
+            "dhidden": 7168,
+            "dexpert": 2048,
+            "nroutedexperts": 8,
+            "nexpertspertoken": 4,
+            "bs": 4,
+            "seqlen": 8192,
+            "seed": 81394
+          },
+          "complete": true
+        },
+        {
+          "samples": 3,
+          "latency_samples_ms": [
+            38.4444775390625,
+            38.55376708984375,
+            38.52618896484375
+          ],
+          "median_latency_ms": 38.52618896484375,
+          "mad_latency_ms": 0.027578125000005116,
+          "p95_latency_ms": 38.55100927734375,
+          "min_latency_ms": 38.4444775390625,
+          "max_latency_ms": 38.55376708984375,
+          "config": {
+            "dhidden": 3584,
+            "dexpert": 1024,
+            "nroutedexperts": 4,
+            "nexpertspertoken": 2,
+            "bs": 8,
+            "seqlen": 4096,
+            "seed": 81394
+          },
+          "complete": true
+        }
+      ]
+    },
+    "E3": {
+      "schedule": {
+        "block_token": 128,
+        "block_dhidden": 128,
+        "block_dexpert": 128,
+        "threads": 256,
+        "num_stages": 1,
+        "num_stages_down": 1,
+        "s1_bn": 128,
+        "s1_bk": 128,
+        "s1_stages": 1,
+        "s2_bn": 128,
+        "s2_bk": 64,
+        "s2_stages": 1,
+        "swizzle_panel": 8,
+        "swizzle_order": "row",
+        "swizzle_panel_down": 16,
+        "swizzle_order_down": "row",
+        "gemm_policy": "full_row",
+        "gemm_policy_down": "full_row",
+        "single_weight_buffer": true,
+        "min_blocks_per_sm": null
+      },
+      "runs": [
+        {
+          "round_index": 1,
+          "order_index": 2,
+          "returncode": 0,
+          "result_recorded": true,
+          "result_error": null,
+          "log": "logs/moe-stage1-confirm-20260715T150421Z-round-1-E3.log",
+          "command": [
+            "/data/metax-race/.conda/bin/python",
+            "/data/MoE-opt/benchmarks/tilelang-moe/tune_moe.py",
+            "--experiment",
+            "E3",
+            "--mode",
+            "performance",
+            "--warmup",
+            "10",
+            "--iteration",
+            "100",
+            "--result-json",
+            "/tmp/moe-stage1-confirm-wrzp5ofa/round-1-E3.json"
+          ]
+        },
+        {
+          "round_index": 2,
+          "order_index": 1,
+          "returncode": 0,
+          "result_recorded": true,
+          "result_error": null,
+          "log": "logs/moe-stage1-confirm-20260715T150421Z-round-2-E3.log",
+          "command": [
+            "/data/metax-race/.conda/bin/python",
+            "/data/MoE-opt/benchmarks/tilelang-moe/tune_moe.py",
+            "--experiment",
+            "E3",
+            "--mode",
+            "performance",
+            "--warmup",
+            "10",
+            "--iteration",
+            "100",
+            "--result-json",
+            "/tmp/moe-stage1-confirm-wrzp5ofa/round-2-E3.json"
+          ]
+        },
+        {
+          "round_index": 3,
+          "order_index": 2,
+          "returncode": 0,
+          "result_recorded": true,
+          "result_error": null,
+          "log": "logs/moe-stage1-confirm-20260715T150421Z-round-3-E3.log",
+          "command": [
+            "/data/metax-race/.conda/bin/python",
+            "/data/MoE-opt/benchmarks/tilelang-moe/tune_moe.py",
+            "--experiment",
+            "E3",
+            "--mode",
+            "performance",
+            "--warmup",
+            "10",
+            "--iteration",
+            "100",
+            "--result-json",
+            "/tmp/moe-stage1-confirm-wrzp5ofa/round-3-E3.json"
+          ]
+        }
+      ],
+      "records": [
+        {
+          "schema_version": 1,
+          "record_type": "moe-benchmark-process",
+          "recorded_at": "2026-07-15T15:07:53.624017+00:00",
+          "pid": 52600,
+          "experiment": "E3",
+          "schedule": {
+            "block_token": 128,
+            "block_dhidden": 128,
+            "block_dexpert": 128,
+            "threads": 256,
+            "num_stages": 1,
+            "num_stages_down": 1,
+            "s1_bn": 128,
+            "s1_bk": 128,
+            "s1_stages": 1,
+            "s2_bn": 128,
+            "s2_bk": 64,
+            "s2_stages": 1,
+            "swizzle_panel": 8,
+            "swizzle_order": "row",
+            "swizzle_panel_down": 16,
+            "swizzle_order_down": "row",
+            "gemm_policy": "full_row",
+            "gemm_policy_down": "full_row",
+            "single_weight_buffer": true,
+            "min_blocks_per_sm": null
+          },
+          "benchmark": {
+            "warmup": 10,
+            "iteration": 100,
+            "shape": "all"
+          },
+          "results": [
+            {
+              "test_type": "performance",
+              "config": {
+                "dhidden": 7168,
+                "dexpert": 2048,
+                "nroutedexperts": 8,
+                "nexpertspertoken": 4,
+                "bs": 4,
+                "seqlen": 8192,
+                "seed": 81394
+              },
+              "warmup": 10,
+              "iteration": 100,
+              "latency_ms": 241.49494140625
+            },
+            {
+              "test_type": "performance",
+              "config": {
+                "dhidden": 3584,
+                "dexpert": 1024,
+                "nroutedexperts": 4,
+                "nexpertspertoken": 2,
+                "bs": 8,
+                "seqlen": 4096,
+                "seed": 81394
+              },
+              "warmup": 10,
+              "iteration": 100,
+              "latency_ms": 38.0464111328125
+            }
+          ],
+          "round_index": 1,
+          "order_index": 2
+        },
+        {
+          "schema_version": 1,
+          "record_type": "moe-benchmark-process",
+          "recorded_at": "2026-07-15T15:09:03.126541+00:00",
+          "pid": 52794,
+          "experiment": "E3",
+          "schedule": {
+            "block_token": 128,
+            "block_dhidden": 128,
+            "block_dexpert": 128,
+            "threads": 256,
+            "num_stages": 1,
+            "num_stages_down": 1,
+            "s1_bn": 128,
+            "s1_bk": 128,
+            "s1_stages": 1,
+            "s2_bn": 128,
+            "s2_bk": 64,
+            "s2_stages": 1,
+            "swizzle_panel": 8,
+            "swizzle_order": "row",
+            "swizzle_panel_down": 16,
+            "swizzle_order_down": "row",
+            "gemm_policy": "full_row",
+            "gemm_policy_down": "full_row",
+            "single_weight_buffer": true,
+            "min_blocks_per_sm": null
+          },
+          "benchmark": {
+            "warmup": 10,
+            "iteration": 100,
+            "shape": "all"
+          },
+          "results": [
+            {
+              "test_type": "performance",
+              "config": {
+                "dhidden": 7168,
+                "dexpert": 2048,
+                "nroutedexperts": 8,
+                "nexpertspertoken": 4,
+                "bs": 4,
+                "seqlen": 8192,
+                "seed": 81394
+              },
+              "warmup": 10,
+              "iteration": 100,
+              "latency_ms": 241.75939453125
+            },
+            {
+              "test_type": "performance",
+              "config": {
+                "dhidden": 3584,
+                "dexpert": 1024,
+                "nroutedexperts": 4,
+                "nexpertspertoken": 2,
+                "bs": 8,
+                "seqlen": 4096,
+                "seed": 81394
+              },
+              "warmup": 10,
+              "iteration": 100,
+              "latency_ms": 38.15161376953125
+            }
+          ],
+          "round_index": 2,
+          "order_index": 1
+        },
+        {
+          "schema_version": 1,
+          "record_type": "moe-benchmark-process",
+          "recorded_at": "2026-07-15T15:12:30.945135+00:00",
+          "pid": 53303,
+          "experiment": "E3",
+          "schedule": {
+            "block_token": 128,
+            "block_dhidden": 128,
+            "block_dexpert": 128,
+            "threads": 256,
+            "num_stages": 1,
+            "num_stages_down": 1,
+            "s1_bn": 128,
+            "s1_bk": 128,
+            "s1_stages": 1,
+            "s2_bn": 128,
+            "s2_bk": 64,
+            "s2_stages": 1,
+            "swizzle_panel": 8,
+            "swizzle_order": "row",
+            "swizzle_panel_down": 16,
+            "swizzle_order_down": "row",
+            "gemm_policy": "full_row",
+            "gemm_policy_down": "full_row",
+            "single_weight_buffer": true,
+            "min_blocks_per_sm": null
+          },
+          "benchmark": {
+            "warmup": 10,
+            "iteration": 100,
+            "shape": "all"
+          },
+          "results": [
+            {
+              "test_type": "performance",
+              "config": {
+                "dhidden": 7168,
+                "dexpert": 2048,
+                "nroutedexperts": 8,
+                "nexpertspertoken": 4,
+                "bs": 4,
+                "seqlen": 8192,
+                "seed": 81394
+              },
+              "warmup": 10,
+              "iteration": 100,
+              "latency_ms": 241.78861328125
+            },
+            {
+              "test_type": "performance",
+              "config": {
+                "dhidden": 3584,
+                "dexpert": 1024,
+                "nroutedexperts": 4,
+                "nexpertspertoken": 2,
+                "bs": 8,
+                "seqlen": 4096,
+                "seed": 81394
+              },
+              "warmup": 10,
+              "iteration": 100,
+              "latency_ms": 38.06101806640625
+            }
+          ],
+          "round_index": 3,
+          "order_index": 2
+        }
+      ],
+      "performance": [
+        {
+          "samples": 3,
+          "latency_samples_ms": [
+            241.49494140625,
+            241.75939453125,
+            241.78861328125
+          ],
+          "median_latency_ms": 241.75939453125,
+          "mad_latency_ms": 0.029218750000012506,
+          "p95_latency_ms": 241.78569140625,
+          "min_latency_ms": 241.49494140625,
+          "max_latency_ms": 241.78861328125,
+          "config": {
+            "dhidden": 7168,
+            "dexpert": 2048,
+            "nroutedexperts": 8,
+            "nexpertspertoken": 4,
+            "bs": 4,
+            "seqlen": 8192,
+            "seed": 81394
+          },
+          "complete": true
+        },
+        {
+          "samples": 3,
+          "latency_samples_ms": [
+            38.0464111328125,
+            38.15161376953125,
+            38.06101806640625
+          ],
+          "median_latency_ms": 38.06101806640625,
+          "mad_latency_ms": 0.014606933593746874,
+          "p95_latency_ms": 38.14255419921875,
+          "min_latency_ms": 38.0464111328125,
+          "max_latency_ms": 38.15161376953125,
+          "config": {
+            "dhidden": 3584,
+            "dexpert": 1024,
+            "nroutedexperts": 4,
+            "nexpertspertoken": 2,
+            "bs": 8,
+            "seqlen": 4096,
+            "seed": 81394
+          },
+          "complete": true
+        }
+      ]
+    }
+  },
+  "comparison_to_e0": {
+    "workloads": [
+      {
+        "config": {
+          "dhidden": 7168,
+          "dexpert": 2048,
+          "nroutedexperts": 8,
+          "nexpertspertoken": 4,
+          "bs": 4,
+          "seqlen": 8192,
+          "seed": 81394
+        },
+        "e0_median_latency_ms": 243.46046875,
+        "candidate_median_latency_ms": 241.75939453125,
+        "improvement_pct": 0.6987065405253782
+      },
+      {
+        "config": {
+          "dhidden": 3584,
+          "dexpert": 1024,
+          "nroutedexperts": 4,
+          "nexpertspertoken": 2,
+          "bs": 8,
+          "seqlen": 4096,
+          "seed": 81394
+        },
+        "e0_median_latency_ms": 38.52618896484375,
+        "candidate_median_latency_ms": 38.06101806640625,
+        "improvement_pct": 1.2074147766392906
+      }
+    ],
+    "e0_combined_median_ms": 281.9866577148437,
+    "candidate_combined_median_ms": 279.82041259765623,
+    "combined_improvement_pct": 0.7682083736664168,
+    "minimum_workload_improvement_pct": 0.6987065405253782,
+    "meets_latency_policy": false
+  }
+}

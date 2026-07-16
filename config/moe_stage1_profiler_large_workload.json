@@ -1,0 +1,15 @@
+{
+  "shape": "large",
+  "test_type": "performance",
+  "dhidden": 7168,
+  "dexpert": 2048,
+  "nroutedexperts": 8,
+  "nexpertspertoken": 4,
+  "bs": 4,
+  "seqlen": 8192,
+  "seed": 81394,
+  "kernel_names": {
+    "fc1_gate_up": "kernel_kernel",
+    "fc2_down": "kernel_kernel_1"
+  }
+}

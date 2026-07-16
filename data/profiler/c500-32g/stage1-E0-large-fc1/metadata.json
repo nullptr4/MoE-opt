@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "host_id": "c500-32g",
+  "run_id": "stage1-E0-large-fc1",
+  "archived_at": "2026-07-15T14:49:25.230317+00:00",
+  "git_commit": "b05f720de2bbeccabc7d4b8d9549935883fc9695",
+  "source_path": "/opt/mcProfiler-ubuntu18.04/output20260715144727",
+  "workload": {
+    "shape": "large",
+    "test_type": "performance",
+    "dhidden": 7168,
+    "dexpert": 2048,
+    "nroutedexperts": 8,
+    "nexpertspertoken": 4,
+    "bs": 4,
+    "seqlen": 8192,
+    "seed": 81394,
+    "kernel_names": {
+      "fc1_gate_up": "kernel_kernel",
+      "fc2_down": "kernel_kernel_1"
+    }
+  },
+  "config": {
+    "block_token": 128,
+    "block_dhidden": 128,
+    "block_dexpert": 128,
+    "threads": 256,
+    "num_stages": 1,
+    "num_stages_down": 1,
+    "s1_bn": 128,
+    "s1_bk": 128,
+    "s1_stages": 1,
+    "s2_bn": 128,
+    "s2_bk": 128,
+    "s2_stages": 1,
+    "swizzle_panel": 8,
+    "swizzle_order": "row",
+    "swizzle_panel_down": 16,
+    "swizzle_order_down": "row",
+    "gemm_policy": "full_row",
+    "gemm_policy_down": "full_row",
+    "single_weight_buffer": true,
+    "min_blocks_per_sm": null
+  },
+  "files": [
+    {
+      "path": "raw/output20260715144727/Compute_Instructions_Cycles_Rate20260715144820442.png",
+      "sha256": "efc9dd904aa93a627e658f492fd5c68d0b6feaf47d0d0e7ee720db02e81256b1",
+      "bytes": 41833
+    },
+    {
+      "path": "raw/output20260715144727/DPC_Computing_cycles_comparison20260715144820572.png",
+      "sha256": "6aba12b4cc05f958840cca796aa679b30ebf9ca9f434f6d7ccc91c21012832ed",
+      "bytes": 26251
+    },
+    {
+      "path": "raw/output20260715144727/Dnoc_Read_Latency_Histogram20260715144821302.png",
+      "sha256": "4bf44dde275bef57c1fb70ed30afbbba875e6c67c64c8b7b074864c82c0a0d8d",
+      "bytes": 25316
+    },
+    {
+      "path": "raw/output20260715144727/ISU_stall_cycles_layout20260715144820861.png",
+      "sha256": "46d743cdaf153c7e29940b9c259cf6329abeb9e225ee4db847745db578e61c8f",
+      "bytes": 39215
+    },
+    {
+      "path": "raw/output20260715144727/Instructions_Comparison20260715144820682.png",
+      "sha256": "382ba30aeed14ee74c51e141ab5b2c8f24512c42366b7b107977f5e2624ec1d2",
+      "bytes": 35346
+    },
+    {
+      "path": "raw/output20260715144727/Memory_Data_Flow_Chart20260715144821027.png",
+      "sha256": "adf56590f1888c76914986ef7662ff4bfb14b844831804efc8992eff7a028f7a",
+      "bytes": 70473
+    },
+    {
+      "path": "raw/output20260715144727/RoofLine20260715144819443.png",
+      "sha256": "f3a2cfc96154a39d27dfa87b4c11d39015bf548a6d769d9dc2ebff52be001bcf",
+      "bytes": 83177
+    },
+    {
+      "path": "raw/output20260715144727/batches.json",
+      "sha256": "9b59c7c412e1626b680320abdaa31d393ab54e6a7bcc9f2bf33c2eeeed0aa338",
+      "bytes": 3663
+    },
+    {
+      "path": "raw/output20260715144727/event_batch_0.json",
+      "sha256": "cf2743a22bdd81da3f14e514aa5cb667e757a8bf884edf89f6753d207d3303ec",
+      "bytes": 12641
+    },
+    {
+      "path": "raw/output20260715144727/mcProfiler.json",
+      "sha256": "cf2743a22bdd81da3f14e514aa5cb667e757a8bf884edf89f6753d207d3303ec",
+      "bytes": 12641
+    },
+    {
+      "path": "raw/output20260715144727/moe-stage1-E0-large-fc1.json",
+      "sha256": "33c335d202d5f8a62123594c8404e9c77213e1186ed3969be83c03de84e4cbf6",
+      "bytes": 18193
+    }
+  ]
+}
