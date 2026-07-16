@@ -71,8 +71,6 @@ python fusedmoe_benchmark.py
 python scripts/check_repository.py
 git diff --check
 ```
-
-=======
 当前默认 schedule 已固化报告中的已验证策略：`FullRow`、stage-1
 `row8`/stage-2 `row16`、gate/up 单 shared weight buffer 和 stage-1
 `T.serial`。运行时的 autotune 只在这组已通过 functional 的 swizzle
