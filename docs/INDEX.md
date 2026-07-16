@@ -27,6 +27,7 @@
 - [算子优化课程整理](../materials/op_optimization/%E7%AE%97%E5%AD%90%E4%BC%98%E5%8C%96%E7%9B%B8%E5%85%B3%E8%AF%BE%E7%A8%8B%E6%95%B4%E7%90%86.md)
 - [MoE TileLang 基准与测试代码](../benchmarks/tilelang-moe/)
 - [MoE 基线实验规范](MOE_BASELINE_EXPERIMENTS.md)
+- [MoE 优化阶段总结与当前状态](../reports/2026-07-16-moe-optimization-summary.md)
 - [MoE 阶段 1：FC1/FC2 解耦结果](../reports/2026-07-15-moe-stage1-decoupling-results.md)
 - [MoE 阶段 2：Profiler 决策表](../reports/2026-07-16-moe-stage2-profiler-decision-table.md)
 - [优化报告与实验日志](../reports/2026-07-11-moe-optimization-report.md)
