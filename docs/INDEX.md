@@ -48,3 +48,11 @@
 - benchmark 需要 MACA GPU，不能在普通 CPU 环境中替代验证性能。
 - 正确性、性能和提交接口以对应题包的题面为准。
 - 不要把 API Key、算力平台凭据、个人数据或本地构建目录提交到仓库。
+
+## 6. 贡献与治理
+
+- [贡献指南](../CONTRIBUTING.md)
+- [仓库治理](../GOVERNANCE.md)
+- [安全策略](../SECURITY.md)
+- [行为准则](../CODE_OF_CONDUCT.md)
+- [Coding Agent 约定](../AGENTS.md)

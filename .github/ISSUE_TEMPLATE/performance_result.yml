@@ -1,0 +1,66 @@
+name: 性能结果或优化提案
+description: 提交可复现的 C500 调优结果、回归或候选方案
+title: "[Perf]: "
+labels:
+  - performance
+body:
+  - type: input
+    id: host
+    attributes:
+      label: Host ID 与 GPU 配置
+      placeholder: c500-32g / MetaX C500 32 GiB
+    validations:
+      required: true
+  - type: textarea
+    id: software
+    attributes:
+      label: 软件栈
+      description: MACA、驱动、Python、PyTorch、TileLang 和 source commit。
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: workload
+    attributes:
+      label: Workload
+      description: Shape、dtype、专家数、token 分组和测试模式。
+      render: json
+    validations:
+      required: true
+  - type: textarea
+    id: schedule
+    attributes:
+      label: Schedule / Config
+      render: json
+    validations:
+      required: true
+  - type: textarea
+    id: method
+    attributes:
+      label: 测量方法
+      description: Warm-up、iterations、cache policy、时钟/占用条件和比较基线。
+    validations:
+      required: true
+  - type: textarea
+    id: results
+    attributes:
+      label: 正确性与性能结果
+      description: 同时列出 correctness、baseline、candidate、重复样本或中位数。
+    validations:
+      required: true
+  - type: input
+    id: evidence
+    attributes:
+      label: 仓库记录或 profiler 路径
+      placeholder: data/autotune/... 或 reports/...
+  - type: checkboxes
+    id: integrity
+    attributes:
+      label: 数据完整性确认
+      options:
+        - label: 结果来自所填写的真实硬件和软件环境。
+          required: true
+        - label: 候选已经通过对应的正确性测试。
+          required: true
+        - label: 我没有把另一显存配置的结果标记为本机实测结果。
+          required: true
