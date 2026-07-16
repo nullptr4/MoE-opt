@@ -25,9 +25,3 @@ cmake-build-*/
 *.log
 .cache/
 external/
-
-# Raw profiler payloads are versioned through Git LFS when present.
-!data/profiler/
-!data/profiler/**/
-!data/profiler/**/raw/
-!data/profiler/**/raw/**

@@ -12,3 +12,4 @@
 - `materials/Intro-ops/`、`benchmarks/tilelang-race-tests/`：补充的训练营、MLA 和 NSA 资料。
 
 没有提交服务器 Conda 环境、TileLang build/cache、递归子模块工作树或 Python 字节码。完整 TileLang 源码按 `docs/REPRODUCIBILITY.md` 放在 `external/tilelang-metax` 后即可复现 benchmark。
+

@@ -41,13 +41,3 @@
 | gate activation FP16 + reuse gate FP32 accumulator for up | pass (2/2) | 308.72207031 ms | 47.09996582 ms | rejected: the separate gate/up reductions reread input, and bandwidth cost overwhelms the register saving |
 | one-weight, FullRow, row8/row16, down threads=512 | pass (2/2) | 275.21447266 ms | 42.49893555 ms | rejected: a wider down block lowers CTA concurrency more than it reduces per-thread work |
 | one-weight, FullRow, row8/row16, down threads=128 | pass (2/2) | 281.08361328 ms | 42.67457520 ms | rejected: two 64-lane warps cannot sustain the down GEMM efficiently |
-| bounded TileLang autotune + shape autoheuristic, default cache | pass (4/4) | 242.42052734 ms | 37.99260498 ms | current local verification; selected only validated row-swizzle candidates |
-| Stage1 E0 decoupled control (3-process median) | pass (2/2) | 243.68445313 ms | 38.61989258 ms | canonical E0 control |
-| Stage1 E1: FC1 BK64 only (3-process median) | pass (2/2) | 251.33406250 ms | 39.11004883 ms | rejected: combined -2.88% |
-| Stage1 E2: FC1 BN64 only (3-process median) | pass (2/2) | 295.48572266 ms | 44.57479980 ms | rejected: combined -20.46% |
-| Stage1 E3: FC2 BK64/stage1 only (3-process median) | pass (2/2) | 241.32337891 ms | 38.04675293 ms | provisional +1.04%; required interleaved confirmation |
-| Stage1 E4: FC2 BK64/stage2 only (3-process median) | pass (2/2) | 246.66210938 ms | 38.65204834 ms | rejected: combined -1.07% |
-| Stage1 E5: FC2 BN256 only (3-process median) | pass (2/2) | 266.42359375 ms | 41.58349609 ms | rejected: combined -9.10% |
-| Stage1 E3 interleaved confirmation (3-process median) | pass (2/2), OJ trial pass (2/2 + fuzz 4/4) | 241.75939453 ms | 38.06101807 ms | not promoted: +0.70% / +1.21%, combined +0.768% below 1% policy |
-| Stage1 E3 final source-snapshotted confirmation (3-process median) | completed, promotion rejected | 241.45742188 ms | 38.02514648 ms | not promoted: +0.79% / +1.47%, combined +0.882% below 1% policy |
-| Stage2 targeted-profiler decision table | E0 retained; source hashes verified | 243.68445313 ms | 38.61989258 ms | tile search stopped; FC1 async pipeline gate not met, proceed to epilogue/full-tail-empty work |
