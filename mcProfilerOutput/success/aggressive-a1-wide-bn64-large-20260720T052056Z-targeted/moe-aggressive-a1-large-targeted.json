@@ -1,0 +1,991 @@
+{
+    "perf_counters": {
+        "0": [
+            {
+                "CE": {
+                    "generic": {
+                        "CE_PERF_BUSY_CYCLES": 9750666073,
+                        "CE_PERF_SEND_RM_WORKGROUPS": 13294485,
+                        "CE_PERF_SEND_RM_WAVES": 27307374
+                    }
+                },
+                "ISU": {
+                    "dpcId0,blockId0": {
+                        "AP_PERF_WAVES": 264119,
+                        "AP_PERF_INST_MMA_F32": 0,
+                        "AP_PERF_BSM_READ_INFLIGHT_LEVEL": 1244759615,
+                        "AP_PERF_BSM_ATOMIC_CYCLES": 259202,
+                        "AP_PERF_ISU_ARB_DATA_STALL": 10109964,
+                        "AP_PERF_BSM_INFLIGHT_LEVEL_IN_AP": 211365968
+                    },
+                    "dpcId0,blockId1": {
+                        "AP_PERF_WAVES": 263708,
+                        "AP_PERF_INSTS_BSM": 15718064,
+                        "AP_PERF_INST_FMA_F64": 0,
+                        "AP_PERF_INST_CYCLES_MMA": 441712640,
+                        "AP_PERF_BSM_INFLIGHT_LEVEL": 1345515265,
+                        "AP_PERF_BSM_WR_CYCLES": 13893148
+                    },
+                    "dpcId0,blockId2": {
+                        "AP_PERF_WAVES": 263426,
+                        "AP_PERF_INSTS_GVM_ATOMIC": 1136037,
+                        "AP_PERF_INST_MMA_TF64": 0,
+                        "AP_PERF_INST_TRANS_FP32": 3868992,
+                        "AP_PERF_INST_CYCLES_VALU_4CYCLES": 325435320,
+                        "AP_PERF_INSTS_MMA": 27549696
+                    },
+                    "dpcId0,blockId3": {
+                        "AP_PERF_WAVES": 262980,
+                        "AP_PERF_INSTS_GVM": 8154202,
+                        "AP_PERF_INST_MISC": 34763523,
+                        "AP_PERF_INST_GLOBAL_ATOMIC_64": 29,
+                        "AP_PERF_INST_MMA_FP16": 27484160,
+                        "AP_PERF_INST_CYCLES_MMA_32CYCLES": 0
+                    },
+                    "dpcId0,blockId4": {
+                        "AP_PERF_WAVES": 263284,
+                        "AP_PERF_INSTS_SALU": 43489270,
+                        "AP_PERF_INST_GENERIC_WR": 0,
+                        "AP_PERF_BSM_ATOMIC_INFLIGHT_LEVEL": 601319,
+                        "AP_PERF_ISU_ARB_VALU_STALL": 0,
+                        "AP_PERF_ISU_AP_BUSY": 648308152
+                    },
+                    "dpcId0,blockId5": {
+                        "AP_PERF_WAVES": 262722,
+                        "AP_PERF_MTE_PI_SEG_SEL_F64": 0,
+                        "AP_PERF_INST_GENERIC_RD": 0,
+                        "AP_PERF_INST_MMA_TF32": 0,
+                        "AP_PERF_INST_MMA_BF16": 0,
+                        "AP_PERF_INSTS_VALU": 82085218
+                    },
+                    "dpcId0,blockId6": {
+                        "AP_PERF_WAVES": 262508,
+                        "AP_PERF_INSTS_LDU": 1978639,
+                        "AP_PERF_INST_BSM_RD": 13759118,
+                        "AP_PERF_INST_TRANS_FP16": 0,
+                        "AP_PERF_BSM_RD_CYCLES": 109651804,
+                        "AP_PERF_BSM_CONFLICT_CYCLES": 54687388
+                    },
+                    "dpcId0,blockId7": {
+                        "AP_PERF_WAVES": 262041,
+                        "AP_PERF_INST_GLOBAL_RD": 6423313,
+                        "AP_PERF_INST_BSM_ATOMIC": 5076,
+                        "AP_PERF_INST_FMA_F32": 995468,
+                        "AP_PERF_INST_CYCLES_VALU_16CYCLES": 61717248,
+                        "AP_PERF_ISU_ARB_WSM_STALL": 32545059
+                    },
+                    "dpcId0,blockId8": {
+                        "AP_PERF_WAVES": 647774719,
+                        "AP_PERF_INST_GLOBAL_ATOMIC": 1122972,
+                        "AP_PERF_INST_PRIVATE_WR": 0,
+                        "AP_PERF_INST_MMA_F64": 0,
+                        "AP_PERF_BSM_WR_INFLIGHT_LEVEL": 100784071,
+                        "AP_PERF_ISU_ARB_VLS_STALL": 473596672
+                    },
+                    "dpcId0,blockId9": {
+                        "AP_PERF_WAVES": 647839567,
+                        "AP_PERF_INST_GLOBAL_WR": 554647,
+                        "AP_PERF_INST_PRIVATE_RD": 0,
+                        "AP_PERF_INST_BSM_WR": 1814903,
+                        "AP_PERF_INST_CYCLES_VALU": 384621796,
+                        "AP_PERF_INST_CYCLES_MMA_16CYCLES": 435617792
+                    },
+                    "dpcId0,blockId10": {
+                        "AP_PERF_WAVES": 648895338,
+                        "AP_PERF_INST_MMA_INT8": 0
+                    }
+                },
+                "L2C": {
+                    "dpcId0,blockId0": {
+                        "perf_wr_req": 20573580,
+                        "perf_atomic_req": 7340832,
+                        "perf_dnoc_rdreq_128B": 57238387,
+                        "perf_dnoc_rd_histogram_256_511": 22870854
+                    },
+                    "dpcId0,blockId1": {
+                        "perf_hit": 187300198,
+                        "perf_dnoc_wrreq_64B": 499,
+                        "perf_req": 266922926,
+                        "perf_rd_req": 239008603
+                    },
+                    "dpcId0,blockId2": {
+                        "perf_miss": 67219919,
+                        "perf_dnoc_wrreq_32B_low": 438,
+                        "perf_dnoc_rdreq": 59036142,
+                        "perf_dnoc_wrreq": 10022992
+                    },
+                    "dpcId0,blockId3": {
+                        "1_b1": 9750923238,
+                        "perf_sector_hit": 2359616,
+                        "perf_dnoc_wrreq_32B_high": 1,
+                        "perf_dnoc_rdreq_inflight_level": 15908776585
+                    },
+                    "dpcId1,blockId0": {
+                        "perf_dnoc_wrreq_128B": 10022097,
+                        "perf_dnoc_rdreq_32B": 0,
+                        "perf_dnoc_rdreq_64B": 1840826,
+                        "perf_dnoc_rd_histogram_1K_2K": 34089
+                    },
+                    "dpcId1,blockId1": {
+                        "perf_dnoc_rd_histogram_0_255": 39157760,
+                        "perf_dnoc_rd_histogram_512_1K": 1773652,
+                        "perf_dnoc_rd_histogram_2K_INF": 7565
+                    }
+                },
+                "RM": {
+                    "dpcId0,blockId0": {
+                        "RM_PERF_WAVES_InFlight_Level_P1": 0,
+                        "RM_PERF_DISPATCHED_WAVES_P2": 0,
+                        "RM_PERF_WAVES_InFlight_Level_P2": 0,
+                        "RM_PERF_DISPATCHED_WAVES_P3": 0
+                    },
+                    "dpcId1,blockId0": {
+                        "RM_PERF_WAVES_InFlight_Level_P0": 28403843725,
+                        "RM_PERF_DISPATCHED_WAVES_P1": 0,
+                        "RM_PERF_DISPATCHED_WAVES_P0": 3413409,
+                        "RM_PERF_WAVES_InFlight_Level_P3": 0
+                    }
+                },
+                "SL1": {
+                    "dpcId0,blockId0": {
+                        "sl1_kcache_rd": 3982033,
+                        "sl1_kcache_l2_rd": 31507,
+                        "sl1_kcache_total_hit_event": 4618185,
+                        "sl1_kcache_total_hit_on_miss_event": 51677
+                    },
+                    "dpcId0,blockId2": {
+                        "sl1_kcache_total_miss_event": 31228
+                    }
+                },
+                "VL1": {
+                    "dpcId0,blockId0": {
+                        "p_stall_due_oldest_pt1": 16400553,
+                        "p_stall_due_oldest_pt2": 15338130,
+                        "p_total_read_instruction_event": 6486830,
+                        "p_total_write_instruction_event": 552928
+                    },
+                    "dpcId0,blockId1": {
+                        "p_stall_due_oldest_pt3": 15572220,
+                        "p_total_atomic_instruction_event": 1139070,
+                        "p_perf_miss_cnt": 82570350,
+                        "p_perf_thread_req_cnt": 488471190
+                    },
+                    "dpcId0,blockId2": {
+                        "perf_inflt_rd_req": 73566528,
+                        "p_stall_due_oldest_pt0": 17621541
+                    }
+                },
+                "VLS": {
+                    "dpcId0,blockId0": {
+                        "PERFEVENT_VLS_ACTIVE": 0
+                    }
+                }
+            },
+            {
+                "CE": {
+                    "generic": {
+                        "CE_PERF_BUSY_CYCLES": 187340461,
+                        "CE_PERF_SEND_RM_WORKGROUPS": 32928,
+                        "CE_PERF_SEND_RM_WAVES": 131712
+                    }
+                },
+                "ISU": {
+                    "dpcId0,blockId0": {
+                        "AP_PERF_WAVES": 1280,
+                        "AP_PERF_INST_MMA_F32": 0,
+                        "AP_PERF_BSM_READ_INFLIGHT_LEVEL": 423467420,
+                        "AP_PERF_BSM_ATOMIC_CYCLES": 0,
+                        "AP_PERF_ISU_ARB_DATA_STALL": 81920,
+                        "AP_PERF_BSM_INFLIGHT_LEVEL_IN_AP": 73300120
+                    },
+                    "dpcId0,blockId1": {
+                        "AP_PERF_WAVES": 1280,
+                        "AP_PERF_INSTS_BSM": 5160960,
+                        "AP_PERF_INST_FMA_F64": 0,
+                        "AP_PERF_INST_CYCLES_MMA": 146800640,
+                        "AP_PERF_BSM_INFLIGHT_LEVEL": 456006056,
+                        "AP_PERF_BSM_WR_CYCLES": 4587520
+                    },
+                    "dpcId0,blockId2": {
+                        "AP_PERF_WAVES": 1276,
+                        "AP_PERF_INSTS_GVM_ATOMIC": 0,
+                        "AP_PERF_INST_MMA_TF64": 0,
+                        "AP_PERF_INST_TRANS_FP32": 353456,
+                        "AP_PERF_INST_CYCLES_VALU_4CYCLES": 36657008,
+                        "AP_PERF_INSTS_MMA": 9146368
+                    },
+                    "dpcId0,blockId3": {
+                        "AP_PERF_WAVES": 1276,
+                        "AP_PERF_INSTS_GVM": 1725136,
+                        "AP_PERF_INST_MISC": 7751686,
+                        "AP_PERF_INST_GLOBAL_ATOMIC_64": 0,
+                        "AP_PERF_INST_MMA_FP16": 9146368,
+                        "AP_PERF_INST_CYCLES_MMA_32CYCLES": 0
+                    },
+                    "dpcId0,blockId4": {
+                        "AP_PERF_WAVES": 1272,
+                        "AP_PERF_INSTS_SALU": 3341489,
+                        "AP_PERF_INST_GENERIC_WR": 0,
+                        "AP_PERF_BSM_ATOMIC_INFLIGHT_LEVEL": 0,
+                        "AP_PERF_ISU_ARB_VALU_STALL": 0,
+                        "AP_PERF_ISU_AP_BUSY": 185916694
+                    },
+                    "dpcId0,blockId5": {
+                        "AP_PERF_WAVES": 1268,
+                        "AP_PERF_MTE_PI_SEG_SEL_F64": 0,
+                        "AP_PERF_INST_GENERIC_RD": 0,
+                        "AP_PERF_INST_MMA_TF32": 0,
+                        "AP_PERF_INST_MMA_BF16": 0,
+                        "AP_PERF_INSTS_VALU": 9194560
+                    },
+                    "dpcId0,blockId6": {
+                        "AP_PERF_WAVES": 1268,
+                        "AP_PERF_INSTS_LDU": 11412,
+                        "AP_PERF_INST_BSM_RD": 4544512,
+                        "AP_PERF_INST_TRANS_FP16": 0,
+                        "AP_PERF_BSM_RD_CYCLES": 36356096,
+                        "AP_PERF_BSM_CONFLICT_CYCLES": 18178048
+                    },
+                    "dpcId0,blockId7": {
+                        "AP_PERF_WAVES": 1264,
+                        "AP_PERF_INST_GLOBAL_RD": 1698816,
+                        "AP_PERF_INST_BSM_ATOMIC": 0,
+                        "AP_PERF_INST_FMA_F32": 243952,
+                        "AP_PERF_INST_CYCLES_VALU_16CYCLES": 5602048,
+                        "AP_PERF_ISU_ARB_WSM_STALL": 11326427
+                    },
+                    "dpcId0,blockId8": {
+                        "AP_PERF_WAVES": 185681564,
+                        "AP_PERF_INST_GLOBAL_ATOMIC": 0,
+                        "AP_PERF_INST_PRIVATE_WR": 0,
+                        "AP_PERF_INST_MMA_F64": 0,
+                        "AP_PERF_BSM_WR_INFLIGHT_LEVEL": 32501741,
+                        "AP_PERF_ISU_ARB_VLS_STALL": 150332740
+                    },
+                    "dpcId0,blockId9": {
+                        "AP_PERF_WAVES": 185776940,
+                        "AP_PERF_INST_GLOBAL_WR": 9932,
+                        "AP_PERF_INST_PRIVATE_RD": 0,
+                        "AP_PERF_INST_BSM_WR": 562688,
+                        "AP_PERF_INST_CYCLES_VALU": 41645872,
+                        "AP_PERF_INST_CYCLES_MMA_16CYCLES": 144048128
+                    },
+                    "dpcId0,blockId10": {
+                        "AP_PERF_WAVES": 186020928,
+                        "AP_PERF_INST_MMA_INT8": 0
+                    }
+                },
+                "L2C": {
+                    "dpcId0,blockId0": {
+                        "perf_wr_req": 524288,
+                        "perf_atomic_req": 0,
+                        "perf_dnoc_rdreq_128B": 23373473,
+                        "perf_dnoc_rd_histogram_256_511": 9150183
+                    },
+                    "dpcId0,blockId1": {
+                        "perf_hit": 50392643,
+                        "perf_dnoc_wrreq_64B": 0,
+                        "perf_req": 74273187,
+                        "perf_rd_req": 73748896
+                    },
+                    "dpcId0,blockId2": {
+                        "perf_miss": 23480125,
+                        "perf_dnoc_wrreq_32B_low": 0,
+                        "perf_dnoc_rdreq": 23349057,
+                        "perf_dnoc_wrreq": 131072
+                    },
+                    "dpcId0,blockId3": {
+                        "1_b1": 187330077,
+                        "perf_sector_hit": 262091,
+                        "perf_dnoc_wrreq_32B_high": 0,
+                        "perf_dnoc_rdreq_inflight_level": 6107357665
+                    },
+                    "dpcId1,blockId0": {
+                        "perf_dnoc_wrreq_128B": 131072,
+                        "perf_dnoc_rdreq_32B": 0,
+                        "perf_dnoc_rdreq_64B": 129,
+                        "perf_dnoc_rd_histogram_1K_2K": 794
+                    },
+                    "dpcId1,blockId1": {
+                        "perf_dnoc_rd_histogram_0_255": 15926191,
+                        "perf_dnoc_rd_histogram_512_1K": 340481,
+                        "perf_dnoc_rd_histogram_2K_INF": 0
+                    }
+                },
+                "RM": {
+                    "dpcId0,blockId0": {
+                        "RM_PERF_WAVES_InFlight_Level_P1": 0,
+                        "RM_PERF_DISPATCHED_WAVES_P2": 0,
+                        "RM_PERF_WAVES_InFlight_Level_P2": 0,
+                        "RM_PERF_DISPATCHED_WAVES_P3": 0
+                    },
+                    "dpcId1,blockId0": {
+                        "RM_PERF_WAVES_InFlight_Level_P0": 6995699040,
+                        "RM_PERF_DISPATCHED_WAVES_P1": 0,
+                        "RM_PERF_DISPATCHED_WAVES_P0": 16464,
+                        "RM_PERF_WAVES_InFlight_Level_P3": 0
+                    }
+                },
+                "SL1": {
+                    "dpcId0,blockId0": {
+                        "sl1_kcache_rd": 23040,
+                        "sl1_kcache_l2_rd": 70,
+                        "sl1_kcache_total_hit_event": 22646,
+                        "sl1_kcache_total_hit_on_miss_event": 324
+                    },
+                    "dpcId0,blockId2": {
+                        "sl1_kcache_total_miss_event": 70
+                    }
+                },
+                "VL1": {
+                    "dpcId0,blockId0": {
+                        "p_stall_due_oldest_pt1": 6064025,
+                        "p_stall_due_oldest_pt2": 5909936,
+                        "p_total_read_instruction_event": 1720320,
+                        "p_total_write_instruction_event": 10240
+                    },
+                    "dpcId0,blockId1": {
+                        "p_stall_due_oldest_pt3": 6091743,
+                        "p_total_atomic_instruction_event": 0,
+                        "p_perf_miss_cnt": 23090188,
+                        "p_perf_thread_req_cnt": 110710832
+                    },
+                    "dpcId0,blockId2": {
+                        "perf_inflt_rd_req": 22865920,
+                        "p_stall_due_oldest_pt0": 6219539
+                    }
+                },
+                "VLS": {
+                    "dpcId0,blockId0": {
+                        "PERFEVENT_VLS_ACTIVE": 0
+                    }
+                },
+                "args": {
+                    "kernelName": [
+                        "kernel_kernel"
+                    ],
+                    "tag": [
+                        -1
+                    ]
+                }
+            },
+            {
+                "CE": {
+                    "generic": {
+                        "CE_PERF_BUSY_CYCLES": 89126959,
+                        "CE_PERF_SEND_RM_WORKGROUPS": 57624,
+                        "CE_PERF_SEND_RM_WAVES": 230496
+                    }
+                },
+                "ISU": {
+                    "dpcId0,blockId0": {
+                        "AP_PERF_WAVES": 2216,
+                        "AP_PERF_INST_MMA_F32": 0,
+                        "AP_PERF_BSM_READ_INFLIGHT_LEVEL": 192044724,
+                        "AP_PERF_BSM_ATOMIC_CYCLES": 0,
+                        "AP_PERF_ISU_ARB_DATA_STALL": 282432,
+                        "AP_PERF_BSM_INFLIGHT_LEVEL_IN_AP": 29534404
+                    },
+                    "dpcId0,blockId1": {
+                        "AP_PERF_WAVES": 2220,
+                        "AP_PERF_INSTS_BSM": 2557440,
+                        "AP_PERF_INST_FMA_F64": 0,
+                        "AP_PERF_INST_CYCLES_MMA": 72744960,
+                        "AP_PERF_BSM_INFLIGHT_LEVEL": 207640565,
+                        "AP_PERF_BSM_WR_CYCLES": 2273280
+                    },
+                    "dpcId0,blockId2": {
+                        "AP_PERF_WAVES": 2220,
+                        "AP_PERF_INSTS_GVM_ATOMIC": 0,
+                        "AP_PERF_INST_MMA_TF64": 0,
+                        "AP_PERF_INST_TRANS_FP32": 45680,
+                        "AP_PERF_INST_CYCLES_VALU_4CYCLES": 22942864,
+                        "AP_PERF_INSTS_MMA": 4546560
+                    },
+                    "dpcId0,blockId3": {
+                        "AP_PERF_WAVES": 2216,
+                        "AP_PERF_INSTS_GVM": 921504,
+                        "AP_PERF_INST_MISC": 3950444,
+                        "AP_PERF_INST_GLOBAL_ATOMIC_64": 0,
+                        "AP_PERF_INST_MMA_FP16": 4538368,
+                        "AP_PERF_INST_CYCLES_MMA_32CYCLES": 0
+                    },
+                    "dpcId0,blockId4": {
+                        "AP_PERF_WAVES": 2216,
+                        "AP_PERF_INSTS_SALU": 2125449,
+                        "AP_PERF_INST_GENERIC_WR": 0,
+                        "AP_PERF_BSM_ATOMIC_INFLIGHT_LEVEL": 0,
+                        "AP_PERF_ISU_ARB_VALU_STALL": 0,
+                        "AP_PERF_ISU_AP_BUSY": 88008322
+                    },
+                    "dpcId0,blockId5": {
+                        "AP_PERF_WAVES": 2220,
+                        "AP_PERF_MTE_PI_SEG_SEL_F64": 0,
+                        "AP_PERF_INST_GENERIC_RD": 0,
+                        "AP_PERF_INST_MMA_TF32": 0,
+                        "AP_PERF_INST_MMA_BF16": 0,
+                        "AP_PERF_INSTS_VALU": 5744284
+                    },
+                    "dpcId0,blockId6": {
+                        "AP_PERF_WAVES": 2212,
+                        "AP_PERF_INSTS_LDU": 19908,
+                        "AP_PERF_INST_BSM_RD": 2265088,
+                        "AP_PERF_INST_TRANS_FP16": 0,
+                        "AP_PERF_BSM_RD_CYCLES": 18120704,
+                        "AP_PERF_BSM_CONFLICT_CYCLES": 9060352
+                    },
+                    "dpcId0,blockId7": {
+                        "AP_PERF_WAVES": 2216,
+                        "AP_PERF_INST_GLOBAL_RD": 886112,
+                        "AP_PERF_INST_BSM_ATOMIC": 0,
+                        "AP_PERF_INST_FMA_F32": 0,
+                        "AP_PERF_INST_CYCLES_VALU_16CYCLES": 729344,
+                        "AP_PERF_ISU_ARB_WSM_STALL": 4656745
+                    },
+                    "dpcId0,blockId8": {
+                        "AP_PERF_WAVES": 88009388,
+                        "AP_PERF_INST_GLOBAL_ATOMIC": 0,
+                        "AP_PERF_INST_PRIVATE_WR": 0,
+                        "AP_PERF_INST_MMA_F64": 0,
+                        "AP_PERF_BSM_WR_INFLIGHT_LEVEL": 15625422,
+                        "AP_PERF_ISU_ARB_VLS_STALL": 77943707
+                    },
+                    "dpcId0,blockId9": {
+                        "AP_PERF_WAVES": 88012162,
+                        "AP_PERF_INST_GLOBAL_WR": 35336,
+                        "AP_PERF_INST_PRIVATE_RD": 0,
+                        "AP_PERF_INST_BSM_WR": 283648,
+                        "AP_PERF_INST_CYCLES_VALU": 23634464,
+                        "AP_PERF_INST_CYCLES_MMA_16CYCLES": 72613888
+                    },
+                    "dpcId0,blockId10": {
+                        "AP_PERF_WAVES": 88023520,
+                        "AP_PERF_INST_MMA_INT8": 0
+                    }
+                },
+                "L2C": {
+                    "dpcId0,blockId0": {
+                        "perf_wr_req": 1835008,
+                        "perf_atomic_req": 0,
+                        "perf_dnoc_rdreq_128B": 1732976,
+                        "perf_dnoc_rd_histogram_256_511": 199449
+                    },
+                    "dpcId0,blockId1": {
+                        "perf_hit": 35282705,
+                        "perf_dnoc_wrreq_64B": 256,
+                        "perf_req": 38849891,
+                        "perf_rd_req": 37014880
+                    },
+                    "dpcId0,blockId2": {
+                        "perf_miss": 2190383,
+                        "perf_dnoc_wrreq_32B_low": 212,
+                        "perf_dnoc_rdreq": 1731626,
+                        "perf_dnoc_wrreq": 459384
+                    },
+                    "dpcId0,blockId3": {
+                        "1_b1": 89161532,
+                        "perf_sector_hit": 917502,
+                        "perf_dnoc_wrreq_32B_high": 1,
+                        "perf_dnoc_rdreq_inflight_level": 378654532
+                    },
+                    "dpcId1,blockId0": {
+                        "perf_dnoc_wrreq_128B": 458927,
+                        "perf_dnoc_rdreq_32B": 0,
+                        "perf_dnoc_rdreq_64B": 17,
+                        "perf_dnoc_rd_histogram_1K_2K": 0
+                    },
+                    "dpcId1,blockId1": {
+                        "perf_dnoc_rd_histogram_0_255": 1567217,
+                        "perf_dnoc_rd_histogram_512_1K": 996,
+                        "perf_dnoc_rd_histogram_2K_INF": 0
+                    }
+                },
+                "RM": {
+                    "dpcId0,blockId0": {
+                        "RM_PERF_WAVES_InFlight_Level_P1": 0,
+                        "RM_PERF_DISPATCHED_WAVES_P2": 0,
+                        "RM_PERF_WAVES_InFlight_Level_P2": 0,
+                        "RM_PERF_DISPATCHED_WAVES_P3": 0
+                    },
+                    "dpcId1,blockId0": {
+                        "RM_PERF_WAVES_InFlight_Level_P0": 3422115600,
+                        "RM_PERF_DISPATCHED_WAVES_P1": 0,
+                        "RM_PERF_DISPATCHED_WAVES_P0": 28812,
+                        "RM_PERF_WAVES_InFlight_Level_P3": 0
+                    }
+                },
+                "SL1": {
+                    "dpcId0,blockId0": {
+                        "sl1_kcache_rd": 39924,
+                        "sl1_kcache_l2_rd": 70,
+                        "sl1_kcache_total_hit_event": 39619,
+                        "sl1_kcache_total_hit_on_miss_event": 235
+                    },
+                    "dpcId0,blockId2": {
+                        "sl1_kcache_total_miss_event": 70
+                    }
+                },
+                "VL1": {
+                    "dpcId0,blockId0": {
+                        "p_stall_due_oldest_pt1": 422734,
+                        "p_stall_due_oldest_pt2": 335511,
+                        "p_total_read_instruction_event": 886248,
+                        "p_total_write_instruction_event": 35304
+                    },
+                    "dpcId0,blockId1": {
+                        "p_stall_due_oldest_pt3": 367380,
+                        "p_total_atomic_instruction_event": 0,
+                        "p_perf_miss_cnt": 11975560,
+                        "p_perf_thread_req_cnt": 59087040
+                    },
+                    "dpcId0,blockId2": {
+                        "perf_inflt_rd_req": 11409456,
+                        "p_stall_due_oldest_pt0": 345570
+                    }
+                },
+                "VLS": {
+                    "dpcId0,blockId0": {
+                        "PERFEVENT_VLS_ACTIVE": 0
+                    }
+                },
+                "args": {
+                    "kernelName": [
+                        "kernel_kernel_1"
+                    ],
+                    "tag": [
+                        -1
+                    ]
+                }
+            },
+            {
+                "CE": {
+                    "generic": {
+                        "CE_PERF_BUSY_CYCLES": 186836172,
+                        "CE_PERF_SEND_RM_WORKGROUPS": 32928,
+                        "CE_PERF_SEND_RM_WAVES": 131712
+                    }
+                },
+                "ISU": {
+                    "dpcId0,blockId0": {
+                        "AP_PERF_WAVES": 1284,
+                        "AP_PERF_INST_MMA_F32": 0,
+                        "AP_PERF_BSM_READ_INFLIGHT_LEVEL": 425039492,
+                        "AP_PERF_BSM_ATOMIC_CYCLES": 0,
+                        "AP_PERF_ISU_ARB_DATA_STALL": 81824,
+                        "AP_PERF_BSM_INFLIGHT_LEVEL_IN_AP": 73944120
+                    },
+                    "dpcId0,blockId1": {
+                        "AP_PERF_WAVES": 1280,
+                        "AP_PERF_INSTS_BSM": 5160960,
+                        "AP_PERF_INST_FMA_F64": 0,
+                        "AP_PERF_INST_CYCLES_MMA": 146800640,
+                        "AP_PERF_BSM_INFLIGHT_LEVEL": 456861684,
+                        "AP_PERF_BSM_WR_CYCLES": 4587520
+                    },
+                    "dpcId0,blockId2": {
+                        "AP_PERF_WAVES": 1276,
+                        "AP_PERF_INSTS_GVM_ATOMIC": 0,
+                        "AP_PERF_INST_MMA_TF64": 0,
+                        "AP_PERF_INST_TRANS_FP32": 353456,
+                        "AP_PERF_INST_CYCLES_VALU_4CYCLES": 36648912,
+                        "AP_PERF_INSTS_MMA": 9146368
+                    },
+                    "dpcId0,blockId3": {
+                        "AP_PERF_WAVES": 1272,
+                        "AP_PERF_INSTS_GVM": 1719172,
+                        "AP_PERF_INST_MISC": 7727401,
+                        "AP_PERF_INST_GLOBAL_ATOMIC_64": 0,
+                        "AP_PERF_INST_MMA_FP16": 9117696,
+                        "AP_PERF_INST_CYCLES_MMA_32CYCLES": 0
+                    },
+                    "dpcId0,blockId4": {
+                        "AP_PERF_WAVES": 1272,
+                        "AP_PERF_INSTS_SALU": 3341156,
+                        "AP_PERF_INST_GENERIC_WR": 0,
+                        "AP_PERF_BSM_ATOMIC_INFLIGHT_LEVEL": 0,
+                        "AP_PERF_ISU_ARB_VALU_STALL": 0,
+                        "AP_PERF_ISU_AP_BUSY": 185866362
+                    },
+                    "dpcId0,blockId5": {
+                        "AP_PERF_WAVES": 1268,
+                        "AP_PERF_MTE_PI_SEG_SEL_F64": 0,
+                        "AP_PERF_INST_GENERIC_RD": 0,
+                        "AP_PERF_INST_MMA_TF32": 0,
+                        "AP_PERF_INST_MMA_BF16": 0,
+                        "AP_PERF_INSTS_VALU": 9194784
+                    },
+                    "dpcId0,blockId6": {
+                        "AP_PERF_WAVES": 1264,
+                        "AP_PERF_INSTS_LDU": 11376,
+                        "AP_PERF_INST_BSM_RD": 4530176,
+                        "AP_PERF_INST_TRANS_FP16": 0,
+                        "AP_PERF_BSM_RD_CYCLES": 36241408,
+                        "AP_PERF_BSM_CONFLICT_CYCLES": 18120704
+                    },
+                    "dpcId0,blockId7": {
+                        "AP_PERF_WAVES": 1264,
+                        "AP_PERF_INST_GLOBAL_RD": 1698816,
+                        "AP_PERF_INST_BSM_ATOMIC": 0,
+                        "AP_PERF_INST_FMA_F32": 243952,
+                        "AP_PERF_INST_CYCLES_VALU_16CYCLES": 5602048,
+                        "AP_PERF_ISU_ARB_WSM_STALL": 11350321
+                    },
+                    "dpcId0,blockId8": {
+                        "AP_PERF_WAVES": 185588990,
+                        "AP_PERF_INST_GLOBAL_ATOMIC": 0,
+                        "AP_PERF_INST_PRIVATE_WR": 0,
+                        "AP_PERF_INST_MMA_F64": 0,
+                        "AP_PERF_BSM_WR_INFLIGHT_LEVEL": 32502222,
+                        "AP_PERF_ISU_ARB_VLS_STALL": 150190717
+                    },
+                    "dpcId0,blockId9": {
+                        "AP_PERF_WAVES": 185722446,
+                        "AP_PERF_INST_GLOBAL_WR": 10080,
+                        "AP_PERF_INST_PRIVATE_RD": 0,
+                        "AP_PERF_INST_BSM_WR": 564480,
+                        "AP_PERF_INST_CYCLES_VALU": 41785520,
+                        "AP_PERF_INST_CYCLES_MMA_16CYCLES": 144506880
+                    },
+                    "dpcId0,blockId10": {
+                        "AP_PERF_WAVES": 185476818,
+                        "AP_PERF_INST_MMA_INT8": 0
+                    }
+                },
+                "L2C": {
+                    "dpcId0,blockId0": {
+                        "perf_wr_req": 524288,
+                        "perf_atomic_req": 0,
+                        "perf_dnoc_rdreq_128B": 21876882,
+                        "perf_dnoc_rd_histogram_256_511": 8207151
+                    },
+                    "dpcId0,blockId1": {
+                        "perf_hit": 51887475,
+                        "perf_dnoc_wrreq_64B": 0,
+                        "perf_req": 74273443,
+                        "perf_rd_req": 73749152
+                    },
+                    "dpcId0,blockId2": {
+                        "perf_miss": 21982348,
+                        "perf_dnoc_wrreq_32B_low": 0,
+                        "perf_dnoc_rdreq": 21851287,
+                        "perf_dnoc_wrreq": 131072
+                    },
+                    "dpcId0,blockId3": {
+                        "1_b1": 186825085,
+                        "perf_sector_hit": 262109,
+                        "perf_dnoc_wrreq_32B_high": 0,
+                        "perf_dnoc_rdreq_inflight_level": 5661633178
+                    },
+                    "dpcId1,blockId0": {
+                        "perf_dnoc_wrreq_128B": 131072,
+                        "perf_dnoc_rdreq_32B": 0,
+                        "perf_dnoc_rdreq_64B": 128,
+                        "perf_dnoc_rd_histogram_1K_2K": 449
+                    },
+                    "dpcId1,blockId1": {
+                        "perf_dnoc_rd_histogram_0_255": 15183037,
+                        "perf_dnoc_rd_histogram_512_1K": 287765,
+                        "perf_dnoc_rd_histogram_2K_INF": 0
+                    }
+                },
+                "RM": {
+                    "dpcId0,blockId0": {
+                        "RM_PERF_WAVES_InFlight_Level_P1": 0,
+                        "RM_PERF_DISPATCHED_WAVES_P2": 0,
+                        "RM_PERF_WAVES_InFlight_Level_P2": 0,
+                        "RM_PERF_DISPATCHED_WAVES_P3": 0
+                    },
+                    "dpcId1,blockId0": {
+                        "RM_PERF_WAVES_InFlight_Level_P0": 6971234808,
+                        "RM_PERF_DISPATCHED_WAVES_P1": 0,
+                        "RM_PERF_DISPATCHED_WAVES_P0": 16464,
+                        "RM_PERF_WAVES_InFlight_Level_P3": 0
+                    }
+                },
+                "SL1": {
+                    "dpcId0,blockId0": {
+                        "sl1_kcache_rd": 23076,
+                        "sl1_kcache_l2_rd": 70,
+                        "sl1_kcache_total_hit_event": 22722,
+                        "sl1_kcache_total_hit_on_miss_event": 284
+                    },
+                    "dpcId0,blockId2": {
+                        "sl1_kcache_total_miss_event": 70
+                    }
+                },
+                "VL1": {
+                    "dpcId0,blockId0": {
+                        "p_stall_due_oldest_pt1": 6047776,
+                        "p_stall_due_oldest_pt2": 5808108,
+                        "p_total_read_instruction_event": 1725248,
+                        "p_total_write_instruction_event": 10228
+                    },
+                    "dpcId0,blockId1": {
+                        "p_stall_due_oldest_pt3": 6193536,
+                        "p_total_atomic_instruction_event": 0,
+                        "p_perf_miss_cnt": 23101440,
+                        "p_perf_thread_req_cnt": 110755840
+                    },
+                    "dpcId0,blockId2": {
+                        "perf_inflt_rd_req": 22855616,
+                        "p_stall_due_oldest_pt0": 6233126
+                    }
+                },
+                "VLS": {
+                    "dpcId0,blockId0": {
+                        "PERFEVENT_VLS_ACTIVE": 0
+                    }
+                },
+                "args": {
+                    "kernelName": [
+                        "kernel_kernel"
+                    ],
+                    "tag": [
+                        -1
+                    ]
+                }
+            },
+            {
+                "CE": {
+                    "generic": {
+                        "CE_PERF_BUSY_CYCLES": 89029237,
+                        "CE_PERF_SEND_RM_WORKGROUPS": 57624,
+                        "CE_PERF_SEND_RM_WAVES": 230496
+                    }
+                },
+                "ISU": {
+                    "dpcId0,blockId0": {
+                        "AP_PERF_WAVES": 2216,
+                        "AP_PERF_INST_MMA_F32": 0,
+                        "AP_PERF_BSM_READ_INFLIGHT_LEVEL": 192035604,
+                        "AP_PERF_BSM_ATOMIC_CYCLES": 0,
+                        "AP_PERF_ISU_ARB_DATA_STALL": 282816,
+                        "AP_PERF_BSM_INFLIGHT_LEVEL_IN_AP": 29677064
+                    },
+                    "dpcId0,blockId1": {
+                        "AP_PERF_WAVES": 2216,
+                        "AP_PERF_INSTS_BSM": 2552832,
+                        "AP_PERF_INST_FMA_F64": 0,
+                        "AP_PERF_INST_CYCLES_MMA": 72613888,
+                        "AP_PERF_BSM_INFLIGHT_LEVEL": 207807991,
+                        "AP_PERF_BSM_WR_CYCLES": 2269184
+                    },
+                    "dpcId0,blockId2": {
+                        "AP_PERF_WAVES": 2216,
+                        "AP_PERF_INSTS_GVM_ATOMIC": 0,
+                        "AP_PERF_INST_MMA_TF64": 0,
+                        "AP_PERF_INST_TRANS_FP32": 45584,
+                        "AP_PERF_INST_CYCLES_VALU_4CYCLES": 22911664,
+                        "AP_PERF_INSTS_MMA": 4538368
+                    },
+                    "dpcId0,blockId3": {
+                        "AP_PERF_WAVES": 2216,
+                        "AP_PERF_INSTS_GVM": 921632,
+                        "AP_PERF_INST_MISC": 3950692,
+                        "AP_PERF_INST_GLOBAL_ATOMIC_64": 0,
+                        "AP_PERF_INST_MMA_FP16": 4538368,
+                        "AP_PERF_INST_CYCLES_MMA_32CYCLES": 0
+                    },
+                    "dpcId0,blockId4": {
+                        "AP_PERF_WAVES": 2220,
+                        "AP_PERF_INSTS_SALU": 2126867,
+                        "AP_PERF_INST_GENERIC_WR": 0,
+                        "AP_PERF_BSM_ATOMIC_INFLIGHT_LEVEL": 0,
+                        "AP_PERF_ISU_ARB_VALU_STALL": 0,
+                        "AP_PERF_ISU_AP_BUSY": 88166214
+                    },
+                    "dpcId0,blockId5": {
+                        "AP_PERF_WAVES": 2216,
+                        "AP_PERF_MTE_PI_SEG_SEL_F64": 0,
+                        "AP_PERF_INST_GENERIC_RD": 0,
+                        "AP_PERF_INST_MMA_TF32": 0,
+                        "AP_PERF_INST_MMA_BF16": 0,
+                        "AP_PERF_INSTS_VALU": 5733452
+                    },
+                    "dpcId0,blockId6": {
+                        "AP_PERF_WAVES": 2216,
+                        "AP_PERF_INSTS_LDU": 19944,
+                        "AP_PERF_INST_BSM_RD": 2269184,
+                        "AP_PERF_INST_TRANS_FP16": 0,
+                        "AP_PERF_BSM_RD_CYCLES": 18153472,
+                        "AP_PERF_BSM_CONFLICT_CYCLES": 9076736
+                    },
+                    "dpcId0,blockId7": {
+                        "AP_PERF_WAVES": 2216,
+                        "AP_PERF_INST_GLOBAL_RD": 886216,
+                        "AP_PERF_INST_BSM_ATOMIC": 0,
+                        "AP_PERF_INST_FMA_F32": 0,
+                        "AP_PERF_INST_CYCLES_VALU_16CYCLES": 729344,
+                        "AP_PERF_ISU_ARB_WSM_STALL": 4659966
+                    },
+                    "dpcId0,blockId8": {
+                        "AP_PERF_WAVES": 88000358,
+                        "AP_PERF_INST_GLOBAL_ATOMIC": 0,
+                        "AP_PERF_INST_PRIVATE_WR": 0,
+                        "AP_PERF_INST_MMA_F64": 0,
+                        "AP_PERF_BSM_WR_INFLIGHT_LEVEL": 15655666,
+                        "AP_PERF_ISU_ARB_VLS_STALL": 77874279
+                    },
+                    "dpcId0,blockId9": {
+                        "AP_PERF_WAVES": 88006834,
+                        "AP_PERF_INST_GLOBAL_WR": 35400,
+                        "AP_PERF_INST_PRIVATE_RD": 0,
+                        "AP_PERF_INST_BSM_WR": 283648,
+                        "AP_PERF_INST_CYCLES_VALU": 23643440,
+                        "AP_PERF_INST_CYCLES_MMA_16CYCLES": 72613888
+                    },
+                    "dpcId0,blockId10": {
+                        "AP_PERF_WAVES": 88004426,
+                        "AP_PERF_INST_MMA_INT8": 0
+                    }
+                },
+                "L2C": {
+                    "dpcId0,blockId0": {
+                        "perf_wr_req": 1835008,
+                        "perf_atomic_req": 0,
+                        "perf_dnoc_rdreq_128B": 1697275,
+                        "perf_dnoc_rd_histogram_256_511": 193308
+                    },
+                    "dpcId0,blockId1": {
+                        "perf_hit": 35318436,
+                        "perf_dnoc_wrreq_64B": 228,
+                        "perf_req": 38849891,
+                        "perf_rd_req": 37014880
+                    },
+                    "dpcId0,blockId2": {
+                        "perf_miss": 2156134,
+                        "perf_dnoc_wrreq_32B_low": 226,
+                        "perf_dnoc_rdreq": 1697382,
+                        "perf_dnoc_wrreq": 459434
+                    },
+                    "dpcId0,blockId3": {
+                        "1_b1": 89072676,
+                        "perf_sector_hit": 917503,
+                        "perf_dnoc_wrreq_32B_high": 0,
+                        "perf_dnoc_rdreq_inflight_level": 370409103
+                    },
+                    "dpcId1,blockId0": {
+                        "perf_dnoc_wrreq_128B": 458979,
+                        "perf_dnoc_rdreq_32B": 0,
+                        "perf_dnoc_rdreq_64B": 73,
+                        "perf_dnoc_rd_histogram_1K_2K": 7
+                    },
+                    "dpcId1,blockId1": {
+                        "perf_dnoc_rd_histogram_0_255": 1535546,
+                        "perf_dnoc_rd_histogram_512_1K": 997,
+                        "perf_dnoc_rd_histogram_2K_INF": 0
+                    }
+                },
+                "RM": {
+                    "dpcId0,blockId0": {
+                        "RM_PERF_WAVES_InFlight_Level_P1": 0,
+                        "RM_PERF_DISPATCHED_WAVES_P2": 0,
+                        "RM_PERF_WAVES_InFlight_Level_P2": 0,
+                        "RM_PERF_DISPATCHED_WAVES_P3": 0
+                    },
+                    "dpcId1,blockId0": {
+                        "RM_PERF_WAVES_InFlight_Level_P0": 3421900014,
+                        "RM_PERF_DISPATCHED_WAVES_P1": 0,
+                        "RM_PERF_DISPATCHED_WAVES_P0": 28812,
+                        "RM_PERF_WAVES_InFlight_Level_P3": 0
+                    }
+                },
+                "SL1": {
+                    "dpcId0,blockId0": {
+                        "sl1_kcache_rd": 39888,
+                        "sl1_kcache_l2_rd": 70,
+                        "sl1_kcache_total_hit_event": 39566,
+                        "sl1_kcache_total_hit_on_miss_event": 252
+                    },
+                    "dpcId0,blockId2": {
+                        "sl1_kcache_total_miss_event": 70
+                    }
+                },
+                "VL1": {
+                    "dpcId0,blockId0": {
+                        "p_stall_due_oldest_pt1": 383246,
+                        "p_stall_due_oldest_pt2": 330653,
+                        "p_total_read_instruction_event": 886168,
+                        "p_total_write_instruction_event": 35352
+                    },
+                    "dpcId0,blockId1": {
+                        "p_stall_due_oldest_pt3": 354158,
+                        "p_total_atomic_instruction_event": 0,
+                        "p_perf_miss_cnt": 11950992,
+                        "p_perf_thread_req_cnt": 58968320
+                    },
+                    "dpcId0,blockId2": {
+                        "perf_inflt_rd_req": 11389032,
+                        "p_stall_due_oldest_pt0": 304374
+                    }
+                },
+                "VLS": {
+                    "dpcId0,blockId0": {
+                        "PERFEVENT_VLS_ACTIVE": 0
+                    }
+                },
+                "args": {
+                    "kernelName": [
+                        "kernel_kernel_1"
+                    ],
+                    "tag": [
+                        -1
+                    ]
+                }
+            }
+        ]
+    },
+    "umd_data": {},
+    "device_info": {
+        "6": {
+            "gpu_id": "31510",
+            "cpu_cores_count": 0,
+            "mem_banks_count": 1,
+            "direct_link_count": 4,
+            "indirect_link_count": 8,
+            "vendor_id": 39321,
+            "device_id": 16385,
+            "drm_render_minor": 132,
+            "isa_major": 10,
+            "isa_minor": 0,
+            "is_vf": 0,
+            "max_vf_nums": 8,
+            "domain": 0,
+            "location_id": 13568,
+            "num_sdma_engines": 5,
+            "num_sdma_queues_per_engine": 9,
+            "num_vpue_cores": 1,
+            "num_vpud_cores": 8,
+            "caches_count": 157,
+            "peu_id_base": 0,
+            "peu_count": 416,
+            "max_waves_per_peu": 8,
+            "wsm_size_in_kb": 64,
+            "wave_front_size": 64,
+            "dpc_count": 8,
+            "dpc0_ap_mask": 8191,
+            "dpc1_ap_mask": 73727,
+            "dpc2_ap_mask": 139263,
+            "dpc3_ap_mask": 204799,
+            "dpc4_ap_mask": 270335,
+            "dpc5_ap_mask": 335871,
+            "dpc6_ap_mask": 401407,
+            "dpc7_ap_mask": 466943,
+            "dpc_arrays": 1,
+            "ap_per_dpc": 13,
+            "peu_per_ap": 4,
+            "pri_mem_per_thread": 4,
+            "max_slots_private_ap": 32,
+            "num_ce_queues": 16,
+            "max_engine_clk_gpu": 1600,
+            "max_engine_clk_cpu": 3600,
+            "mgpu_id": 0,
+            "topology_id": 2,
+            "socket_id": 1,
+            "hbmecc": 1,
+            "local_mem_size": 68719476736,
+            "capability": 4432512,
+            "maxprocess": 10
+        }
+    }
+}

@@ -104,6 +104,8 @@ def _moe_autoheuristic_configs(
     gemm_policy_down=None,
     single_weight_buffer=True,
     min_blocks_per_sm=None,
+    metadata_m=None,
+    combine_gate_up=False,
     s1_bn=None,
     s1_bk=None,
     s1_stages=None,
@@ -117,14 +119,26 @@ def _moe_autoheuristic_configs(
     therefore dispatches only the validated row-swizzle variants, while
     TileLang autotune measures the selected small set on the actual tensors.
     """
+    stage_schedule = resolve_stage_schedule(
+        block_dhidden=block_dhidden,
+        block_dexpert=block_dexpert,
+        num_stages=num_stages,
+        num_stages_down=num_stages_down,
+        s1_bn=s1_bn,
+        s1_bk=s1_bk,
+        s1_stages=s1_stages,
+        s2_bn=s2_bn,
+        s2_bk=s2_bk,
+        s2_stages=s2_stages,
+    )
     common = {
-        "s1_bn": 128,
-        "s1_bk": 128,
-        "s2_bn": 128,
-        "s2_bk": 128,
-        "threads": 256,
-        "s1_stages": 1,
-        "s2_stages": 1,
+        "s1_bn": stage_schedule["s1_bn"],
+        "s1_bk": stage_schedule["s1_bk"],
+        "s2_bn": stage_schedule["s2_bn"],
+        "s2_bk": stage_schedule["s2_bk"],
+        "threads": threads,
+        "s1_stages": stage_schedule["s1_stages"],
+        "s2_stages": stage_schedule["s2_stages"],
         "swizzle_order": "row",
         "swizzle_order_down": "row",
         "gemm_policy": "full_row",
@@ -177,6 +191,7 @@ def _moe_forward_tilelang_routed(
     single_weight_buffer=True,
     min_blocks_per_sm=None,
     metadata_m=None,
+    combine_gate_up=False,
     s1_bn=None,
     s1_bk=None,
     s1_stages=None,
@@ -232,6 +247,8 @@ def _moe_forward_tilelang_routed(
         raise ValueError(f"unsupported GEMM warp policy: {exc.args[0]}") from exc
     if single_weight_buffer and s1_stages != 1:
         raise ValueError("single_weight_buffer currently requires s1_stages=1")
+    if combine_gate_up and not single_weight_buffer:
+        raise ValueError("combine_gate_up requires the single physical weight buffer path")
 
     # The public benchmark builds routing metadata in fixed 128-token units.
     # A smaller compute tile therefore needs multiple CTAs per metadata entry
@@ -275,14 +292,22 @@ def _moe_forward_tilelang_routed(
         # Step 1: Compute gate and up logits
         with T.Kernel(M, T.ceildiv(dexpert, s1_bn), threads=threads) as (bx, by):
             input_shared = T.alloc_fragment((block_token, s1_bk), dtype=dtype)
-            routed_expert_gate_shared = T.alloc_shared((s1_bn, s1_bk), dtype=dtype)
-            if single_weight_buffer:
-                routed_expert_up_shared = routed_expert_gate_shared
+            if combine_gate_up:
+                routed_expert_gate_up_shared = T.alloc_shared((2 * s1_bn, s1_bk), dtype=dtype)
+                gate_up_logits_local = T.alloc_fragment(
+                    (block_token, 2 * s1_bn), dtype=accum_dtype
+                )
+                combined_up_logits_local = T.alloc_fragment(
+                    (block_token, s1_bn), dtype=accum_dtype
+                )
             else:
-                routed_expert_up_shared = T.alloc_shared((s1_bn, s1_bk), dtype=dtype)
-
-            gate_logits_local = T.alloc_fragment((block_token, s1_bn), dtype=accum_dtype)
-            up_logits_local = T.alloc_fragment((block_token, s1_bn), dtype=accum_dtype)
+                routed_expert_gate_shared = T.alloc_shared((s1_bn, s1_bk), dtype=dtype)
+                if single_weight_buffer:
+                    routed_expert_up_shared = routed_expert_gate_shared
+                else:
+                    routed_expert_up_shared = T.alloc_shared((s1_bn, s1_bk), dtype=dtype)
+                gate_logits_local = T.alloc_fragment((block_token, s1_bn), dtype=accum_dtype)
+                up_logits_local = T.alloc_fragment((block_token, s1_bn), dtype=accum_dtype)
 
             T.use_swizzle(panel_size=swizzle_panel, order=swizzle_order)
             if min_blocks_per_sm is not None:
@@ -297,10 +322,59 @@ def _moe_forward_tilelang_routed(
             m_start = m_start_padded - group_padded_offsets[cur_group_idx] + group_offsets[cur_group_idx]
             actual_rows = T.max(0, T.min(block_token, cur_group_size - (m_start_padded - group_padded_offsets[cur_group_idx])))
 
-            T.clear(gate_logits_local)
-            T.clear(up_logits_local)
+            if combine_gate_up:
+                T.clear(gate_up_logits_local)
+                # One physical 2*BN weight tile and one accumulator replace
+                # the two independent Gate/Up GEMMs. The two global tensors
+                # remain separate to preserve the public benchmark ABI.
+                for k in T.serial(T.ceildiv(dhidden, s1_bk)):
+                    T.copy(
+                        input[m_start : m_start + block_token, k * s1_bk : (k + 1) * s1_bk],
+                        input_shared,
+                    )
+                    T.copy(
+                        routed_expert_gate[
+                            cur_group_idx,
+                            by * s1_bn : (by + 1) * s1_bn,
+                            k * s1_bk : (k + 1) * s1_bk,
+                        ],
+                        routed_expert_gate_up_shared[0:s1_bn, 0:s1_bk],
+                    )
+                    T.copy(
+                        routed_expert_up[
+                            cur_group_idx,
+                            by * s1_bn : (by + 1) * s1_bn,
+                            k * s1_bk : (k + 1) * s1_bk,
+                        ],
+                        routed_expert_gate_up_shared[s1_bn : 2 * s1_bn, 0:s1_bk],
+                    )
+                    T.gemm(
+                        input_shared,
+                        routed_expert_gate_up_shared,
+                        gate_up_logits_local,
+                        transpose_B=True,
+                        policy=gemm_policy_stage1,
+                    )
 
-            if single_weight_buffer:
+                # The MACA layout inferencer requires one affine access pattern
+                # per fragment in a Parallel op. Split the physical Up half
+                # before applying SwiGLU instead of reading j and j+BN in one
+                # expression.
+                for i, j in T.Parallel(block_token, s1_bn):
+                    combined_up_logits_local[i, j] = gate_up_logits_local[i, j + s1_bn]
+
+                for i, j in T.Parallel(block_token, s1_bn):
+                    gate_up_logits_local[i, j] = gate_up_logits_local[i, j] * (
+                        1.0 / (1.0 + T.exp2(-gate_up_logits_local[i, j] * scale))
+                    )
+                    combined_up_logits_local[i, j] = (
+                        combined_up_logits_local[i, j] * gate_up_logits_local[i, j]
+                    )
+            else:
+                T.clear(gate_logits_local)
+                T.clear(up_logits_local)
+
+            if not combine_gate_up and single_weight_buffer:
                 # The two copies alias by design, so this loop must remain
                 # serialized rather than use TileLang's copy pipeline.
                 for k in T.serial(T.ceildiv(dhidden, s1_bk)):
@@ -334,7 +408,7 @@ def _moe_forward_tilelang_routed(
                         transpose_B=True,
                         policy=gemm_policy_stage1,
                     )
-            else:
+            elif not combine_gate_up:
                 for k in T.Pipelined(T.ceildiv(dhidden, s1_bk), num_stages=s1_stages):
                     T.copy(
                         input[m_start : m_start + block_token, k * s1_bk : (k + 1) * s1_bk],
@@ -367,13 +441,19 @@ def _moe_forward_tilelang_routed(
                         policy=gemm_policy_stage1,
                     )
 
-            for i, j in T.Parallel(block_token, s1_bn):
-                gate_logits_local[i, j] = gate_logits_local[i, j] * (1.0 / (1.0 + T.exp2(-gate_logits_local[i, j] * scale)))
-                up_logits_local[i, j] = up_logits_local[i, j] * gate_logits_local[i, j]
+            if not combine_gate_up:
+                for i, j in T.Parallel(block_token, s1_bn):
+                    gate_logits_local[i, j] = gate_logits_local[i, j] * (
+                        1.0 / (1.0 + T.exp2(-gate_logits_local[i, j] * scale))
+                    )
+                    up_logits_local[i, j] = up_logits_local[i, j] * gate_logits_local[i, j]
 
             for i, j in T.Parallel(block_token, s1_bn):
                 if i < actual_rows:
-                    up_logits[m_start + i, by * s1_bn + j] = up_logits_local[i, j]
+                    if combine_gate_up:
+                        up_logits[m_start + i, by * s1_bn + j] = combined_up_logits_local[i, j]
+                    else:
+                        up_logits[m_start + i, by * s1_bn + j] = up_logits_local[i, j]
 
         # Step 2: Compute down logits
         with T.Kernel(M, T.ceildiv(dhidden, s2_bn), threads=threads) as (bx, by):
@@ -510,6 +590,9 @@ class RoutedMoEKernel:
         # Internal launch metadata may be specialized by the benchmark's
         # packing path without changing the public constructor ABI.
         self.metadata_m = None
+        # Aggressive candidates can select the exact Gate/Up wide-GEMM path
+        # without extending the public constructor or call signatures.
+        self.combine_gate_up = False
         self.backend = backend
 
         # Defer compilation/tuning until real tensors are available.  This
@@ -554,6 +637,7 @@ class RoutedMoEKernel:
             "gemm_policy_down": self.gemm_policy_down,
             "single_weight_buffer": self.single_weight_buffer,
             "min_blocks_per_sm": self.min_blocks_per_sm,
+            "combine_gate_up": self.combine_gate_up,
         }
         config.update(tuner_result.get("config") or {})
         record = {
@@ -648,6 +732,8 @@ class RoutedMoEKernel:
             }
             if self.metadata_m is not None:
                 compile_kwargs["metadata_m"] = self.metadata_m
+            if self.combine_gate_up:
+                compile_kwargs["combine_gate_up"] = True
             manual_schedule = {
                 "s1_bn": self.s1_bn,
                 "s1_bk": self.s1_bk,
@@ -691,7 +777,12 @@ class RoutedMoEKernel:
                 with set_autotune_inputs(*autotune_inputs):
                     self.impl = moe_forward_tilelang_routed(**compile_kwargs)
             else:
-                self.impl = moe_forward_tilelang_routed(**compile_kwargs)
+                # A promoted/manual schedule is already fully specified. Do
+                # not send it back through the autotuner wrapper: TileLang
+                # would only detect duplicate tunable parameters on every new
+                # RoutedMoEKernel instance, adding host-side launch gaps while
+                # ultimately selecting the same direct JIT specialization.
+                self.impl = _moe_forward_tilelang_routed(**compile_kwargs)
 
             self._record_tuning_observation()
 

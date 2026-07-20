@@ -187,6 +187,7 @@ class Stage1CliTest(unittest.TestCase):
             ("--swizzle-panel", "16"),
             ("--gemm-policy-down", "square"),
             ("--no-single-weight-buffer",),
+            ("--combine-gate-up",),
         ):
             with self.subTest(flags=flags):
                 result = subprocess.run(

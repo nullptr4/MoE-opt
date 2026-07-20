@@ -1,0 +1,157 @@
+{
+  "schema_version": 1,
+  "record_type": "moe-aggressive-optimization-summary",
+  "recorded_at": "2026-07-20T05:26:42Z",
+  "source": {
+    "base_commit": "b60f94e8c779be560e0a8832aa65d25fca0f6f1a",
+    "worktree_modified": true,
+    "design_document": "METAX_MOE_AGGRESSIVE_OPTIMIZATION_SCHEMES.md"
+  },
+  "environment": {
+    "device": "MetaX C500",
+    "memory_profile": "64 GiB",
+    "maca_driver": "3.8.30",
+    "maca": "3.7.1.5",
+    "pytorch": "2.8.0+metax3.7.1.3",
+    "tilelang": "0.1.12+maca.gitec48829b",
+    "mcprofiler": "3.8.1.4 (575f5a9f6d)"
+  },
+  "r1_screen": {
+    "method": "one process, 10 warm-up, 100 iterations, official seed and workloads",
+    "control": {
+      "schedule": "E3+E7 default: FC1 BN128/BK128, FC2 BK64, exact metadata",
+      "large_ms": 238.76966796875,
+      "small_ms": 37.43806640625,
+      "raw": "aggressive-a1-screen-control-20260720T045800Z.json"
+    },
+    "a1": {
+      "schedule": "combined Gate/Up, logical BN64, physical BN128, BK64",
+      "large_ms": 290.985078125,
+      "small_ms": 43.143681640625,
+      "large_improvement_pct": -21.868527355444442,
+      "small_improvement_pct": -15.240144008672646,
+      "combined_improvement_pct": -20.97009539638274,
+      "decision": "reject",
+      "raw": "aggressive-a1-screen-candidate-20260720T045800Z.json"
+    },
+    "a1b": {
+      "schedule": "combined Gate/Up, logical BN128, physical BN256, BK64",
+      "large_ms": 237.14544921875,
+      "small_ms": 37.08261474609375,
+      "large_improvement_pct": 0.6802450092666661,
+      "small_improvement_pct": 0.9494391518492215,
+      "combined_improvement_pct": 0.7167324313476883,
+      "decision": "advance to five-process validation",
+      "raw": "aggressive-a1b-screen-candidate-20260720T050300Z.json"
+    }
+  },
+  "a1b_five_process": {
+    "method": "five independent alternating processes, 20 warm-up, 100 iterations per process",
+    "functional": {
+      "large": true,
+      "small": true,
+      "raw": "aggressive-a1b-20260720T052900Z-functional.json"
+    },
+    "control": {
+      "large": {
+        "runs_ms": [238.87287109375, 238.81376953125, 238.8625, 238.98482421875, 238.82333984375],
+        "median_ms": 238.8625,
+        "mad_ms": 0.039160156250005684,
+        "p95_ms": 238.96243359375,
+        "mean_ms": 238.8714609375,
+        "min_ms": 238.81376953125,
+        "max_ms": 238.98482421875,
+        "stdev_ms": 0.06814957537668985,
+        "cv_pct": 0.028529810597391115
+      },
+      "small": {
+        "runs_ms": [37.45111572265625, 37.46058837890625, 37.4951025390625, 37.48559814453125, 37.46435546875],
+        "median_ms": 37.46435546875,
+        "mad_ms": 0.013239746093752558,
+        "p95_ms": 37.49320166015625,
+        "mean_ms": 37.47135205078125,
+        "min_ms": 37.45111572265625,
+        "max_ms": 37.4951025390625,
+        "stdev_ms": 0.01831225442884548,
+        "cv_pct": 0.0488700124938878
+      }
+    },
+    "candidate": {
+      "large": {
+        "runs_ms": [237.42125, 237.095625, 237.43150390625, 237.48296875, 237.5001171875],
+        "median_ms": 237.43150390625,
+        "mad_ms": 0.05146484375001137,
+        "p95_ms": 237.4966875,
+        "mean_ms": 237.38629296874998,
+        "min_ms": 237.095625,
+        "max_ms": 237.5001171875,
+        "stdev_ms": 0.16587348372707747,
+        "cv_pct": 0.06987492059994946
+      },
+      "small": {
+        "runs_ms": [37.2912890625, 37.16193115234375, 37.3087109375, 37.2977880859375, 37.2572265625],
+        "median_ms": 37.2912890625,
+        "mad_ms": 0.017421875000003695,
+        "p95_ms": 37.3065263671875,
+        "mean_ms": 37.26338916015625,
+        "min_ms": 37.16193115234375,
+        "max_ms": 37.3087109375,
+        "stdev_ms": 0.05989043977640719,
+        "cv_pct": 0.16072193411876995
+      }
+    },
+    "large_improvement_pct": 0.5990877989429169,
+    "small_improvement_pct": 0.46194950929920664,
+    "combined_improvement_pct": 0.5804946092839688,
+    "decision": "retain as combinable candidate; do not replace the default because improvement is below 1%"
+  },
+  "mcprofiler": {
+    "method": "per-kernel, single-pass, targeted kernel_kernel and kernel_kernel_1",
+    "control_large": "mcProfilerOutput/success/e3e7-combined-large-20260720T034000Z-targeted",
+    "control_small": "mcProfilerOutput/success/e3e7-combined-small-20260720T034100Z-targeted",
+    "a1_large": "mcProfilerOutput/success/aggressive-a1-wide-bn64-large-20260720T052056Z-targeted",
+    "a1b_large": "mcProfilerOutput/success/aggressive-a1b-wide-bn128-large-20260720T051739Z-targeted",
+    "a1b_small": "mcProfilerOutput/success/aggressive-a1b-wide-bn128-small-20260720T051921Z-targeted",
+    "fc1": {
+      "control_large": {"workgroups": 16464.0, "waves": 65856.0, "total_kcycles": 127993.62},
+      "a1_large": {"workgroups": 32928.0, "waves": 131712.0, "total_kcycles": 187340.46},
+      "a1b_large": {"workgroups": 16464.0, "waves": 65856.0, "total_kcycles": 127420.65},
+      "control_small": {"workgroups": 4112.0, "waves": 16448.0, "total_kcycles": 16785.66},
+      "a1b_small": {"workgroups": 4112.0, "waves": 16448.0, "total_kcycles": 16576.08}
+    },
+    "note": "single-pass instruction and global-traffic estimates varied across runs; workgroups, waves, and total cycles are used for attribution"
+  },
+  "explicit_schedule_direct_jit_fix": {
+    "method": "scripts/run-moe.sh, one process before and after, official functional and performance workloads, 10 warm-up, 100 iterations",
+    "cause": "the promoted E3+E7 schedule was already fully specified but still traversed the TileLang autotuner wrapper on every new RoutedMoEKernel instance",
+    "before": {"large_ms": 271.28029297, "small_ms": 69.71956055},
+    "after": {"large_ms": 239.36107422, "small_ms": 37.92316895},
+    "large_improvement_pct": 11.766139884525206,
+    "small_improvement_pct": 45.606127389740124,
+    "combined_improvement_pct": 18.684937747711665,
+    "functional_after": {"large": true, "small": true},
+    "claim_scope": "entrypoint wrapper overhead removal; the promoted GPU schedule and controlled A1/A1b comparison are unchanged"
+  },
+  "int8_gate": {
+    "lowering": "__builtin_mxc_mma_16x16x16i8",
+    "exact_int32_check": {"shape": [128, 128, 128], "exact_match": true, "max_abs_diff": 0},
+    "throughput_microbenchmark": {
+      "shape": {"m": 128, "n": 128, "k": 3584},
+      "method": "five alternating in-process event measurements, 20 warm-up and 100 timed iterations",
+      "fp16_runs_ms": [0.14182400703430176, 0.14182400703430176, 0.14182400703430176, 0.14182400703430176, 0.14182400703430176],
+      "fp16_median_ms": 0.14182400703430176,
+      "int8_runs_ms": [0.12211199849843979, 0.12134400010108948, 0.12134400010108948, 0.12185599654912949, 0.12160000205039978],
+      "int8_median_ms": 0.12160000205039978,
+      "int8_speedup_over_fp16": 1.1663158276553294
+    },
+    "w8a8_accuracy_screen": {
+      "shape": {"m": 128, "hidden": 3584, "expert": 1024},
+      "scheme": "per-row activation and per-output-channel weight symmetric INT8",
+      "max_abs_diff": 0.20745933055877686,
+      "mean_abs_diff": 0.020139388740062714,
+      "relative_l2": 0.02102309837937355,
+      "mismatch_ratio_pct_at_atol_rtol_1e_2": 44.37517547607422
+    },
+    "decision": "do not implement R2 in the submission path; ordinary W8A8 misses the tolerance screen and residual variants need at least two INT8 GEMMs while measured INT8 speedup is only 1.1663x"
+  }
+}
