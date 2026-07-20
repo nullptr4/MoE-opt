@@ -1,0 +1,148 @@
+{
+  "schema_version": 1,
+  "record_type": "moe-a1b-followup-search-summary",
+  "recorded_at": "2026-07-20T11:24:16Z",
+  "decision": "retain-a1b-no-successor",
+  "source": {
+    "target_branch": "feature/c500-a1b-followups",
+    "target_baseline_commit": "0935d29a0bcbd789de8dcd499dd4e1fac15ae692",
+    "target_kernel": "benchmarks/tilelang-moe/custom_fusedmoe.py",
+    "target_kernel_sha256": "581a00710cfe04b75a7da2bda8aa9fd273f9abfad9030fcf8c00191bc6fe8a27",
+    "agent_control_commit": "80074e33f5d10c9be1c26b2e8546f2d561eae2d4",
+    "agent_repository": "/data/metax-c500-autotune-agent"
+  },
+  "environment": {
+    "evidence_kind": "hardware",
+    "environment_fingerprint": "sha256:7ba1381313d23e9a1e1d9dcb225e5844628d2d8b0876db5adbaa1df5f85ebdc0",
+    "device": "MetaX C500 64 GiB",
+    "mx_smi": "2.3.1",
+    "driver": "3.8.30",
+    "maca": "3.7.1.5",
+    "bios": "1.33.5.0",
+    "python": "3.12.11",
+    "pytorch": "2.8.0+metax3.7.1.3",
+    "tilelang": "0.1.12+maca.gitec48829b",
+    "tilelang_source": "/opt/tilelang-metax",
+    "mcprofiler": "3.8.1.4+575f5a9f6d",
+    "clock_policy": "not operator locked; mx-smi performance state and thermal row captured per run"
+  },
+  "official_protocol": {
+    "seed": 81394,
+    "atol": 0.01,
+    "rtol": 0.01,
+    "functional": {
+      "large": {"hidden": 7168, "intermediate": 2048, "experts": 8, "top_k": 4, "batch": 1, "sequence": 8192},
+      "small": {"hidden": 3584, "intermediate": 1024, "experts": 4, "top_k": 2, "batch": 2, "sequence": 4096}
+    },
+    "performance": {
+      "large": {"hidden": 7168, "intermediate": 2048, "experts": 8, "top_k": 4, "batch": 4, "sequence": 8192},
+      "small": {"hidden": 3584, "intermediate": 1024, "experts": 4, "top_k": 2, "batch": 8, "sequence": 4096}
+    },
+    "warmup": 10,
+    "iterations": 100,
+    "outlier_policy": "none",
+    "acceptance": {
+      "minimum_mean_improvement_pct": 0.5,
+      "minimum_median_improvement_pct": 0.5,
+      "maximum_relative_stddev_pct": 3.0,
+      "independent_confirmation_required": true,
+      "adjacent_ab_or_abba_required": true
+    }
+  },
+  "baseline": {
+    "label": "A1b",
+    "schedule": {"combine_gate_up": true, "s1_bn": 128, "s1_bk": 64, "s1_stages": 1, "s2_bn": 128, "s2_bk": 64, "s2_stages": 1, "swizzle_panel": 8, "swizzle_panel_down": 16, "min_blocks_per_sm": null},
+    "correctness": {"large_mismatch_count": 0, "large_max_abs_error": 0.005859375, "small_mismatch_count": 0, "small_max_abs_error": 0.0078125},
+    "benchmark": {"mean_ms": 274.93158878326415, "median_ms": 274.85132217407227, "stddev_ms": 0.4813049958800604, "relative_stddev_pct": 0.17506354872138244, "p90_ms": 275.5101142883301},
+    "profiler_fc1": {"launch_1_total_kcycles": 126057.01, "launch_2_total_kcycles": 126494.63, "workgroups": 16464, "waves": 65856, "private_reads": 0, "private_writes": 0},
+    "artifact": "/data/metax-c500-autotune-agent/artifacts/p9/baseline-b9c0ba47aa9b21dd1dd9c6d2.json",
+    "artifact_sha256": "c7f0c6060c7288654a76a6e420bf9195f51f65b3de568b14a43bd79f20da9d47",
+    "ordered_samples": "/data/metax-c500-autotune-agent/artifacts/commands/metax-ff7ba48aefab1c50c932eac3-0001/stdout.txt",
+    "profiler_attempt": "/data/metax-c500-autotune-agent/artifacts/profiler/p9-baseline-80074e33f5d1-20260720T105559358743Z/mcprofiler-attempt.json",
+    "profiler_status": "parsed"
+  },
+  "candidates": [
+    {
+      "candidate_id": "a1d-s1-bk128",
+      "change": "combined Gate/Up FC1 BK64 to BK128; physical shared tile 32 KiB to 64 KiB",
+      "source_commit": "b3189a3674e1622b40b85147b05c2d6c7a775f14",
+      "diff_hash": "sha256:c04954a356ed0a94978913b70b07d6fc85044fb132a49eb1584e44864dc9a2e8",
+      "correctness": {"large_mismatch_count": 0, "large_max_abs_error": 0.005859375, "small_mismatch_count": 0, "small_max_abs_error": 0.0078125},
+      "benchmark": {"mean_ms": 386.0154141998291, "median_ms": 386.0596580505371, "stddev_ms": 0.8569023892269746, "p90_ms": 386.9996673583984, "mean_improvement_pct": -40.40416960021835, "median_improvement_pct": -40.461270113895614},
+      "profiler_fc1": {"launch_1_total_kcycles": 220137.54, "launch_2_total_kcycles": 219667.78, "workgroups": 16464, "waves": 65856, "private_reads": 262304448, "private_writes": 5136768},
+      "decision": "reject",
+      "reason": "64 KiB physical shared tile causes FC1 spill/resource regression",
+      "artifact": "/data/metax-c500-autotune-agent/artifacts/p9/experiment-807c845ecd5aa07b99714955.json",
+      "artifact_sha256": "01b65be8628a509ac8915b37912184b850a30ad1187a95468b62eb815a4af8ce",
+      "ordered_samples": "/data/metax-c500-autotune-agent/artifacts/commands/metax-93fe3388114193280398986c-0002/stdout.txt",
+      "profiler_attempt": "/data/metax-c500-autotune-agent/artifacts/profiler/a1d-s1-bk128-20260720T110558636832Z/mcprofiler-attempt.json",
+      "profiler_status": "parsed"
+    },
+    {
+      "candidate_id": "a1e-large-row4",
+      "change": "use stage-1 row4 swizzle only for the official Large shape; Small remains row8",
+      "source_commit": "3e851c8344a2c3e6cbd12ab0afec3339427156dc",
+      "diff_hash": "sha256:94352e43e1a80a05be024e205ff0cac1ff163e4ca5135372991f6ab8aac8d71a",
+      "correctness": {"large_mismatch_count": 0, "large_max_abs_error": 0.005859375, "small_mismatch_count": 0, "small_max_abs_error": 0.0078125},
+      "benchmark": {"mean_ms": 274.61143936157225, "median_ms": 274.5752258300781, "stddev_ms": 0.4608178134558834, "p90_ms": 275.1929363250732, "mean_improvement_pct": 0.11644693980373308, "median_improvement_pct": 0.10045298010947165},
+      "profiler_fc1": {"launch_1_total_kcycles": 126310.67, "launch_2_total_kcycles": 125728.56, "workgroups": 16464, "waves": 65856, "private_reads": 0, "private_writes": 0},
+      "decision": "reject",
+      "reason": "mean and median improvements are below the 0.5% noise gate",
+      "artifact": "/data/metax-c500-autotune-agent/artifacts/p9/experiment-41b28e1a40f0c005ed8abfc5.json",
+      "artifact_sha256": "56a22e16deb8ec0e674d8b606a4e62ec29aca0eae703c6d3878fc9bec05748e7",
+      "ordered_samples": "/data/metax-c500-autotune-agent/artifacts/commands/metax-1605f64a3e899e8f1fdd237a-0002/stdout.txt",
+      "profiler_attempt": "/data/metax-c500-autotune-agent/artifacts/profiler/a1e-large-row4-20260720T111154592188Z/mcprofiler-attempt.json",
+      "profiler_status": "parsed"
+    },
+    {
+      "candidate_id": "a1f-min-blocks-2",
+      "change": "annotate stage-1 min_blocks_per_sm=2",
+      "source_commit": "8c065a5abc4686ec1f61c5802bdd87ed8a94a233",
+      "diff_hash": "sha256:62814b17ed398afe9ec2dd7bfec3694284817c9e3560ac4ad1a4688a8bc62f7a",
+      "correctness": {"large_mismatch_count": 0, "large_max_abs_error": 0.005859375, "small_mismatch_count": 0, "small_max_abs_error": 0.0078125},
+      "benchmark": {"mean_ms": 275.1388419723511, "median_ms": 275.05305671691895, "stddev_ms": 0.4865308509913777, "p90_ms": 275.63298072814945, "mean_improvement_pct": -0.075383549050933, "median_improvement_pct": -0.07339769779929044},
+      "profiler_fc1": {"launch_1_total_kcycles": 126357.24, "launch_2_total_kcycles": 126081.01, "workgroups": 16464, "waves": 65856, "private_reads": 0, "private_writes": 0},
+      "decision": "reject",
+      "reason": "both official mean and median regress",
+      "artifact": "/data/metax-c500-autotune-agent/artifacts/p9/experiment-724343fd5ecd727ad785f5e6.json",
+      "artifact_sha256": "a8b285261190741ca74d1121452d8575daa5c79d400f131b5d922e2f35aee898",
+      "ordered_samples": "/data/metax-c500-autotune-agent/artifacts/commands/metax-b8cedff1d400ce6c53c3da67-0002/stdout.txt",
+      "profiler_attempt": "/data/metax-c500-autotune-agent/artifacts/profiler/a1f-min-blocks-2-20260720T111657787434Z/mcprofiler-attempt.json",
+      "profiler_status": "parsed"
+    },
+    {
+      "candidate_id": "a1g-elide-gate-write",
+      "change": "retain FP32 helper and elide the dead post-SwiGLU Gate fragment write",
+      "source_commit": "66eb17712bbb9d831c285d8b83c41253b96761a0",
+      "diff_hash": "sha256:794215511c17d209b8c2c0d7f4a00358f858450682ea3f9f71b6d59b203133c6",
+      "correctness": {"large_mismatch_count": 0, "large_max_abs_error": 0.005859375, "small_mismatch_count": 0, "small_max_abs_error": 0.0078125},
+      "benchmark": {"mean_ms": 275.4508721923828, "median_ms": 275.41235733032227, "stddev_ms": 0.5387828982396556, "p90_ms": 276.03835067749026, "mean_improvement_pct": -0.18887731723255044, "median_improvement_pct": -0.20412314258203867},
+      "profiler_fc1": {"launch_1_total_kcycles": 126181.15, "launch_2_total_kcycles": 126562.99, "workgroups": 16464, "waves": 65856, "private_reads": 0, "private_writes": 0},
+      "decision": "reject",
+      "reason": "both official mean and median regress",
+      "artifact": "/data/metax-c500-autotune-agent/artifacts/p9/experiment-d276e883b9469ab80c5667b3.json",
+      "artifact_sha256": "14b8d3806667a2c203cb42985e0b5accb9de586cc71f6f7af58387f1740377f0",
+      "ordered_samples": "/data/metax-c500-autotune-agent/artifacts/commands/metax-5759f745a1b49cc9283031da-0002/stdout.txt",
+      "profiler_attempt": "/data/metax-c500-autotune-agent/artifacts/profiler/a1g-elide-gate-write-20260720T112247661747Z/mcprofiler-attempt.json",
+      "profiler_status": "parsed"
+    }
+  ],
+  "excluded_repetition": {
+    "candidate": "A1c FP16 auxiliary Up fragment",
+    "reason": "previous A1b/A1c ABBA already showed A1c slower; A1b 274.897197 ms versus A1c 275.332660 ms, so it was not rerun"
+  },
+  "confirmation": {
+    "second_full_run": "not applicable: no candidate passed the initial 0.5% mean-and-median gate",
+    "abba": "not applicable: no candidate qualified as a winner"
+  },
+  "target_validation": {
+    "kernel_sha256_after_search": "581a00710cfe04b75a7da2bda8aa9fd273f9abfad9030fcf8c00191bc6fe8a27",
+    "pytest": "86 passed in 25.03s with documented MetaX C ABI backend",
+    "repository_check": "passed; 3341 tracked files inspected",
+    "verify_maca": "passed; MetaX C500 target xcore1000",
+    "run_moe_functional": "2/2 passed",
+    "run_moe_performance_ms": {"large": 238.02052734, "small": 37.77364014},
+    "submission_public_and_fuzz": "6/6 passed",
+    "git_diff_check": "passed"
+  }
+}
