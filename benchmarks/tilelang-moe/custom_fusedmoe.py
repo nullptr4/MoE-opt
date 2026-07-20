@@ -560,6 +560,8 @@ class RoutedMoEKernel:
         self.threads = threads
         self.num_stages = num_stages
         self.num_stages_down = num_stages_down
+        if s1_bk is None:
+            s1_bk = 64
         stage_schedule = resolve_stage_schedule(
             block_dhidden=block_dhidden,
             block_dexpert=block_dexpert,
@@ -592,7 +594,7 @@ class RoutedMoEKernel:
         self.metadata_m = None
         # Aggressive candidates can select the exact Gate/Up wide-GEMM path
         # without extending the public constructor or call signatures.
-        self.combine_gate_up = False
+        self.combine_gate_up = True
         self.backend = backend
 
         # Defer compilation/tuning until real tensors are available.  This
