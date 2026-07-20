@@ -460,6 +460,7 @@ def _moe_forward_tilelang_routed(
             up_logits_shared = T.alloc_shared((block_token, s2_bk), dtype=dtype)
             routed_expert_down_shared = T.alloc_shared((s2_bn, s2_bk), dtype=dtype)
             output_local = T.alloc_fragment((block_token, s2_bn), dtype=accum_dtype)
+            routed_weight_local = T.alloc_fragment((block_token,), dtype=dtype)
 
             T.use_swizzle(panel_size=swizzle_panel_down, order=swizzle_order_down)
 
@@ -493,9 +494,13 @@ def _moe_forward_tilelang_routed(
                     policy=gemm_policy_stage2,
                 )
 
+            for i in T.Parallel(block_token):
+                if i < actual_rows:
+                    routed_weight_local[i] = routed_expert_weights[m_start + i]
+
             for i, j in T.Parallel(block_token, s2_bn):
                 if i < actual_rows:
-                    output[m_start + i, by * s2_bn + j] = output_local[i, j] * routed_expert_weights[m_start + i]
+                    output[m_start + i, by * s2_bn + j] = output_local[i, j] * routed_weight_local[i]
 
     return kernel
 
