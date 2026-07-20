@@ -1,0 +1,38 @@
+{
+  "schema_version": "1.0",
+  "campaign_id": "h4f1-followups-20260720",
+  "evidence_kind": "hardware",
+  "baseline": {
+    "id": "H4F1",
+    "target_commit": "61fc0bbdb4a08c0a4ba44af278606ce362b794ce",
+    "target_branch": "feature/c500-h4f1-followups",
+    "source_sha256": "2be93d4210d7d3bdda857887c70540c6c4da964946033fa95e58b114dd1fe47e",
+    "schedule": {"combine_gate_up": true, "fc2_a_scope": "shared", "route_weight_scope": "fragment", "s1_bn": 128, "s1_bk": 64, "s1_stages": 1, "s2_bn": 128, "s2_bk": 64, "s2_stages": 1},
+    "runs": [
+      {"artifact": "/data/metax-c500-autotune-agent/artifacts/p9/baseline-c10d645046d626f648eb64db.json", "environment_fingerprint": "sha256:1d38be1c05a0ca5d8d9503e8e3d4656660b74d4544b1f666f26f7d0c866b54f9", "mean_ms": 237.93424182891846, "median_ms": 237.86291694641113, "stddev_ms": 0.9977320673984122, "p90_ms": 239.30444793701173},
+      {"artifact": "/data/metax-c500-autotune-agent/artifacts/p9/baseline-1e927f756da6697f4aa70681.json", "environment_fingerprint": "sha256:f9eab42b3f85480c57e0b42b0d3f3f54fc30056982958ab1b523791aa1807f8e", "mean_ms": 238.1322343444824, "median_ms": 238.1097011566162, "stddev_ms": 1.1944353645429766, "p90_ms": 239.6466152191162}
+    ]
+  },
+  "protocol": {"functional_shapes": ["functional-large", "functional-small"], "performance_shapes": ["performance-large", "performance-small"], "reference_id": "official-ref-fusedmoe-seed-81394-v1", "dtype": "float16", "atol": 0.01, "rtol": 0.01, "equal_nan": false, "warmup": 10, "iterations": 100, "outlier_policy": "none", "samples": "all 100 ordered samples embedded in each agent artifact"},
+  "sources": {
+    "N06": "https://tilelang.tile-ai.cn/programming_guides/instructions.html",
+    "N07": "https://github.com/tile-ai/tilelang/blob/main/tilelang/language/gemm_op.py",
+    "N08": "https://github.com/tile-ai/tilelang/blob/main/examples/deepseek_mla/README.md",
+    "N09": "https://docs.nvidia.com/cutlass/latest/media/docs/cpp/efficient_gemm.html",
+    "N10": "https://docs.nvidia.com/cutlass/4.3.3/media/docs/cpp/cute/0y_predication.html",
+    "N11": "https://github.com/triton-lang/triton/blob/main/python/tutorials/09-persistent-matmul.py",
+    "N12_unavailable": "https://github.com/tile-ai/tilelang/pull/1820",
+    "N13_no_new_document": "https://developer.metax-tech.com/",
+    "L01": "/opt/tilelang-metax/tilelang/maca/op/gemm/gemm_mma.py"
+  },
+  "hypothesis_to_source": {"H5F1": ["N09", "N10", "M03"], "H5F2": ["N06", "N10", "M04"], "H5F3": ["N09", "M03"], "H5F4": ["N06", "N09", "N10", "M03"], "H5F5": ["N10", "M03", "M05"], "H5S1": ["N07", "L01"], "H5S2": ["N08", "L01", "N13"], "H5S3": ["N06", "N11", "N13"]},
+  "experiments": [
+    {"id": "H5F1", "artifact": "/data/metax-c500-autotune-agent/artifacts/p9/experiment-faf4d3e081aed153694f6144.json", "experiment_id": "experiment-b5e9cb5c416a3b87820931a1", "source_commit": "e100c0b000c249fdf8b34b8a0090a282a254886b", "diff_sha256": "f0bc5e7a073b6ac98b0cb6790ac33308576552f964a60ff20277303ad497e71f", "correctness_mismatches": {"large": 0, "small": 0}, "mean_ms": 238.2852714920044, "median_ms": 238.19161796569824, "stddev_ms": 0.8825038268957536, "p90_ms": 239.3473285675049, "mean_improvement": -0.001475322174680259, "median_improvement": -0.0013818926611463504, "profiler_fc2_cycles_kcycles": [52187.6, 51612.83], "profiler_private_read_write": [0, 0], "decision": "reject"},
+    {"id": "H5F2", "artifact": "/data/metax-c500-autotune-agent/artifacts/p9/experiment-128698788749e7bb3b2e0916.json", "experiment_id": "experiment-9bb107378d9538cbb1357476", "source_commit": "fe318c358fac9a0e3db41ece6a8916a9b0000a55", "diff_sha256": "add1bc5965658d6a0ab2c6ec06794a1001af1d7b20ff6b88fe43adef4776f133", "correctness_mismatches": {"large": 0, "small": 0}, "mean_ms": 237.9979105758667, "median_ms": 238.1337604522705, "stddev_ms": 0.9678242285369161, "p90_ms": 239.18379898071288, "mean_improvement": -0.00026758967712613667, "median_improvement": -0.001138653764682429, "profiler_global_write_instructions": [5, 160, 5, 158], "profiler_private_read_write": [0, 0], "decision": "reject"},
+    {"id": "H5F3", "artifact": "/data/metax-c500-autotune-agent/artifacts/p9/experiment-824a64c75f794e20bc2ca51b.json", "experiment_id": "experiment-43e2342b2111415b4545929f", "source_commit": "968935caefd31e7aff320ca48d7be8c9fcc8612d", "diff_sha256": "86d207a806070e3bec4ed4e330aab38fcc9820c19b956b25f58d996bbb6fc81a", "correctness_mismatches": {"large": 0, "small": 0}, "mean_ms": 240.58751037597656, "median_ms": 240.5503978729248, "stddev_ms": 0.6552819333139713, "p90_ms": 241.34340896606446, "mean_improvement": -0.01115126821033973, "median_improvement": -0.011298444335142592, "profiler_fc2_cycles_kcycles": [55861.05, 55166.25], "profiler_private_read_write": [0, 0], "decision": "reject"},
+    {"id": "H5F4", "artifact": "/data/metax-c500-autotune-agent/artifacts/p9/experiment-ad0541be1f6415d6d47b5009.json", "experiment_id": "experiment-31c6c87e5820b2b235ffc891", "source_commit": "ef3866c18c150b2228775fdb9d4363b864066c48", "diff_sha256": "f029e0c1c29f227b82e263a9764ab783114b3ffe84d61439793a41c652aef9aa", "correctness_mismatches": {"large": 0, "small": 0}, "mean_ms": 239.9394152069092, "median_ms": 239.97695541381836, "stddev_ms": 0.6088283982070167, "p90_ms": 240.69436950683595, "mean_improvement": -0.008427426681328645, "median_improvement": -0.008887633661212962, "profiler_fc2_cycles_kcycles": [56096.84, 54954.26], "profiler_private_read_write": [0, 0], "decision": "reject"},
+    {"id": "H5F5", "artifact": "/data/metax-c500-autotune-agent/artifacts/p9/experiment-d94361d1465eac8e0235969d.json", "experiment_id": "experiment-fa9b18e8ddad63d85f0c0f98", "source_commit": "f1ee1515962c7ecc0336b5730ebdc3dc2c39948f", "diff_sha256": "e913f42f9fc802eb545901ce2e600115beb35ca84c906e6c3ac56378169aa368", "correctness_mismatches": {"large": 0, "small": 0}, "mean_ms": 237.99093227386476, "median_ms": 237.72390365600586, "stddev_ms": 1.148941020614156, "p90_ms": 239.71901168823243, "mean_improvement": 0.000593376495234356, "median_improvement": 0.001620251080642002, "profiler_fc2_cycles_kcycles": [51665.72, 53946.25], "profiler_private_read_write": [0, 0], "profiler_counter_caveat": "Global Read Instructions event was not comparable to its baseline capture", "decision": "reject_below_0.5_percent"}
+  ],
+  "replication_abba": {"performed": false, "reason": "no initial candidate passed both mean and median 0.5%"},
+  "deployment": {"kernel_changed": false, "retained": "H4F1", "kernel_commit": "61fc0bbdb4a08c0a4ba44af278606ce362b794ce", "kernel_sha256": "2be93d4210d7d3bdda857887c70540c6c4da964946033fa95e58b114dd1fe47e"}
+}
