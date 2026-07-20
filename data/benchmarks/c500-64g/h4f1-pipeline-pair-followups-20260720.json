@@ -1,0 +1,252 @@
+{
+  "schema_version": "1.0",
+  "campaign_id": "h4f1-pipeline-pair-layout-followups-20260720",
+  "evidence_kind": "hardware",
+  "accessed_at": "2026-07-20",
+  "baseline": {
+    "id": "H4F1",
+    "kernel_origin_commit": "61fc0bbdb4a08c0a4ba44af278606ce362b794ce",
+    "target_commit_at_measurement": "ceed231329dd04321546b477afe181f85e2aee88",
+    "target_branch": "feature/c500-h4f1-followups",
+    "source_sha256": "2be93d4210d7d3bdda857887c70540c6c4da964946033fa95e58b114dd1fe47e",
+    "schedule": {
+      "combine_gate_up": true,
+      "fc1_loop": "serial",
+      "fc2_a_scope": "shared",
+      "route_weight_scope": "fragment_float16",
+      "s1_bn": 128,
+      "s1_bk": 64,
+      "s1_stages": 1,
+      "s2_bn": 128,
+      "s2_bk": 64,
+      "s2_stages": 1
+    },
+    "artifact": "/data/metax-c500-autotune-agent/artifacts/p9/baseline-6cc629eb15ef9354d8cdc553.json",
+    "baseline_id": "p9-baseline-90a0d7718f7526730bd2970b",
+    "agent_source_commit": "a996c86c2c9a146ac947d7da0910e043a2034981",
+    "environment_fingerprint": "sha256:1c750ce4e2ddb41d6d35fd68aaf1a15a714f289cd5cacfcc14983aafa5138d2a",
+    "mean_ms": 238.55426265716554,
+    "median_ms": 238.6959342956543,
+    "stddev_ms": 1.1099803048517323,
+    "p90_ms": 239.68473663330076,
+    "correctness_mismatches": {"large": 0, "small": 0},
+    "profiler_cycles_kcycles": {"fc1": [126724.58, 126527.41], "fc2": [52749.0, 52135.31]},
+    "profiler_private_reads": {"fc1": [0, 0], "fc2": [0, 0]},
+    "profiler_caveat": "Global Read event used an anomalous small scale in this capture and is not compared across profiler captures."
+  },
+  "protocol": {
+    "functional_shapes": ["functional-large", "functional-small"],
+    "performance_shapes": ["performance-large", "performance-small"],
+    "profile_workload": "performance-large, two consecutive custom_kernel calls mapped as FC1/FC2/FC1/FC2",
+    "reference_id": "official-ref-fusedmoe-seed-81394-v1",
+    "seed": 81394,
+    "dtype": "float16",
+    "accumulate_dtype": "float32",
+    "atol": 0.01,
+    "rtol": 0.01,
+    "equal_nan": false,
+    "warmup": 10,
+    "iterations": 100,
+    "outlier_policy": "none",
+    "samples": "all 100 ordered samples are embedded in every baseline, candidate, replication, and ABBA agent artifact",
+    "acceptance": "mean and median at least 0.5%, stable variance and mechanism-consistent profiler; then a second correctness+10/100+profiler run and adjacent ABBA"
+  },
+  "software": {
+    "device": "MetaX C500 64GiB",
+    "driver": "3.8.30",
+    "mxmaca": "3.7.1.5",
+    "mxcc": "1.0.0@d9102a1572",
+    "pytorch": "2.8.0+metax3.7.1.3",
+    "tilelang_maca": "0.1.12+maca.gitec48829b@ec48829b",
+    "mcprofiler": "3.8.1.4+575f5a9f6d"
+  },
+  "sources": {
+    "N28": {
+      "query": "site:github.com/tile-ai/tilelang T.Pipelined order software pipeline source copy GEMM; github tile-ai tilelang language loop Pipelined order annotations source code",
+      "url": "https://tilelang.com/autoapi/tilelang/language/loop/index.html",
+      "title": "TileLang 0.1.12 loop API: Pipelined",
+      "license": "MIT",
+      "access_status": "opened_official_documentation_body_2026-07-20"
+    },
+    "N29": {
+      "query": "github NVIDIA TensorRT-LLM moe_gemm_kernels fused activation swiglu source; official NVIDIA MoE SwiGLU interleaved gate up",
+      "url": "https://developer.nvidia.com/blog/boosting-moe-training-throughput-with-advanced-fusion-kernels/",
+      "title": "NVIDIA: Boosting MoE Training Throughput with Advanced Fusion Kernels",
+      "license": "NVIDIA website terms; mechanism only, no text or code copied",
+      "access_status": "opened_official_technical_blog_body_2026-07-20"
+    },
+    "N30": {
+      "query": "site:docs.nvidia.com CUDA global memory prefetch independent computation latency hiding programming guide",
+      "url": "https://docs.nvidia.com/cuda/cuda-programming-guide/04-special-topics/async-copies.html",
+      "title": "CUDA Programming Guide: Asynchronous Data Copies and Prefetching Data",
+      "license": "NVIDIA documentation terms; concept only, no CUDA code copied",
+      "access_status": "opened_official_documentation_body_2026-07-20"
+    },
+    "N31": {
+      "query": "site:github.com/NVIDIA/cutlass epilogue prefetch load source accumulator code; CUTLASS efficient GEMM epilogue shared exchange",
+      "url": "https://github.com/NVIDIA/cutlass/blob/main/media/docs/cpp/efficient_gemm.md",
+      "title": "CUTLASS official Efficient GEMM documentation",
+      "license": "BSD-3-Clause",
+      "access_status": "opened_official_source_documentation_body_2026-07-20"
+    },
+    "N32": {
+      "query": "site:developer.metax-tech.com C500 软件流水 预取 全局内存 共享内存; site:developer.metax-tech.com MACA TileLang 流水线 T.Pipelined C500",
+      "url": "https://developer.metax-tech.com/",
+      "title": "MetaX developer portal incremental pipeline/prefetch search",
+      "license": "not evaluated because no matching body was accessible",
+      "access_status": "native_web_search_returned_no_new_accessible_matching_body_2026-07-20"
+    },
+    "L05": {
+      "url": "/opt/tilelang-metax@ec48829bb61fcd55a366407c69355581733cceef",
+      "title": "Installed TileLang-MACA loop, pipeline passes, layout checks, and generated source",
+      "license": "MIT",
+      "access_status": "opened_installed_source_2026-07-20"
+    },
+    "M09": {
+      "url": "/data/metax-c500-autotune-agent/artifacts/p9/experiment-f7fdf72b8bd9f718f18fe881.json",
+      "title": "H4F1 C500 pipeline-form and latest resource evidence",
+      "license": "project-owned measured evidence",
+      "access_status": "verified_local_hardware_artifacts_2026-07-20"
+    }
+  },
+  "hypothesis_to_source": {
+    "H8F1": ["N28", "L05", "M09"],
+    "H8F2": ["N30", "L05", "M09"],
+    "H8F3": ["N29", "N31", "L05", "M09"],
+    "H8F4": ["N28", "L05", "M09"],
+    "H8S1": ["N28", "N30", "N32", "L05"],
+    "H8S2": ["N29", "L05"]
+  },
+  "experiments": [
+    {
+      "id": "H8F1",
+      "mechanism": "replace only the combined Gate/Up FC1 serial K loop with same-buffer stage-1 T.Pipelined",
+      "diff_sha256": "30e9f459f901e106536190874a12d9eaf99078f7aa08340538e0580165c2198c",
+      "patch_sha256": "a0ca0e5fd72f27743ce0777b60fea574454a700677a85ee3663bc7d9c22ab82c",
+      "candidate_source_sha256": "6543398edf4e48c95c896b5a703c1a58f3f49a8a7dec543cb892cb0467aea7a3",
+      "correctness_mismatches": {"large": 0, "small": 0},
+      "runs": [
+        {
+          "artifact": "/data/metax-c500-autotune-agent/artifacts/p9/experiment-23cc182ce9af42079dd4eb55.json",
+          "experiment_id": "experiment-02efcb62ab729fd3719584c5",
+          "source_commit": "45735af1370c1c295b62106b5674ac0a75fddb10",
+          "mean_ms": 233.94630641937255,
+          "median_ms": 234.0627155303955,
+          "stddev_ms": 1.1167370626981277,
+          "p90_ms": 235.15750160217286,
+          "mean_improvement": 0.019316176481051783,
+          "median_improvement": 0.019410547477193212,
+          "profiler_cycles_kcycles": {"fc1": [121760.41, 120283.65], "fc2": [53026.54, 52625.17]},
+          "profiler_private_reads": {"fc1": [263424, 263424], "fc2": [0, 0]}
+        },
+        {
+          "artifact": "/data/metax-c500-autotune-agent/artifacts/p9/experiment-99780c4ca0c103e9c6ce5c0d.json",
+          "experiment_id": "experiment-6eaf4667d55c59aed550fc5c",
+          "source_commit": "482705a05a64c07ad072f6552eb82b6a5e13ba6d",
+          "accepted_ref": "accepted/H8F1-fc1-stage1-pipeline-r2-35f36a2c",
+          "mean_ms": 233.797839012146,
+          "median_ms": 233.76268577575684,
+          "stddev_ms": 1.154053617482387,
+          "p90_ms": 235.18192672729492,
+          "mean_improvement": 0.019938539735318655,
+          "median_improvement": 0.020667501247788433,
+          "profiler_cycles_kcycles": {"fc1": [123268.57, 121803.84], "fc2": [51523.71, 52583.13]},
+          "profiler_private_reads": {"fc1": [263424, 263424], "fc2": [0, 0]}
+        }
+      ],
+      "profiler_attribution": "Both captures reduce dominant FC1 cycles despite a repeatable 263424 private-read spill per FC1 launch; FC2 remains close to baseline. Endpoint gains repeat and ABBA removes ordering bias.",
+      "decision": "accept"
+    },
+    {
+      "id": "H8F2",
+      "mechanism": "prefetch the existing predicated FP16 route fragment before FC2 GEMM",
+      "artifact": "/data/metax-c500-autotune-agent/artifacts/p9/experiment-6957d7150e34741315454b60.json",
+      "experiment_id": "experiment-c319b011f85fcf71c81ca139",
+      "source_commit": "7e21502d93ca089a783c8e4e8216fbb7d248f4d0",
+      "diff_sha256": "8f345d07d6840846c3647f7a67af3484ccc2adb0349a5fc4e4281c80e23598b1",
+      "correctness_mismatches": {"large": 0, "small": 0},
+      "mean_ms": 240.44293548583985,
+      "median_ms": 240.4720630645752,
+      "stddev_ms": 0.5392561389823901,
+      "p90_ms": 241.1289337158203,
+      "mean_improvement": -0.007917162358102955,
+      "median_improvement": -0.007440967832828457,
+      "profiler_cycles_kcycles": {"fc1": [126052.53, 126332.51], "fc2": [55743.82, 54180.56]},
+      "profiler_private_reads": [0, 0, 0, 0],
+      "decision": "reject_fc2_cycles_and_endpoint_regressed"
+    },
+    {
+      "id": "H8F3",
+      "mechanism": "pair-last on-chip Gate/Up shared and accumulator layout with direct SwiGLU",
+      "artifact": "/data/metax-c500-autotune-agent/artifacts/p9/experiment-1c772636e6cfa01ce588bb5f.json",
+      "experiment_id": "experiment-cdfa2e684cbf643ca7f3e665",
+      "source_commit": "69260e088da1838378a93948b380e98dbaa3840e",
+      "diff_sha256": "7b13a01ef9de90ad9b10fe7c99d8e454b12ac2c252eaf0aaefc41ff18d350e1b",
+      "correctness": "not_run_build_failed",
+      "profiler": "not_run_build_failed",
+      "build_error": "InternalError: StructuralEqual failed for gate_up_logits_view indices (i, j, 1) and (i, j, 0)",
+      "build_error_artifact": "/data/metax-c500-autotune-agent/artifacts/commands/metax-d223df79b54813bb4db391f7-0001/stderr.txt",
+      "decision": "reject_installed_tilelang_layout_boundary"
+    },
+    {
+      "id": "H8F4",
+      "mechanism": "issue FC2 down-weight copy before activation copy in the existing stage-1 loop",
+      "artifact": "/data/metax-c500-autotune-agent/artifacts/p9/experiment-f32962d0fb5e61de0253c8ae.json",
+      "experiment_id": "experiment-35adb0d0c242192eaad9c10e",
+      "source_commit": "9ca9ade0ec47d53d9959b444660d30c00a7142ad",
+      "diff_sha256": "8d091bc3c167e1643f596e745b325a1d217ebdf7a3daa1585ad9ed56547ada99",
+      "correctness_mismatches": {"large": 0, "small": 0},
+      "mean_ms": 241.00161487579345,
+      "median_ms": 241.23801612854004,
+      "stddev_ms": 1.0779508097815258,
+      "p90_ms": 242.18741950988772,
+      "mean_improvement": -0.010259100765451784,
+      "median_improvement": -0.010649874872762017,
+      "profiler_cycles_kcycles": {"fc1": [126532.2, 125896.01], "fc2": [53626.37, 55092.68]},
+      "profiler_private_reads": [0, 0, 0, 0],
+      "decision": "reject_fc2_cycles_and_endpoint_regressed"
+    }
+  ],
+  "static_exclusions": [
+    {
+      "id": "H8S1",
+      "mechanism": "prefer_async or target-specific asynchronous global-to-shared copy",
+      "reason": "official API describes a PTX hint; no MetaX body or installed MACA primitive establishes support"
+    },
+    {
+      "id": "H8S2",
+      "mechanism": "offline permanent Gate/Up weight interleaving",
+      "reason": "fixed submission ABI supplies two independent weight tensors"
+    }
+  ],
+  "replication_abba": {
+    "artifact": "/data/metax-c500-autotune-agent/artifacts/p9/abba-eed48f61533f3dcbfd7798eb.json",
+    "order": ["H4F1-r1", "H8F1-r1", "H8F1-r2", "H4F1-r2"],
+    "incumbent_mean_of_run_means_ms": 238.66046377182005,
+    "challenger_mean_of_run_means_ms": 233.94564670562744,
+    "mean_improvement": 0.019755333546575105,
+    "incumbent_mean_of_run_medians_ms": 238.63002014160156,
+    "challenger_mean_of_run_medians_ms": 234.0848035812378,
+    "median_improvement": 0.01904712809254538,
+    "individual_mean_improvements": [0.019972957398941976, 0.01953770969420823],
+    "individual_median_improvements": [0.01892133964777605, 0.019172916537314715],
+    "stable": true,
+    "selected": "H8F1"
+  },
+  "deployment": {
+    "selected": "H8F1",
+    "parent_target_commit": "ceed231329dd04321546b477afe181f85e2aee88",
+    "kernel_sha256": "6543398edf4e48c95c896b5a703c1a58f3f49a8a7dec543cb892cb0467aea7a3",
+    "schedule": "H4F1 plus combined-FC1 same-buffer stage-1 T.Pipelined K loop",
+    "api_and_submission_abi_changed": false
+  },
+  "target_validation": {
+    "pytest_metax": "86 passed",
+    "check_repository": "passed, 3359 tracked files inspected",
+    "verify_maca": "passed, MetaX C500",
+    "run_moe_functional": "2 of 2 passed",
+    "run_moe_performance": "diagnostic only, completed",
+    "submission_public_fuzz": "6 of 6 passed",
+    "git_diff_check": "passed"
+  }
+}

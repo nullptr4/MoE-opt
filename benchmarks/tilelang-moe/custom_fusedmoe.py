@@ -327,7 +327,10 @@ def _moe_forward_tilelang_routed(
                 # One physical 2*BN weight tile and one accumulator replace
                 # the two independent Gate/Up GEMMs. The two global tensors
                 # remain separate to preserve the public benchmark ABI.
-                for k in T.serial(T.ceildiv(dhidden, s1_bk)):
+                # H8F1 keeps one physical buffer and the exact copy/GEMM
+                # order, but lets the installed backend lower the same
+                # stage-1 pipeline form that is already used by FC2.
+                for k in T.Pipelined(T.ceildiv(dhidden, s1_bk), num_stages=s1_stages):
                     T.copy(
                         input[m_start : m_start + block_token, k * s1_bk : (k + 1) * s1_bk],
                         input_shared,

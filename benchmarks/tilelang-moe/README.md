@@ -104,16 +104,15 @@ python tune_moe.py --experiment E4 --mode functional --warmup 0 --iteration 1
 
 ## 6. 当前 C500 默认
 
-`fusedmoe_benchmark.custom_kernel` 当前使用正式接受的 H4F1：combined Gate/Up，FC1 与 FC2
-均为 `BN128/BK64/stage1`，FC2 activation tile 位于 shared，route weight 使用 FP16
-fragment cache。内核 origin commit 为 `61fc0bbdb4a08c0a4ba44af278606ce362b794ce`，源码
-SHA-256 为 `2be93d4210d7d3bdda857887c70540c6c4da964946033fa95e58b114dd1fe47e`。
-H4F1 已通过两次完整 correctness+10/100+mcProfiler 及相邻 H4/H4F1/H4F1/H4 复核；后续
-H5、H6、H7 收敛实验均未产生同时超过 mean/median 0.5% 门槛的候选，因此不得回退到
-E3+E7、A1b 或 H4 作正式对照。接受证据与最新收敛结果见
+`fusedmoe_benchmark.custom_kernel` 当前使用正式接受的 H8F1：在 H4F1 的 combined Gate/Up、
+FC1/FC2 `BN128/BK64/stage1`、FC2 activation shared tile 和 FP16 route-weight fragment cache
+基础上，combined FC1 K loop 使用同 buffer 的 stage-1 `T.Pipelined`。源码 SHA-256 为
+`6543398edf4e48c95c896b5a703c1a58f3f49a8a7dec543cb892cb0467aea7a3`。H8F1 已通过两次
+完整 correctness+10/100+mcProfiler 及相邻 H4F1/H8F1/H8F1/H4F1 复核；ABBA mean/median
+分别提升 `1.9755%/1.9047%`。不得回退到 H4F1、H4、E3+E7 或 A1b 作正式对照。接受证据见
 [`reports/2026-07-20-moe-h4-followup-results.md`](../../reports/2026-07-20-moe-h4-followup-results.md)
 和
-[`reports/2026-07-20-moe-h4f1-locality-metadata-followup-results.md`](../../reports/2026-07-20-moe-h4f1-locality-metadata-followup-results.md)。
+[`reports/2026-07-20-moe-h4f1-pipeline-pair-followup-results.md`](../../reports/2026-07-20-moe-h4f1-pipeline-pair-followup-results.md)。
 
 六组正式实验（每组 3 个独立性能进程，输出 median/MAD/P95）：
 
