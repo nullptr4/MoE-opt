@@ -104,11 +104,16 @@ python tune_moe.py --experiment E4 --mode functional --warmup 0 --iteration 1
 
 ## 6. 当前 C500 默认
 
-`fusedmoe_benchmark.custom_kernel` 使用经过五进程验证的 E3+E7 组合：FC1 保持
-`BK=128`，FC2 使用 `BK=64`，并按每个 expert 的实际 128-row tile 数构造 metadata
-grid，避免末尾空 CTA。该组合相对 E0 的 Large / Small 中位数分别快 1.3110% / 1.3458%。
-原始基准、mcProfiler 和提交 ABI 结果见
-[`reports/2026-07-20-moe-e3e7-promotion.md`](../../reports/2026-07-20-moe-e3e7-promotion.md)。
+`fusedmoe_benchmark.custom_kernel` 当前使用正式接受的 H4F1：combined Gate/Up，FC1 与 FC2
+均为 `BN128/BK64/stage1`，FC2 activation tile 位于 shared，route weight 使用 FP16
+fragment cache。内核 origin commit 为 `61fc0bbdb4a08c0a4ba44af278606ce362b794ce`，源码
+SHA-256 为 `2be93d4210d7d3bdda857887c70540c6c4da964946033fa95e58b114dd1fe47e`。
+H4F1 已通过两次完整 correctness+10/100+mcProfiler 及相邻 H4/H4F1/H4F1/H4 复核；后续
+H5、H6、H7 收敛实验均未产生同时超过 mean/median 0.5% 门槛的候选，因此不得回退到
+E3+E7、A1b 或 H4 作正式对照。接受证据与最新收敛结果见
+[`reports/2026-07-20-moe-h4-followup-results.md`](../../reports/2026-07-20-moe-h4-followup-results.md)
+和
+[`reports/2026-07-20-moe-h4f1-locality-metadata-followup-results.md`](../../reports/2026-07-20-moe-h4f1-locality-metadata-followup-results.md)。
 
 六组正式实验（每组 3 个独立性能进程，输出 median/MAD/P95）：
 

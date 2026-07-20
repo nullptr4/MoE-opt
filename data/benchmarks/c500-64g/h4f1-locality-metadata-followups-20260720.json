@@ -1,0 +1,219 @@
+{
+  "schema_version": "1.0",
+  "campaign_id": "h4f1-locality-metadata-followups-20260720",
+  "evidence_kind": "hardware",
+  "accessed_at": "2026-07-20",
+  "baseline": {
+    "id": "H4F1",
+    "kernel_origin_commit": "61fc0bbdb4a08c0a4ba44af278606ce362b794ce",
+    "target_commit_at_measurement": "69bd0ec5421aebbf697f99ef6798f47e378ec487",
+    "target_branch": "feature/c500-h4f1-followups",
+    "source_sha256": "2be93d4210d7d3bdda857887c70540c6c4da964946033fa95e58b114dd1fe47e",
+    "schedule": {
+      "combine_gate_up": true,
+      "fc2_a_scope": "shared",
+      "route_weight_scope": "fragment_float16",
+      "s1_bn": 128,
+      "s1_bk": 64,
+      "s1_stages": 1,
+      "s2_bn": 128,
+      "s2_bk": 64,
+      "s2_stages": 1
+    },
+    "runs": [
+      {
+        "artifact": "/data/metax-c500-autotune-agent/artifacts/p9/baseline-3bcebcbb48b8153e1dfa1234.json",
+        "baseline_id": "p9-baseline-cd114022392f119dde5046c5",
+        "source_commit": "5fd7330c793b809a7e00a68bc297ffd16a76ba17",
+        "environment_fingerprint": "sha256:83e6664bde009322d40a27b6b223217c7e84d6f3a1e395406571f206ee96d125",
+        "mean_ms": 238.7260418319702,
+        "median_ms": 238.81971168518066,
+        "stddev_ms": 1.100336437154032,
+        "p90_ms": 240.10147666931152,
+        "correctness_mismatches": {"large": 0, "small": 0},
+        "profiler_cycles_kcycles": {"fc1": [126959.58, 126525.98], "fc2": [53370.19, 52271.97]},
+        "candidates": ["H7F1", "H7F2", "H7F3"]
+      },
+      {
+        "artifact": "/data/metax-c500-autotune-agent/artifacts/p9/baseline-165915262a652bd3a0ea0ad7.json",
+        "baseline_id": "p9-baseline-39e3dc744f77893833f5f3cf",
+        "source_commit": "813bda36864c8ed45778e12cc5c93eff79b271ca",
+        "environment_fingerprint": "sha256:83e6664bde009322d40a27b6b223217c7e84d6f3a1e395406571f206ee96d125",
+        "mean_ms": 238.65060035705565,
+        "median_ms": 238.6222095489502,
+        "stddev_ms": 1.0198169238416803,
+        "p90_ms": 239.95143089294433,
+        "correctness_mismatches": {"large": 0, "small": 0},
+        "profiler_cycles_kcycles": {"fc1": [126882.39, 126383.89], "fc2": [51365.43, 51189.43]},
+        "candidates": ["H7F4"]
+      }
+    ]
+  },
+  "protocol": {
+    "functional_shapes": ["functional-large", "functional-small"],
+    "performance_shapes": ["performance-large", "performance-small"],
+    "reference_id": "official-ref-fusedmoe-seed-81394-v1",
+    "seed": 81394,
+    "dtype": "float16",
+    "accumulate_dtype": "float32",
+    "atol": 0.01,
+    "rtol": 0.01,
+    "equal_nan": false,
+    "warmup": 10,
+    "iterations": 100,
+    "outlier_policy": "none",
+    "samples": "all 100 ordered samples embedded in each agent artifact",
+    "acceptance": "mean and median at least 0.5%, stable variance and mechanism-consistent profiler; then full replication and adjacent ABBA"
+  },
+  "software": {
+    "device": "MetaX C500 64GiB",
+    "driver": "3.8.30",
+    "mxmaca": "3.7.1.5",
+    "mxcc": "1.0.0@d9102a1572",
+    "pytorch": "2.8.0+metax3.7.1.3",
+    "tilelang_maca": "0.1.12+maca.gitec48829b@ec48829b",
+    "mcprofiler": "3.8.1.4+575f5a9f6d"
+  },
+  "sources": {
+    "N24": {
+      "query": "site:github.com/tile-ai/tilelang rasterization2DRow use_swizzle threadblock swizzle source",
+      "url": "https://github.com/tile-ai/tilelang",
+      "title": "TileLang official repository GEMM quick start",
+      "license": "MIT",
+      "access_status": "opened_repository_body_2026-07-20"
+    },
+    "N25": {
+      "query": "site:github.com/triton-lang/triton grouped matmul GROUP_SIZE_M L2 cache tutorial source",
+      "url": "https://github.com/triton-lang/triton/blob/main/python/tutorials/03-matrix-multiplication.py",
+      "title": "Triton official matrix multiplication tutorial: program re-ordering",
+      "license": "MIT",
+      "access_status": "opened_source_body_2026-07-20"
+    },
+    "N26": {
+      "query": "site:github.com/tile-ai/tilelang T.copy fragment fragment vectorized source copy op",
+      "url": "https://github.com/tile-ai/tilelang/blob/main/tilelang/language/copy_op.py",
+      "title": "TileLang official T.copy implementation",
+      "license": "MIT",
+      "access_status": "opened_source_body_2026-07-20"
+    },
+    "N27": {
+      "query": "site:github.com/tile-ai/tilelang shared metadata tx == 0 T.sync_threads source",
+      "url": "https://github.com/tile-ai/tilelang/blob/main/examples/deepseek_v32/topk_selector.py",
+      "title": "TileLang official shared-state leader and synchronization example",
+      "license": "MIT",
+      "access_status": "opened_source_body_2026-07-20"
+    },
+    "L04": {
+      "url": "/opt/tilelang-metax@ec48829bb61fcd55a366407c69355581733cceef",
+      "title": "Installed TileLang-MACA rasterization, copy, and generated H4F1 source",
+      "license": "MIT",
+      "access_status": "opened_installed_and_generated_source_2026-07-20"
+    },
+    "M08": {
+      "url": "/data/metax-c500-autotune-agent/artifacts/p9/baseline-5fd6579f75e81a9cb94a8d41.json",
+      "title": "Current H4F1 C500 profile plus historical pre-H4 rasterization boundary",
+      "license": "project-owned measured evidence",
+      "access_status": "verified_local_hardware_artifact_and_historical_report_2026-07-20"
+    }
+  },
+  "hypothesis_to_source": {
+    "H7F1": ["N27", "L04", "M08"],
+    "H7F2": ["N26", "L04", "M08"],
+    "H7F3": ["N24", "N25", "L04", "M08"],
+    "H7F4": ["N26", "L04", "M08"],
+    "H7S1": ["N25", "L04", "M08"]
+  },
+  "experiments": [
+    {
+      "id": "H7F1",
+      "mechanism": "one-thread five-int routing metadata load plus shared CTA broadcast",
+      "artifact": "/data/metax-c500-autotune-agent/artifacts/p9/experiment-7b1816a96c0b8a104d9c6271.json",
+      "experiment_id": "experiment-3d33d6b2d0c7894a8ac9033a",
+      "source_commit": "fc213c0d8c9899f25bcab22d7e71741105d3fbe4",
+      "diff_sha256": "08390e4825d9a7286fab54947c6731c0ffdf237c8ca0717717319c03e8b23ce1",
+      "correctness_mismatches": {"large": 0, "small": 0},
+      "mean_ms": 331.9026002883911,
+      "median_ms": 331.84256744384766,
+      "stddev_ms": 0.5409289483786449,
+      "p90_ms": 332.5437427520752,
+      "mean_improvement": -0.39030747438104885,
+      "median_improvement": -0.3895107949937253,
+      "profiler_cycles_kcycles": {"fc1": [180566.1, 180013.45], "fc2": [91495.91, 91445.08]},
+      "profiler_private_read_write": {"fc1": [197568, 197568], "fc2": [0, 0]},
+      "decision": "reject"
+    },
+    {
+      "id": "H7F2",
+      "mechanism": "FC1 Up-half fragment-to-fragment T.copy",
+      "artifact": "/data/metax-c500-autotune-agent/artifacts/p9/experiment-19adbe3770d3c9ef194480a2.json",
+      "experiment_id": "experiment-264fee2cbc140dba2d07c5a7",
+      "source_commit": "9c7aaa2231f4c5e23a899954c7e3f7f133b986d6",
+      "diff_sha256": "f0eaa45b91fb7105c6fa144fd9cff5f0eace18b4fbb04f1078fe1ccadaceebc9",
+      "correctness_mismatches": {"large": 0, "small": 0},
+      "mean_ms": 238.67420650482177,
+      "median_ms": 238.7714557647705,
+      "stddev_ms": 0.8976870843146794,
+      "p90_ms": 239.80003356933594,
+      "mean_improvement": 0.0002171331068477375,
+      "median_improvement": 0.00020206003964098516,
+      "profiler_cycles_kcycles": {"fc1": [126492.85, 126321.6], "fc2": [52644.57, 52688.53]},
+      "profiler_private_read_write": [0, 0],
+      "decision": "reject"
+    },
+    {
+      "id": "H7F3",
+      "mechanism": "post-H4F1 exact FC2 row16-to-column16 measured follow-up",
+      "artifact": "/data/metax-c500-autotune-agent/artifacts/p9/experiment-db1eb31cb269298204a39d00.json",
+      "experiment_id": "experiment-8116a8c3702d243c8d817139",
+      "source_commit": "02ae77b1f94891dbbac85f5995217874b20886a5",
+      "diff_sha256": "f626248e5ceabe550f631cf0a0806a6068aab1c640dd9f9dff7b95fc3093a63c",
+      "correctness_mismatches": {"large": 0, "small": 0},
+      "mean_ms": 238.98525764465333,
+      "median_ms": 238.9327392578125,
+      "stddev_ms": 0.8002474133936962,
+      "p90_ms": 239.9006259918213,
+      "mean_improvement": -0.0010858296426058762,
+      "median_improvement": -0.00047327572684130985,
+      "profiler_cycles_kcycles": {"fc1": [126636.03, 126231.3], "fc2": [53117.45, 51691.34]},
+      "profiler_global_read_event": {"fc1": [597, 596], "fc2": [2513, 2617], "caveat": "incompatible scale versus normal capture; not compared"},
+      "profiler_private_read_write": [0, 0],
+      "decision": "reject"
+    },
+    {
+      "id": "H7F4",
+      "mechanism": "complete FC2 route global-to-FP16-fragment T.copy with predicated residue",
+      "artifact": "/data/metax-c500-autotune-agent/artifacts/p9/experiment-1fd3ad3ba34cfb304eb22a69.json",
+      "experiment_id": "experiment-92a52cfc7082f9fb87071a05",
+      "source_commit": "bebb143c4a5ba0350d6c2f62f076cea3a96b9503",
+      "diff_sha256": "051d2e2c57f73a96b6a5166f8c8a60ee7753aac6f29ee104431fc383e42180d8",
+      "correctness_mismatches": {"large": 0, "small": 0},
+      "mean_ms": 238.5165251159668,
+      "median_ms": 238.35750579833984,
+      "stddev_ms": 0.8307856803059295,
+      "p90_ms": 239.5850532531738,
+      "mean_improvement": 0.0005618055889583157,
+      "median_improvement": 0.001109300559703564,
+      "profiler_cycles_kcycles": {"fc1": [126219.62, 126263.06], "fc2": [51333.68, 52689.1]},
+      "profiler_global_reads_fc2": [59465887, 59458951],
+      "profiler_private_read_write": [0, 0],
+      "decision": "reject"
+    }
+  ],
+  "static_exclusions": [
+    {
+      "id": "H7S1",
+      "mechanism": "two FC2 output tiles per CTA",
+      "reason": "requires two live 128x128 FP32 accumulators at the measured BN256 spill boundary, or repeats rejected serial persistent computation"
+    }
+  ],
+  "replication_abba": {
+    "performed": false,
+    "reason": "no candidate passed both initial mean and median 0.5% gates"
+  },
+  "deployment": {
+    "kernel_changed": false,
+    "retained": "H4F1",
+    "kernel_commit": "61fc0bbdb4a08c0a4ba44af278606ce362b794ce",
+    "kernel_sha256": "2be93d4210d7d3bdda857887c70540c6c4da964946033fa95e58b114dd1fe47e"
+  }
+}
