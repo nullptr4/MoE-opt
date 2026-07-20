@@ -1,0 +1,104 @@
+{
+  "schema_version": "1.0",
+  "campaign_id": "h8f1-resource-reuse-composition-followups-20260720",
+  "evidence_kind": "hardware",
+  "accessed_at": "2026-07-20",
+  "baseline": {
+    "id": "H8F1",
+    "target_commit": "9bff88ea9f0e78c40613111bc32ee027346513aa",
+    "target_branch": "feature/c500-h4f1-followups",
+    "source_sha256": "6543398edf4e48c95c896b5a703c1a58f3f49a8a7dec543cb892cb0467aea7a3",
+    "schedule": "combined Gate/Up FC1 same-buffer stage-1 T.Pipelined; FC2 A shared; route FP16 fragment; FC1/FC2 BN128/BK64/stage1"
+  },
+  "protocol": {
+    "functional_shapes": ["functional-large", "functional-small"],
+    "performance_shapes": ["performance-large", "performance-small"],
+    "profile_workload": "performance-large; two consecutive custom_kernel calls; FC1/FC2/FC1/FC2",
+    "seed": 81394,
+    "dtype": "float16",
+    "accumulate_dtype": "float32",
+    "atol": 0.01,
+    "rtol": 0.01,
+    "warmup": 10,
+    "iterations": 100,
+    "outlier_policy": "none",
+    "acceptance": "mean and median both at least 0.5%, stable variance and mechanism-consistent profiler; then full replication and adjacent ABBA"
+  },
+  "software": {
+    "device": "MetaX C500 64GiB",
+    "driver": "3.8.30",
+    "mxmaca": "3.7.1.5",
+    "mxcc": "1.0.0@d9102a1572",
+    "pytorch": "2.8.0+metax3.7.1.3",
+    "tilelang_maca": "0.1.12+maca.gitec48829b@ec48829b",
+    "mcprofiler": "3.8.1.4+575f5a9f6d"
+  },
+  "sources": {
+    "N41": {"url": "https://github.com/tile-ai/tilelang/releases", "title": "TileLang official releases: shared-memory reuse and pipeline updates", "license": "MIT", "access_status": "opened_official_release_body_2026-07-20"},
+    "N42": {"url": "https://github.com/tile-ai/tilelang/blob/main/src/transform/merge_shared_memory_allocations.cc", "title": "TileLang MergeSharedMemoryAllocations implementation", "license": "Apache-2.0 file header in MIT repository", "access_status": "opened_official_source_body_2026-07-20"},
+    "N43": {"url": "https://developer.metax-tech.com/forum/media/attachments/c7/ec/p921bRvdtxGdMGVlejqB3MWt5vRdjo5Vd9Mdb21bQ3YTuk9JSnNrARaoU14kszzE/yu-han-tilelang-.pdf", "title": "MetaX-hosted Task 6 TileLang optimization training", "license": "MetaX training material; facts only, no text or code copied", "access_status": "opened_vendor_hosted_pdf_body_2026-07-20"},
+    "N44": {"url": "https://github.com/triton-lang/triton/blob/main/python/tutorials/03-matrix-multiplication.py", "title": "Triton official matrix multiplication tutorial", "license": "MIT", "access_status": "opened_official_source_body_2026-07-20"},
+    "N45": {"url": "https://github.com/NVIDIA/cutlass/blob/main/media/docs/cpp/gemm_api_3x.md", "title": "CUTLASS GEMM 3.x API documentation", "license": "BSD-3-Clause", "access_status": "opened_official_documentation_body_2026-07-20"},
+    "N46": {"url": "https://github.com/NVIDIA/cutlass/blob/main/examples/24_gemm_grouped/gemm_grouped.cu", "title": "CUTLASS grouped GEMM scheduler example", "license": "BSD-3-Clause", "access_status": "opened_official_source_body_2026-07-20"},
+    "L07": {"url": "/opt/tilelang-metax@ec48829bb61fcd55a366407c69355581733cceef", "title": "Exact installed TileLang-MACA shared-memory reuse implementation", "license": "MIT repository and Apache-2.0 transform file", "access_status": "opened_installed_source_body_2026-07-20"},
+    "M12": {"url": "/data/metax-c500-autotune-agent/artifacts/p9", "title": "H8F1 resource boundary and uncombined positive H9F1/H5F5 evidence", "license": "project-owned measured evidence", "access_status": "verified_2026-07-20"},
+    "M13": {"url": "/data/metax-c500-autotune-agent/artifacts/p9", "title": "H10 first-batch endpoint and generated shared-arena evidence", "license": "project-owned measured evidence", "access_status": "verified_2026-07-20"},
+    "M14": {"url": "/data/metax-c500-autotune-agent/artifacts/p9/experiment-124cb50087d631cf7e2b154b.json", "title": "H10F4 installed MACA layout-inference compile boundary", "license": "project-owned measured evidence", "access_status": "verified_2026-07-20"}
+  },
+  "hypothesis_to_source": {
+    "H10F1": ["N43", "N44", "N45", "L07", "M12"],
+    "H10F2": ["N43", "N45", "M12"],
+    "H10F3": ["N41", "N42", "N43", "L07", "M12"],
+    "H10F4": ["N42", "N43", "L07", "M13"],
+    "H10F5": ["N42", "L07", "M13", "M14"],
+    "H10S1": ["N46", "M12"]
+  },
+  "baselines": [
+    {"id": "B0", "artifact": "/data/metax-c500-autotune-agent/artifacts/p9/baseline-4d7ce84636442fb4fba8b415.json", "agent_source_commit": "7599637b69daf34230b6f56d040abf6d1c243113", "environment_fingerprint": "sha256:6fbb2a4be937461d7ae60ae0c1b3f625cce881b6dbe6bbf34800ef2c5b6d0281", "correctness_mismatches": {"large": 0, "small": 0}, "mean_ms": 233.53209915161133, "median_ms": 233.4146547317505, "stddev_ms": 1.1669795655180906, "p90_ms": 235.23092346191407, "profiler_cycles_kcycles": {"fc1": [121129.26, 121543.71], "fc2": [53075.61, 50921.15]}},
+    {"id": "B1", "artifact": "/data/metax-c500-autotune-agent/artifacts/p9/baseline-c216069ad8c10dc6db26c2ac.json", "agent_source_commit": "6b5df074873620b3bb1d288115cd23f92686d5ea", "environment_fingerprint": "sha256:27af7184869adebbf166dc9fe48dbd7c3d55af45e544dba9cb322f699f8a6a75", "correctness_mismatches": {"large": 0, "small": 0}, "mean_ms": 233.89593078613282, "median_ms": 233.69433403015137, "stddev_ms": 1.288645497177489, "p90_ms": 235.62165603637695, "profiler_cycles_kcycles": {"fc1": [122304.04, 123069.67], "fc2": [53791.94, 52752.33]}},
+    {"id": "B2", "artifact": "/data/metax-c500-autotune-agent/artifacts/p9/baseline-2ac289a5c6d355ec5079cc70.json", "agent_source_commit": "8ff8a9c95089d463a1b460c95b57639a78c29a03", "environment_fingerprint": "sha256:994d0c04848cf80cb4a49d100af8b4b4025b4e3d4ffffe7b790b497f754376b1", "correctness_mismatches": {"large": 0, "small": 0}, "mean_ms": 233.5477507019043, "median_ms": 233.56441688537598, "stddev_ms": 1.058402666324173, "p90_ms": 234.70256309509276, "profiler_cycles_kcycles": {"fc1": [121629.69, 122787.31], "fc2": [50925.64, 51738.37]}}
+  ],
+  "experiments": [
+    {"id": "H10F1", "mechanism": "FC2 BN128 to BN64 only", "baseline": "B0", "artifact": "/data/metax-c500-autotune-agent/artifacts/p9/experiment-8693c6ac4f20ced84b005412.json", "experiment_id": "experiment-c632b88177b92aa6d72cee98", "source_commit": "96632467fcee738018d19416cc9976e3b4ebcdba", "diff_sha256": "9452cd08390b0fce64fbc487bafebb646efe18bef0a548720f36ef77266cdd08", "correctness_mismatches": {"large": 0, "small": 0}, "mean_ms": 265.36211029052737, "median_ms": 265.47980880737305, "stddev_ms": 0.8055284712033817, "p90_ms": 266.29266319274905, "mean_improvement": -0.13629822732956157, "median_improvement": -0.13737421119712095, "profiler_cycles_kcycles": {"fc1": [121564.81, 121946.93], "fc2": [84274.24, 84000.75]}, "profiler_workgroups": {"fc1": 16464, "fc2": 115248}, "decision": "reject_fc2_grid_doubled_and_both_metrics_regressed"},
+    {"id": "H10F2", "mechanism": "H9F1 same-pass FC1 product store plus H5F5 full-tile FC2 route predicate removal", "baseline": "B0", "artifact": "/data/metax-c500-autotune-agent/artifacts/p9/experiment-dae16e208cd54376a5571247.json", "experiment_id": "experiment-0e1200383e5096e4f5f565a0", "source_commit": "db631c95a254c0710d69000ac026a889c0c7d943", "diff_sha256": "0bab4ae5bd6bfb3fa02eeebc5d7edf173f8130b880f5180bd9f920433c0a5c9f", "correctness_mismatches": {"large": 0, "small": 0}, "mean_ms": 232.71947818756104, "median_ms": 232.8233003616333, "stddev_ms": 0.9964536103872483, "p90_ms": 234.1029136657715, "mean_improvement": 0.0034796970823387104, "median_improvement": 0.0025334928982792266, "profiler_cycles_kcycles": {"fc1": [121185.66, 120434.06], "fc2": [51649.69, 52190.95]}, "profiler_private_rw": {"fc1": [[263424, 1], [263424, 1]], "fc2": [[0, 0], [0, 0]]}, "decision": "reject_below_both_0.5_percent_gates"},
+    {"id": "H10F3", "mechanism": "new post-mainloop FP16 shared Up tile with automatic lifetime packing", "baseline": "B0", "artifact": "/data/metax-c500-autotune-agent/artifacts/p9/experiment-8e4ec8c9b7671a3c05af675b.json", "experiment_id": "experiment-78554f94415f183bab021be9", "source_commit": "0999f393f4c045962530dd350019eef1a6eecbee", "diff_sha256": "4bd93b609b02d90c74d77a830bb3b6e2acdc8e286e14837d4807c01422e5591c", "correctness_mismatches": {"large": 0, "small": 0}, "mean_ms": 295.72405685424803, "median_ms": 295.6634864807129, "stddev_ms": 1.051351570847047, "p90_ms": 296.98772392272946, "mean_improvement": -0.26631010438638275, "median_improvement": -0.26668776140256173, "generated_fc1_dynamic_shared_bytes": 65536, "profiler_cycles_kcycles": {"fc1": [183096.61, 184006.14], "fc2": [53000.98, 51988.59]}, "profiler_private_rw": {"fc1": [[460992, 460992], [460992, 460992]], "fc2": [[0, 0], [0, 0]]}, "decision": "reject_shared_arena_doubled_and_both_metrics_regressed"},
+    {"id": "H10F4", "mechanism": "explicitly reuse the dead 256x64 weight shared buffer with two offsets in each Parallel", "baseline": "B1", "artifact": "/data/metax-c500-autotune-agent/artifacts/p9/experiment-124cb50087d631cf7e2b154b.json", "experiment_id": "experiment-bf8fba7d46367c0268202b15", "source_commit": "85933c6620cf6720230dfaeb975a75cc9688963a", "diff_sha256": "63f5fb93b7a788dd60d4fd66c6fcdac68577de50d81ff7b06ae5ad06577cd389", "build": "failed", "correctness": "not_run_after_build_failure", "benchmark": "not_run_after_build_failure", "profiler": "not_run_after_build_failure", "failure": "StructuralEqual layout-inference error for gate_up_logits_local (i,j+192) versus (i,j+128)", "decision": "reject_compile_error"},
+    {"id": "H10F5-R1", "mechanism": "explicit weight-buffer reuse with each 64-wide half in a separate affine Parallel", "baseline": "B2", "artifact": "/data/metax-c500-autotune-agent/artifacts/p9/experiment-17843f5d9ff3a12b55b58ba3.json", "experiment_id": "experiment-5780f4ce5c7fd895023f6c09", "source_commit": "9eed5becdd9642075365d141cb30acebb017a03c", "diff_sha256": "a8902e9472353f8135446e21e94edbc7608c8669e5b3983c1738230aed41267e", "correctness_mismatches": {"large": 0, "small": 0}, "mean_ms": 229.39508728027343, "median_ms": 229.3158369064331, "stddev_ms": 1.0328493075269995, "p90_ms": 230.78636207580567, "mean_improvement": 0.017780789620754058, "median_improvement": 0.018190185112948534, "generated_fc1_dynamic_shared_bytes": 32768, "profiler_cycles_kcycles": {"fc1": [118785.3, 117979.48], "fc2": [51477.94, 51265.22]}, "profiler_private_rw": {"fc1": [[921984, 921984], [921984, 921984]], "fc2": [[0, 0], [0, 0]]}, "decision": "initial_accept"},
+    {"id": "H10F5-R2", "mechanism": "independent full replication of H10F5", "baseline": "B2", "artifact": "/data/metax-c500-autotune-agent/artifacts/p9/experiment-d4247ec2c9d02fca35edeead.json", "experiment_id": "experiment-7b8b4187be57c219ef90b001", "source_commit": "bb500056076e49e97d1f302265486260874db612", "diff_sha256": "a8902e9472353f8135446e21e94edbc7608c8669e5b3983c1738230aed41267e", "correctness_mismatches": {"large": 0, "small": 0}, "mean_ms": 229.47124490737914, "median_ms": 229.44537448883057, "stddev_ms": 1.2966011892795133, "p90_ms": 231.16011600494386, "mean_improvement": 0.017454699444861416, "median_improvement": 0.017635573309811445, "generated_fc1_dynamic_shared_bytes": 32768, "profiler_cycles_kcycles": {"fc1": [117503.74, 117449.18], "fc2": [51486.89, 51006.23]}, "profiler_private_rw": {"fc1": [[921984, 921984], [921984, 921984]], "fc2": [[0, 0], [0, 0]]}, "decision": "replication_accept"}
+  ],
+  "static_exclusions": [
+    {"id": "H10S1", "reason": "host-sorted problem descriptors require a pointer table or workspace absent from the fixed submission ABI"}
+  ],
+  "abba": {
+    "artifact": "/data/metax-c500-autotune-agent/artifacts/p9/abba-c8a3af23b9c375b7de656015.json",
+    "order": ["H8F1-r1", "H10F5-r1", "H10F5-r2", "H8F1-r2"],
+    "runs": [
+      {"id": "H8F1-r1", "mean_ms": 233.83954860687257, "median_ms": 233.8561305999756, "stddev_ms": 1.1070194752938523, "p90_ms": 235.1701560974121},
+      {"id": "H10F5-r1", "mean_ms": 229.2476259803772, "median_ms": 229.19987106323242, "stddev_ms": 1.049051956267299, "p90_ms": 230.58660640716553},
+      {"id": "H10F5-r2", "mean_ms": 229.36638441085816, "median_ms": 229.3541145324707, "stddev_ms": 1.196690626298571, "p90_ms": 230.87861213684081},
+      {"id": "H8F1-r2", "mean_ms": 234.19559951782227, "median_ms": 234.08908653259277, "stddev_ms": 1.0863308052555734, "p90_ms": 235.84099349975585}
+    ],
+    "individual_mean_improvements": [0.020382862702009757, 0.01987538615475982],
+    "individual_median_improvements": [0.02039870193480211, 0.01973946464124266],
+    "aggregate_mean_improvement": 0.02012912442838479,
+    "aggregate_median_improvement": 0.020069083288022385,
+    "selected": "H10F5"
+  },
+  "deployment": {
+    "selected": "H10F5",
+    "landing_code_commit": "e60f9b3216d008e342d285cd24f8b6ede1142387",
+    "parent_commit": "9bff88ea9f0e78c40613111bc32ee027346513aa",
+    "kernel_sha256": "338b4d93cadc69a12e49690efc5d3030630b8cf412ee0a0691a6ef44db8bedfe",
+    "schedule": "H8F1 plus explicit post-mainloop reuse of the dead 256x64 FC1 weight shared buffer as two affine 128x64 FP16 Up halves"
+  },
+  "target_validation": {
+    "pytest_metax": "86 passed in 25.06s",
+    "repository_check": "3365 tracked files inspected",
+    "verify_maca": "passed on MetaX C500",
+    "functional": "2 of 2 passed",
+    "run_moe_performance": "diagnostic only: 198.72535156/31.86319824 ms",
+    "submission_public_fuzz": "6 of 6 passed",
+    "stage2_decision_table": "9 versions, 32 hashed sources, deterministic decisions verified",
+    "git_diff_check": "passed"
+  }
+}
