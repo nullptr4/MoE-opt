@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "record_type": "moe-stage2-profiler-decision-table",
-  "generated_at": "2026-07-20T05:42:53.540303+00:00",
+  "generated_at": "2026-07-20T09:41:16.244816+00:00",
   "host_id": "c500-32g",
   "methodology": {
     "workload": "Large public performance shape",
@@ -1255,8 +1255,8 @@
     },
     {
       "path": "benchmarks/tilelang-moe/custom_fusedmoe.py",
-      "sha256": "e4a8cc3f9cc93eaf2885486067562ad1037522aa16320b2b91367663e8ced14f",
-      "bytes": 32321
+      "sha256": "581a00710cfe04b75a7da2bda8aa9fd273f9abfad9030fcf8c00191bc6fe8a27",
+      "bytes": 32369
     },
     {
       "path": "benchmarks/tilelang-moe/submission.py",
