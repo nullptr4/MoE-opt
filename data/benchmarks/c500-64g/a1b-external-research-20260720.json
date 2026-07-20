@@ -1,0 +1,636 @@
+{
+  "schema_version": "1.0",
+  "campaign_id": "a1b-external-mechanisms-20260720",
+  "accessed_at": "2026-07-20",
+  "evidence_separation": {
+    "external_fact": "A statement directly supported by an opened primary source; results on CUDA or ROCm are not C500 results.",
+    "engineering_inference": "A testable mapping from external mechanism plus local A1b source/profiler evidence to this TileLang-MACA kernel.",
+    "c500_measured_conclusion": "A conclusion supported only after official correctness, ordered warmup-10/timing-100 samples, and a workload-matched mcProfiler attempt on the real C500."
+  },
+  "immutable_baseline": {
+    "baseline_id": "A1b",
+    "target_branch": "feature/c500-a1b-followups",
+    "target_state_commit": "347f17bf1875698db67e2df2fe2a398b0892ad6c",
+    "baseline_source_commit": "0935d29a0bcbd789de8dcd499dd4e1fac15ae692",
+    "agent_state_commit": "42e777ff294e742a71e43e6d24e5553a103fd033",
+    "source_path": "benchmarks/tilelang-moe/custom_fusedmoe.py",
+    "source_sha256": "581a00710cfe04b75a7da2bda8aa9fd273f9abfad9030fcf8c00191bc6fe8a27"
+  },
+  "search": {
+    "tool": "native Web Search",
+    "summary_as_evidence": false,
+    "rounds": [
+      {
+        "round": 0,
+        "queries": [
+          "site:github.com/tile-ai/tilelang grouped gemm persistent kernel MoE",
+          "site:tilelang.com grouped GEMM persistent kernel GEMM documentation",
+          "site:github.com/NVIDIA/TensorRT-LLM MoE CUTLASS grouped GEMM implementation",
+          "site:github.com/triton-lang/triton fused MoE grouped GEMM persistent kernel tutorial"
+        ]
+      },
+      {
+        "round": 1,
+        "queries": [
+          "site:github.com/tile-ai/tilelang/pull/1923 ptr-table grouped GEMM",
+          "site:github.com/tile-ai/tilelang \"grouped_gemm\" \"examples\"",
+          "site:github.com/tile-ai/tilelang persistent GEMM example tilelang",
+          "site:github.com/tile-ai/tilelang split k GEMM atomic_add"
+        ]
+      },
+      {
+        "round": 2,
+        "queries": [
+          "site:nvidia.github.io/TensorRT-LLM MoE backend grouped GEMM CUTLASS routing fused activation",
+          "site:github.com/NVIDIA/TensorRT-LLM \"fused_moe\" \"grouped\"",
+          "site:github.com/NVIDIA/cutlass examples MoE grouped gemm persistent scheduler",
+          "site:developer.nvidia.com/blog MoE grouped GEMM persistent kernel expert batching"
+        ]
+      },
+      {
+        "round": 3,
+        "queries": [
+          "site:github.com/NVIDIA/cutlass \"moe\" \"grouped_gemm\" path:examples",
+          "site:github.com/NVIDIA/TensorRT-LLM \"MoeGemmRunner\" grouped gemm",
+          "site:github.com/NVIDIA/TensorRT-LLM \"fused_moe\" \"moe_kernels\"",
+          "site:github.com/NVIDIA/cutlass \"PersistentTileSchedulerSm90Group\" grouped gemm"
+        ]
+      },
+      {
+        "round": 4,
+        "queries": [
+          "site:triton-lang.org/main/getting-started/tutorials fused MoE grouped GEMM persistent",
+          "site:github.com/triton-lang/triton \"fused_moe\" grouped GEMM",
+          "site:github.com/flashinfer-ai/flashinfer fused_moe grouped gemm source",
+          "site:docs.flashinfer.ai fused moe cutlass grouped gemm"
+        ]
+      },
+      {
+        "round": 5,
+        "queries": [
+          "site:deepspeed.readthedocs.io MoE fused kernel grouped GEMM expert tokens",
+          "site:github.com/NVIDIA/Megatron-LM grouped_gemm MoE token dispatcher fusion",
+          "site:github.com/databricks/megablocks grouped GEMM MoE kernel paper",
+          "site:github.com/ROCm/composable_kernel MoE grouped GEMM split k tile scheduler"
+        ]
+      },
+      {
+        "round": 6,
+        "queries": [
+          "MegaBlocks Efficient Sparse Training with Mixture-of-Experts paper arxiv",
+          "site:arxiv.org mixture of experts grouped gemm persistent kernel Split-K",
+          "site:github.com/ROCm/rocm-libraries \"moe\" \"grouped_gemm\" ck_tile",
+          "site:rocm.docs.amd.com composable kernel grouped gemm MoE CK Tile"
+        ]
+      },
+      {
+        "round": 7,
+        "queries": [
+          "MetaX C500 official product specifications MACA programming guide",
+          "site:metax-tech.com C500 MACA mcProfiler",
+          "site:developer.metax-tech.com MACA kernel programming performance",
+          "沐曦 C500 官方 MACA 编程 性能 优化 mcProfiler"
+        ]
+      },
+      {
+        "round": 8,
+        "queries": [
+          "site:developer.metax-tech.com/doc C500 MXMACA C++ Programming Guide shared memory occupancy warp",
+          "site:developer.metax-tech.com/api/client/document/preview/559 C500 MXMACAC++ProgrammingGuide async copy",
+          "site:developer.metax-tech.com mcProfiler 用户指南 counter private read shared memory",
+          "site:developer.metax-tech.com mcTriton MoE grouped GEMM C500"
+        ]
+      },
+      {
+        "round": 9,
+        "queries": [
+          "site:github.com/flashinfer-ai/flashinfer/pull/2944 grouped-gemm combine fusion",
+          "site:github.com/flashinfer-ai/flashinfer \"combine fusion\" grouped-gemm",
+          "site:github.com/flashinfer-ai/flashinfer/blob/main/flashinfer/fused_moe core.py",
+          "site:github.com/flashinfer-ai/flashinfer \"routing_method_type\" fused_moe"
+        ]
+      },
+      {
+        "round": 10,
+        "queries": [
+          "site:github.com/deepspeedai/DeepSpeed/blob/master/deepspeed/moe sharded_moe.py einsum capacity token dispatch",
+          "site:github.com/deepspeedai/DeepSpeed \"fused\" \"MoE\" kernel token",
+          "site:github.com/deepspeedai/DeepSpeed \"drop_tokens\" MoE",
+          "site:deepspeed.ai/tutorials/mixture-of-experts token dropping capacity"
+        ]
+      }
+    ]
+  },
+  "sources": [
+    {
+      "id": "S01",
+      "title": "TileLang official repository",
+      "url": "https://github.com/tile-ai/tilelang",
+      "publisher": "TileLang",
+      "source_type": "official_repository",
+      "support_level": "official",
+      "access_status": "opened",
+      "accessed_at": "2026-07-20",
+      "license": "MIT",
+      "key_mechanism": "GEMM examples, pipelining, parallel copy, L2 swizzle, persistent GEMM.",
+      "license_boundary": "Mechanisms and MIT source may be studied; repository backend validation does not establish MetaX support or performance.",
+      "c500_tilelang_applicability": "Local TileLang-MACA must compile each API; generic T.Persistent is present locally."
+    },
+    {
+      "id": "S02",
+      "title": "TileLang example_gemm_persistent.py",
+      "url": "https://github.com/tile-ai/tilelang/blob/main/examples/gemm/example_gemm_persistent.py",
+      "publisher": "TileLang",
+      "source_type": "official_source_code",
+      "support_level": "official",
+      "access_status": "opened_and_cross_checked_locally",
+      "accessed_at": "2026-07-20",
+      "license": "MIT",
+      "key_mechanism": "Grid limited to device SM count; T.Persistent maps each physical program across multiple logical GEMM tiles.",
+      "license_boundary": "Use the installed API rather than copying backend-specific generated code.",
+      "c500_tilelang_applicability": "The installed ec48829 fork contains the same generic primitive."
+    },
+    {
+      "id": "S03",
+      "title": "TileLang releases",
+      "url": "https://github.com/tile-ai/tilelang/releases",
+      "publisher": "TileLang",
+      "source_type": "official_release_notes",
+      "support_level": "official",
+      "access_status": "opened",
+      "accessed_at": "2026-07-20",
+      "license": "MIT",
+      "key_mechanism": "Recent grouped-GEMM ptr-table, grouped compilation and shared-memory reuse controls.",
+      "license_boundary": "Do not assume APIs newer than the installed MetaX fork exist.",
+      "c500_tilelang_applicability": "Motivates grouped/persistent mechanisms; ptr-table ABI is not available to the fixed submission."
+    },
+    {
+      "id": "S04",
+      "title": "Triton Group GEMM tutorial",
+      "url": "https://triton-lang.org/main/getting-started/tutorials/08-grouped-gemm.html",
+      "publisher": "Triton",
+      "source_type": "official_documentation",
+      "support_level": "official",
+      "access_status": "opened",
+      "accessed_at": "2026-07-20",
+      "license": "MIT",
+      "key_mechanism": "Device-side problem descriptors and persistent programs traverse grouped problems and tiles.",
+      "license_boundary": "Borrow scheduling concept only; no Triton/CUDA code is introduced.",
+      "c500_tilelang_applicability": "Current ABI has packed tokens and fixed pointers, so descriptor ABI changes are excluded."
+    },
+    {
+      "id": "S05",
+      "title": "Triton Persistent Matmul tutorial",
+      "url": "https://triton-lang.org/main/getting-started/tutorials/09-persistent-matmul.html",
+      "publisher": "Triton",
+      "source_type": "official_documentation",
+      "support_level": "official",
+      "access_status": "opened",
+      "accessed_at": "2026-07-20",
+      "license": "MIT",
+      "key_mechanism": "Launch min(NUM_SMS, num_tiles), loop over logical tiles, and optionally subtile epilogue to reduce shared memory.",
+      "license_boundary": "CUDA TMA, warp specialization, Hopper and Blackwell details are explicitly not portable.",
+      "c500_tilelang_applicability": "Only generic persistent tile scheduling is considered."
+    },
+    {
+      "id": "S06",
+      "title": "Boosting MoE Training Throughput with Advanced Fusion Kernels",
+      "url": "https://developer.nvidia.com/blog/boosting-moe-training-throughput-with-advanced-fusion-kernels/",
+      "publisher": "NVIDIA",
+      "source_type": "official_technical_blog",
+      "support_level": "official",
+      "access_status": "opened",
+      "accessed_at": "2026-07-20",
+      "license": "NVIDIA website and referenced code terms",
+      "key_mechanism": "Fuse activation/scaling to remove intermediate traffic; keep group metadata on device; dynamically schedule irregular expert work.",
+      "license_boundary": "No CUDA/CuTe source copied and no GB200 numbers extrapolated.",
+      "c500_tilelang_applicability": "Abstract epilogue scaling, metadata reuse and persistent scheduling can be independently implemented and measured."
+    },
+    {
+      "id": "S07",
+      "title": "Introducing Grouped GEMM APIs in cuBLAS",
+      "url": "https://developer.nvidia.com/blog/introducing-grouped-gemm-apis-in-cublas-and-more-performance-updates/",
+      "publisher": "NVIDIA",
+      "source_type": "official_technical_blog",
+      "support_level": "official",
+      "access_status": "opened",
+      "accessed_at": "2026-07-20",
+      "license": "NVIDIA website terms",
+      "key_mechanism": "Execute variable-size GEMMs in one grouped launch; MoE is a target use case.",
+      "license_boundary": "API and performance figures are NVIDIA-specific.",
+      "c500_tilelang_applicability": "Current kernel already groups expert work in one TileLang kernel; cuBLAS is not callable."
+    },
+    {
+      "id": "S08",
+      "title": "NVIDIA CUTLASS",
+      "url": "https://github.com/NVIDIA/cutlass",
+      "publisher": "NVIDIA",
+      "source_type": "official_repository",
+      "support_level": "official",
+      "access_status": "opened",
+      "accessed_at": "2026-07-20",
+      "license": "BSD-3-Clause for main C++; NVIDIA EULA for python/CuTeDSL",
+      "key_mechanism": "Grouped persistent schedulers and expert-wise problem descriptors.",
+      "license_boundary": "No CuTeDSL code copied; CUDA architecture intrinsics and constants are excluded.",
+      "c500_tilelang_applicability": "Supports generic H1 scheduling hypothesis only."
+    },
+    {
+      "id": "S09",
+      "title": "MoE as Dense GEMM: Extreme Optimization in Expert Parallelism",
+      "url": "https://nvidia.github.io/TensorRT-LLM/blogs/tech_blog/blog24_MoE_as_Dense_GEMM.html",
+      "publisher": "NVIDIA TensorRT-LLM",
+      "source_type": "official_technical_blog",
+      "support_level": "official",
+      "access_status": "opened",
+      "accessed_at": "2026-07-20",
+      "license": "NVIDIA documentation terms",
+      "key_mechanism": "Dense expert execution may beat sparse scheduling for very-low-token Blackwell FP4 workloads.",
+      "license_boundary": "Hardware, precision and workload-specific result.",
+      "c500_tilelang_applicability": "Excluded because it changes work/precision and depends on SM100/103."
+    },
+    {
+      "id": "S10",
+      "title": "FlashInfer official repository",
+      "url": "https://github.com/flashinfer-ai/flashinfer",
+      "publisher": "FlashInfer",
+      "source_type": "official_repository",
+      "support_level": "official",
+      "access_status": "opened",
+      "accessed_at": "2026-07-20",
+      "license": "Apache-2.0",
+      "key_mechanism": "Fused MoE, grouped GEMM, routing, and grouped-GEMM/combine fusion.",
+      "license_boundary": "No CUDA-only kernel is imported; use conceptual metadata/combine fusion only.",
+      "c500_tilelang_applicability": "Supports H2/H3 local route-scale transformations."
+    },
+    {
+      "id": "S11",
+      "title": "FlashInfer issue #3031: Filter invalid tactics by occupancy",
+      "url": "https://github.com/flashinfer-ai/flashinfer/issues/3031",
+      "publisher": "FlashInfer community",
+      "source_type": "issue",
+      "support_level": "community",
+      "access_status": "opened",
+      "accessed_at": "2026-07-20",
+      "license": "Repository Apache-2.0; issue text under GitHub terms",
+      "key_mechanism": "Query occupancy before tactic profiling and filter zero-occupancy tactics.",
+      "license_boundary": "This is not a C500 vendor rule or measured result.",
+      "c500_tilelang_applicability": "Supports static register/shared-memory feasibility screening before C500 runs."
+    },
+    {
+      "id": "S12",
+      "title": "Megatron-LM MoE token dispatcher source",
+      "url": "https://github.com/NVIDIA/Megatron-LM/blob/main/megatron/core/transformer/moe/token_dispatcher.py",
+      "publisher": "NVIDIA Megatron-LM",
+      "source_type": "official_source_code",
+      "support_level": "official",
+      "access_status": "opened",
+      "accessed_at": "2026-07-20",
+      "license": "Primary BSD-like license with mixed-license repository",
+      "key_mechanism": "Device-resident expert metadata and fused permute/unpermute avoid D2H synchronization.",
+      "license_boundary": "Only the metadata reuse concept is borrowed.",
+      "c500_tilelang_applicability": "Dispatcher rewrite is outside ABI; local per-row metadata caching remains feasible."
+    },
+    {
+      "id": "S13",
+      "title": "MegaBlocks repository",
+      "url": "https://github.com/databricks/megablocks",
+      "publisher": "Databricks",
+      "source_type": "official_repository",
+      "support_level": "official",
+      "access_status": "opened",
+      "accessed_at": "2026-07-20",
+      "license": "Apache-2.0",
+      "key_mechanism": "Block-sparse dropless MoE and grouped GEMM path.",
+      "license_boundary": "No source copied.",
+      "c500_tilelang_applicability": "Packing/drop reformulation changes the fixed official workload and is excluded."
+    },
+    {
+      "id": "S14",
+      "title": "MegaBlocks: Efficient Sparse Training with Mixture-of-Experts",
+      "url": "https://arxiv.org/abs/2211.15841",
+      "publisher": "arXiv / authors",
+      "source_type": "paper",
+      "support_level": "official",
+      "access_status": "opened",
+      "accessed_at": "2026-07-20",
+      "license": "Paper terms; implementation Apache-2.0",
+      "key_mechanism": "Block-sparse computation avoids token dropping and padding tradeoff.",
+      "license_boundary": "Cited as research; no implementation copied.",
+      "c500_tilelang_applicability": "Not ABI-feasible because benchmark inputs are already padded/expert-stacked."
+    },
+    {
+      "id": "S15",
+      "title": "DeepSpeed Mixture of Experts tutorial",
+      "url": "https://www.deepspeed.ai/tutorials/mixture-of-experts/",
+      "publisher": "DeepSpeed",
+      "source_type": "official_documentation",
+      "support_level": "official",
+      "access_status": "opened",
+      "accessed_at": "2026-07-20",
+      "license": "Project Apache-2.0",
+      "key_mechanism": "Expert parallelism and token routing/capacity system design.",
+      "license_boundary": "No code copied.",
+      "c500_tilelang_applicability": "Multi-device dispatcher changes are outside this single-kernel ABI."
+    },
+    {
+      "id": "S16",
+      "title": "DeepSpeed MoE for NLG tutorial",
+      "url": "https://www.deepspeed.ai/tutorials/mixture-of-experts-nlg/",
+      "publisher": "DeepSpeed",
+      "source_type": "official_documentation",
+      "support_level": "official",
+      "access_status": "opened",
+      "accessed_at": "2026-07-20",
+      "license": "Project Apache-2.0",
+      "key_mechanism": "Capacity factors and token drop/no-drop choices.",
+      "license_boundary": "No code copied.",
+      "c500_tilelang_applicability": "Excluded because official routing/workload/quality semantics are fixed."
+    },
+    {
+      "id": "S17",
+      "title": "CK Tile grouped_gemm_kernel documentation",
+      "url": "https://rocm.docs.amd.com/projects/composable_kernel/en/docs-7.1.1/doxygen/html/structck__tile_1_1_grouped_gemm_kernel.html",
+      "publisher": "AMD ROCm",
+      "source_type": "official_documentation",
+      "support_level": "official",
+      "access_status": "opened",
+      "accessed_at": "2026-07-20",
+      "license": "MIT",
+      "key_mechanism": "UsePersistentKernel, MaxOccupancyGridSize, device group lookup, K-tail pipeline selection and SplitKBatchOffset.",
+      "license_boundary": "AMD wave/occupancy values are not reused.",
+      "c500_tilelang_applicability": "Strong generic support for H1; Split-K requires separate ABI/atomic review."
+    },
+    {
+      "id": "S18",
+      "title": "CK Tile conceptual documentation",
+      "url": "https://rocm.docs.amd.com/projects/composable_kernel/en/develop/conceptual/ck_tile/index.html",
+      "publisher": "AMD ROCm",
+      "source_type": "official_documentation",
+      "support_level": "official",
+      "access_status": "opened",
+      "accessed_at": "2026-07-20",
+      "license": "MIT",
+      "key_mechanism": "Tile-level cooperative memory movement, coalescing and composable pipelines.",
+      "license_boundary": "Concept only; no AMD ISA assumptions.",
+      "c500_tilelang_applicability": "Supports H4 memory-scope/occupancy experiment."
+    },
+    {
+      "id": "S19",
+      "title": "MetaX C500 official product page",
+      "url": "https://www.metax-tech.com/en/goods/prod.html?cid=107&id=21",
+      "publisher": "MetaX",
+      "source_type": "official_product_page",
+      "support_level": "official",
+      "access_status": "opened",
+      "accessed_at": "2026-07-20",
+      "license": "MetaX website terms",
+      "key_mechanism": "C500 64GB, ECC, high bandwidth and MXMACA software stack.",
+      "license_boundary": "Public specifications only.",
+      "c500_tilelang_applicability": "Confirms device/software identity; no CUDA-equivalent constants inferred."
+    },
+    {
+      "id": "S20",
+      "title": "MXMACA release notes PDF",
+      "url": "https://developer.metax-tech.com/api/client/document/file/222/preview/?file_type=pdf",
+      "publisher": "MetaX",
+      "source_type": "official_release_notes",
+      "support_level": "official",
+      "access_status": "opened",
+      "accessed_at": "2026-07-20",
+      "license": "MetaX documentation terms",
+      "key_mechanism": "Group GEMM API, MoE/vLLM Triton optimizations, FP16 MMA and branch improvements, mcProfiler, plus version-dependent atomic/metric limitations.",
+      "license_boundary": "No closed implementation copied and no version-independent capability assumed.",
+      "c500_tilelang_applicability": "Supports grouped-MoE profiling; raises risk for atomic Split-K."
+    },
+    {
+      "id": "S21",
+      "title": "MetaX developer documentation index",
+      "url": "https://developer.metax-tech.com/doc",
+      "publisher": "MetaX",
+      "source_type": "official_documentation_index",
+      "support_level": "official",
+      "access_status": "opened",
+      "accessed_at": "2026-07-20",
+      "license": "MetaX documentation terms",
+      "key_mechanism": "Current MXMACA programming and tool documentation entry points.",
+      "license_boundary": "Index facts only.",
+      "c500_tilelang_applicability": "Used to verify current public capability boundaries."
+    },
+    {
+      "id": "S22",
+      "title": "MetaX developer quick start",
+      "url": "https://developer.metax-tech.com/api/client/document/preview/459/index.html",
+      "publisher": "MetaX",
+      "source_type": "official_documentation",
+      "support_level": "official",
+      "access_status": "opened",
+      "accessed_at": "2026-07-20",
+      "license": "MetaX documentation terms",
+      "key_mechanism": "MXMACA programming model and API setup.",
+      "license_boundary": "No undocumented hardware constants inferred.",
+      "c500_tilelang_applicability": "Confirms software model only."
+    },
+    {
+      "id": "S23",
+      "title": "MetaX forum: asynchronous copy optimization example",
+      "url": "https://developer.metax-tech.com/forum/t/ru-he-shi-yong-yi-bu-kao-bei-yi-da-dao-you-hua-de-xiao-guo-ni/215/",
+      "publisher": "MetaX developer forum user",
+      "source_type": "community_forum",
+      "support_level": "community",
+      "access_status": "opened",
+      "accessed_at": "2026-07-20",
+      "license": "Forum terms",
+      "key_mechanism": "One user example reports async copy slower than synchronous copy on C500.",
+      "license_boundary": "Unverified anecdote, not a general performance fact.",
+      "c500_tilelang_applicability": "Only supports measuring async changes instead of assuming benefit."
+    },
+    {
+      "id": "S24",
+      "title": "Public C500 TileLang competition presentation",
+      "url": "https://developer.metax-tech.com/forum/media/attachments/c7/ec/p921bRvdtxGdMGVlejqB3MWt5vRdjo5Vd9Mdb21bQ3YTuk9JSnNrARaoU14kszzE/yu-han-tilelang-.pdf",
+      "publisher": "MetaX developer forum attachment",
+      "source_type": "community_presentation",
+      "support_level": "community",
+      "access_status": "opened",
+      "accessed_at": "2026-07-20",
+      "license": "Forum attachment terms",
+      "key_mechanism": "Analyze latency, grid/block, register/shared and occupancy; do not blindly apply NCU stall interpretations; measure async copy.",
+      "license_boundary": "Not treated as an official MetaX performance guarantee.",
+      "c500_tilelang_applicability": "Supports mcProfiler/resource-based H1/H4 review."
+    },
+    {
+      "id": "U01",
+      "title": "TileLang pull request #1923",
+      "url": "https://github.com/tile-ai/tilelang/pull/1923",
+      "publisher": "TileLang",
+      "source_type": "pull_request",
+      "support_level": "official",
+      "access_status": "unavailable_cache_miss",
+      "accessed_at": "2026-07-20",
+      "license": "Repository MIT",
+      "key_mechanism": "Potential ptr-table grouped GEMM implementation.",
+      "license_boundary": "No claim from the inaccessible PR body is used as evidence.",
+      "c500_tilelang_applicability": "Release notes, repository source and local installed code are used instead."
+    },
+    {
+      "id": "U02",
+      "title": "FlashInfer pull request #2944",
+      "url": "https://github.com/flashinfer-ai/flashinfer/pull/2944",
+      "publisher": "FlashInfer",
+      "source_type": "pull_request",
+      "support_level": "official",
+      "access_status": "not_stably_accessible",
+      "accessed_at": "2026-07-20",
+      "license": "Repository Apache-2.0",
+      "key_mechanism": "Potential grouped-GEMM/combine fusion implementation.",
+      "license_boundary": "No unavailable PR-body detail is used; only official repository/release content is cited.",
+      "c500_tilelang_applicability": "Conceptual support only."
+    }
+  ],
+  "local_capability_review": {
+    "tilelang_version": "0.1.12+maca.gitec48829b",
+    "tilelang_commit": "ec48829",
+    "facts": [
+      "The installed tree contains examples/gemm/example_gemm_persistent.py using driver.get_num_sms() and T.Persistent.",
+      "T.Persistent is implemented in src/ir.cc and tilelang/language/loop.py as a generic logical-tile loop.",
+      "T.atomic_add exists, but Split-K still needs a legal reduction design and the MetaX release notes require version-specific atomic review.",
+      "A1b FC2 currently scales each output row by routed_expert_weights in its per-output-tile epilogue.",
+      "Prior A1b profiler evidence reported no private spill; therefore H4 is a measured tradeoff, not a presumed win."
+    ]
+  },
+  "hypotheses": [
+    {
+      "id": "H1",
+      "candidate_id": "P1-fc2-persistent",
+      "mechanism": "Use native T.Persistent for FC2 while preserving logical tiles and arithmetic.",
+      "source_ids": ["S01", "S02", "S04", "S05", "S06", "S08", "S17"],
+      "external_fact": "Multiple official frameworks implement persistent grouped/matmul scheduling by limiting physical programs and iterating logical tiles.",
+      "engineering_inference": "A1b FC2's large logical grid may reduce scheduling overhead or improve device-side tile traversal on C500.",
+      "abi_feasible": true,
+      "numerical_risk": "low",
+      "performance_risk": "medium",
+      "static_review": "Use only locally installed T.Persistent; no CUDA TMA or architecture constants.",
+      "planned_order": 1,
+      "c500_measured_conclusion": null
+    },
+    {
+      "id": "H2",
+      "candidate_id": "P2-route-weight-cache",
+      "mechanism": "Load one routed expert weight per FC2 row into a local fragment and broadcast in the epilogue.",
+      "source_ids": ["S06", "S10", "S11", "S12"],
+      "external_fact": "Fused MoE implementations reuse device metadata and fuse scaling/combine work.",
+      "engineering_inference": "Explicit caching may remove repeated global load instructions if the current compiler does not hoist the scalar automatically.",
+      "abi_feasible": true,
+      "numerical_risk": "low",
+      "performance_risk": "low_to_medium_register_pressure",
+      "static_review": "Multiplication location, type and ordering remain unchanged.",
+      "planned_order": 2,
+      "c500_measured_conclusion": null
+    },
+    {
+      "id": "H3",
+      "candidate_id": "P3-route-scale-fc1",
+      "mechanism": "Move route scaling from the FC2 output epilogue to the FC1 SwiGLU intermediate epilogue using linearity.",
+      "source_ids": ["S06", "S10"],
+      "external_fact": "MoE kernels fuse activation/scaling/combine work to remove repeated traffic and operations.",
+      "engineering_inference": "Scaling a smaller intermediate tile count may remove repeated FC2 metadata loads and multiplies.",
+      "abi_feasible": true,
+      "numerical_risk": "medium_due_to_fp16_intermediate_rounding",
+      "performance_risk": "low_to_medium",
+      "static_review": "Official Large and Small correctness at unchanged tolerance must gate all timing.",
+      "planned_order": 3,
+      "c500_measured_conclusion": null
+    },
+    {
+      "id": "H4",
+      "candidate_id": "P4-fc2-a-shared",
+      "mechanism": "Move the FC2 A tile from fragment/register scope to shared memory.",
+      "source_ids": ["S01", "S02", "S11", "S18", "S20", "S24"],
+      "external_fact": "GEMM schedules trade register and shared-memory footprints against occupancy and cooperative reuse.",
+      "engineering_inference": "The change may reduce register pressure/redundant loads, or may regress by consuming about 32 KiB shared memory per block; mcProfiler decides.",
+      "abi_feasible": true,
+      "numerical_risk": "low",
+      "performance_risk": "medium_occupancy_tradeoff",
+      "static_review": "A1b had no measured private spill, so no benefit is assumed.",
+      "planned_order": 4,
+      "c500_measured_conclusion": null
+    },
+    {
+      "id": "H5",
+      "candidate_id": null,
+      "mechanism": "Split-K with atomic or workspace reduction.",
+      "source_ids": ["S17", "S20"],
+      "external_fact": "CK Tile exposes Split-K offsets; MetaX release notes describe version-dependent atomic limitations.",
+      "engineering_inference": "A1b already has abundant FC2 MxN tiles and the fixed ABI has no reduction workspace.",
+      "abi_feasible": false,
+      "numerical_risk": "high_reduction_order",
+      "performance_risk": "high_atomic_overhead",
+      "static_review": "Excluded unless later profiler evidence proves K-parallelism is necessary and a legal reduction is found.",
+      "planned_order": null,
+      "c500_measured_conclusion": null
+    },
+    {
+      "id": "H6",
+      "candidate_id": null,
+      "mechanism": "Block-sparse/dropless/capacity/token-drop reformulation.",
+      "source_ids": ["S13", "S14", "S15", "S16"],
+      "external_fact": "These systems alter packing, capacity, dropping, or communication.",
+      "engineering_inference": "The official benchmark already supplies padded expert-stacked inputs and fixed routing semantics.",
+      "abi_feasible": false,
+      "numerical_risk": "prohibited_semantics_change",
+      "performance_risk": "not_evaluable_under_fixed_workload",
+      "static_review": "Excluded by ABI/workload contract.",
+      "planned_order": null,
+      "c500_measured_conclusion": null
+    },
+    {
+      "id": "H7",
+      "candidate_id": null,
+      "mechanism": "Dense expert execution in FP4.",
+      "source_ids": ["S09"],
+      "external_fact": "TensorRT-LLM reports a Blackwell FP4 low-token regime where dense expert execution can win.",
+      "engineering_inference": "Current C500 workload, precision and required expert work are different.",
+      "abi_feasible": false,
+      "numerical_risk": "prohibited_precision_and_work_change",
+      "performance_risk": "not_transferable",
+      "static_review": "Excluded.",
+      "planned_order": null,
+      "c500_measured_conclusion": null
+    },
+    {
+      "id": "H8",
+      "candidate_id": null,
+      "mechanism": "CUDA TMA/WGMMA/warp-specialized persistent kernels.",
+      "source_ids": ["S05", "S08"],
+      "external_fact": "The referenced implementation is architecture-specific to Hopper/Blackwell CUDA.",
+      "engineering_inference": "The current TileLang-MACA fork exposes no equivalent mechanism.",
+      "abi_feasible": false,
+      "numerical_risk": "unknown",
+      "performance_risk": "unsupported_backend",
+      "static_review": "Excluded; only generic T.Persistent is used.",
+      "planned_order": null,
+      "c500_measured_conclusion": null
+    }
+  ],
+  "formal_protocol": {
+    "functional_shapes": ["official-large", "official-small"],
+    "performance_shapes": ["official-large", "official-small"],
+    "seed": "official unchanged",
+    "atol": 0.01,
+    "rtol": 0.01,
+    "equal_nan": false,
+    "warmup": 10,
+    "iterations": 100,
+    "outlier_policy": "none",
+    "required_artifacts": [
+      "ordered_raw_samples",
+      "source_commit_and_diff",
+      "environment_fingerprint",
+      "device_and_software_state",
+      "large_small_correctness",
+      "mcprofiler_evidence_or_hashed_failure_attempt"
+    ],
+    "second_run_gate": "Both mean and median improve at least 0.5%, variance is stable, and profiler evidence is mechanism-consistent.",
+    "deployment_gate": "Second complete correctness+10/100+profiler support plus adjacent A/B or ABBA reproducibility."
+  }
+}
