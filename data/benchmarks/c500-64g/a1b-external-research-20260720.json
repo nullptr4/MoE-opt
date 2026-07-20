@@ -19,6 +19,8 @@
   "search": {
     "tool": "native Web Search",
     "summary_as_evidence": false,
+    "round_count": 11,
+    "query_count": 44,
     "rounds": [
       {
         "round": 0,
@@ -511,7 +513,24 @@
       "performance_risk": "medium",
       "static_review": "Use only locally installed T.Persistent; no CUDA TMA or architecture constants.",
       "planned_order": 1,
-      "c500_measured_conclusion": null
+      "c500_measured_conclusion": {
+        "status": "rejected",
+        "reason": "The mechanism took effect, but limiting FC2 to one physical CTA per SM removed latency hiding and regressed end-to-end time.",
+        "artifact": "/data/metax-c500-autotune-agent/artifacts/p9/experiment-1a4561cd9ad1cb23e599c4dd.json",
+        "experiment_id": "experiment-0c8f0add3fe2cfc91592e424",
+        "mean_ms": 335.686979598999,
+        "median_ms": 335.68116188049316,
+        "stddev_ms": 0.4242681382005016,
+        "mean_improvement": -0.22039260970553418,
+        "median_improvement": -0.22051817900281817,
+        "profiler_large_fc2": {
+          "total_cycles_kcycles": 146126.07,
+          "workgroups": 104,
+          "waves": 416,
+          "private_read_instructions": 0,
+          "private_write_instructions": 0
+        }
+      }
     },
     {
       "id": "H2",
@@ -525,7 +544,23 @@
       "performance_risk": "low_to_medium_register_pressure",
       "static_review": "Multiplication location, type and ordering remain unchanged.",
       "planned_order": 2,
-      "c500_measured_conclusion": null
+      "c500_measured_conclusion": {
+        "status": "rejected_below_gate",
+        "reason": "Profiler confirmed fewer FC2 global-read instructions, but both end-to-end improvements remained below the strict 0.5% gate.",
+        "artifact": "/data/metax-c500-autotune-agent/artifacts/p9/experiment-651372a539eaaa5938a3ae85.json",
+        "experiment_id": "experiment-e714657e783e5601dbc2a9c9",
+        "mean_ms": 273.8149527359009,
+        "median_ms": 273.7544994354248,
+        "stddev_ms": 0.43991391683259873,
+        "mean_improvement": 0.004543622320584054,
+        "median_improvement": 0.004643748034616929,
+        "profiler_large_fc2": {
+          "total_cycles_kcycles": 88041.41,
+          "global_read_instructions": 88954532,
+          "private_read_instructions": 0,
+          "private_write_instructions": 0
+        }
+      }
     },
     {
       "id": "H3",
@@ -539,7 +574,24 @@
       "performance_risk": "low_to_medium",
       "static_review": "Official Large and Small correctness at unchanged tolerance must gate all timing.",
       "planned_order": 3,
-      "c500_measured_conclusion": null
+      "c500_measured_conclusion": {
+        "status": "rejected",
+        "reason": "Unchanged-tolerance correctness passed, but earlier FP16 scaling introduced private traffic in FC1 and caused an end-to-end regression.",
+        "artifact": "/data/metax-c500-autotune-agent/artifacts/p9/experiment-acc457a6763636a0b7e77605.json",
+        "experiment_id": "experiment-806c6d9461d56ed5cc7fee25",
+        "mean_ms": 276.62770343780517,
+        "median_ms": 276.73676681518555,
+        "stddev_ms": 0.7087303310588993,
+        "mean_improvement": -0.005682154603050574,
+        "median_improvement": -0.006199611572619365,
+        "profiler_large": {
+          "fc1_total_cycles_kcycles": 129786.51,
+          "fc1_private_read_instructions": 197568,
+          "fc1_private_write_instructions": 197568,
+          "fc2_total_cycles_kcycles": 87840.49,
+          "fc2_global_read_instructions": 88497150
+        }
+      }
     },
     {
       "id": "H4",
@@ -553,7 +605,50 @@
       "performance_risk": "medium_occupancy_tradeoff",
       "static_review": "A1b had no measured private spill, so no benefit is assumed.",
       "planned_order": 4,
-      "c500_measured_conclusion": null
+      "c500_measured_conclusion": {
+        "status": "accepted_and_deployed",
+        "reason": "Both complete runs exceeded the mean/median gate, profiler showed a mechanism-consistent FC2 cycle/read-instruction reduction without private spill, and ABBA was stable.",
+        "artifacts": [
+          "/data/metax-c500-autotune-agent/artifacts/p9/experiment-68a5259b5a15dd0356e1a28e.json",
+          "/data/metax-c500-autotune-agent/artifacts/p9/experiment-989798e2a12068dad99e7840.json",
+          "/data/metax-c500-autotune-agent/artifacts/p9/abba-42fb02517c2d75307b9acaec.json"
+        ],
+        "experiment_ids": [
+          "experiment-5ceee29d72c688f7bbdfcd9c",
+          "experiment-643d638dd0ce354e1000e958"
+        ],
+        "accepted_source_sha256": "c70e328a8d69ca5278fac4ec2ebf85fac1d099696a7f98c392c66b1ff7be1c78",
+        "runs": [
+          {
+            "mean_ms": 239.85608470916748,
+            "median_ms": 240.2711067199707,
+            "stddev_ms": 1.3482662382732427,
+            "mean_improvement": 0.12800134958572154,
+            "median_improvement": 0.1263875160642673,
+            "large_fc2_total_cycles_kcycles": 52170.9,
+            "large_fc2_global_read_instructions": 62679987
+          },
+          {
+            "mean_ms": 239.98983463287354,
+            "median_ms": 240.1153221130371,
+            "stddev_ms": 1.2394173179185608,
+            "mean_improvement": 0.12751510070399685,
+            "median_improvement": 0.1269539402976264,
+            "large_fc2_total_cycles_kcycles": 54728.38,
+            "large_fc2_global_read_instructions": 62664123
+          }
+        ],
+        "abba": {
+          "order": ["A1b-r1", "H4-r1", "H4-r2", "A1b-r2"],
+          "a1b_aggregate_mean_ms": 275.4022660636902,
+          "a1b_aggregate_median_ms": 275.2816638946533,
+          "h4_aggregate_mean_ms": 240.00618337631226,
+          "h4_aggregate_median_ms": 240.1968650817871,
+          "mean_improvement": 0.12852502338957572,
+          "median_improvement": 0.1274505476190841,
+          "stable": true
+        }
+      }
     },
     {
       "id": "H5",
@@ -567,7 +662,10 @@
       "performance_risk": "high_atomic_overhead",
       "static_review": "Excluded unless later profiler evidence proves K-parallelism is necessary and a legal reduction is found.",
       "planned_order": null,
-      "c500_measured_conclusion": null
+      "c500_measured_conclusion": {
+        "status": "excluded_by_static_evidence",
+        "reason": "No legal reduction workspace exists in the fixed ABI; atomic reduction changes ordering and the measured FC2 grid already exposes abundant MxN parallelism."
+      }
     },
     {
       "id": "H6",
@@ -581,7 +679,10 @@
       "performance_risk": "not_evaluable_under_fixed_workload",
       "static_review": "Excluded by ABI/workload contract.",
       "planned_order": null,
-      "c500_measured_conclusion": null
+      "c500_measured_conclusion": {
+        "status": "excluded_by_contract",
+        "reason": "Would change official routing, padding, capacity, token-drop semantics, or communication workload."
+      }
     },
     {
       "id": "H7",
@@ -595,7 +696,10 @@
       "performance_risk": "not_transferable",
       "static_review": "Excluded.",
       "planned_order": null,
-      "c500_measured_conclusion": null
+      "c500_measured_conclusion": {
+        "status": "excluded_by_contract",
+        "reason": "Would change required expert work and precision and relies on an unrelated Blackwell FP4 regime."
+      }
     },
     {
       "id": "H8",
@@ -609,9 +713,57 @@
       "performance_risk": "unsupported_backend",
       "static_review": "Excluded; only generic T.Persistent is used.",
       "planned_order": null,
-      "c500_measured_conclusion": null
+      "c500_measured_conclusion": {
+        "status": "excluded_by_backend_capability",
+        "reason": "Installed TileLang-MACA exposes no TMA/WGMMA/warp-specialization equivalent; only generic T.Persistent was tested as H1."
+      }
     }
   ],
+  "hardware_campaign": {
+    "evidence_kind": "hardware",
+    "device": "MetaX C500 64GB at PCI 0000:35:00.0",
+    "environment_fingerprint": "sha256:134605998c671ae89eb52a1288ce871da02ec21fc2da634e314af218e09a9fb5",
+    "software": {
+      "driver": "3.8.30",
+      "device_bios": "1.33.5.0",
+      "maca": "3.7.1.5",
+      "mxcc": "1.0.0 (d9102a1572)",
+      "pytorch": "2.8.0+metax3.7.1.3",
+      "tilelang": "0.1.12+maca.gitec48829b@ec48829",
+      "mcprofiler": "3.8.1.4+575f5a9f6d"
+    },
+    "baseline": {
+      "artifact": "/data/metax-c500-autotune-agent/artifacts/p9/baseline-710b813ed767e6760ae81412.json",
+      "mean_ms": 275.0647430419922,
+      "median_ms": 275.03167724609375,
+      "stddev_ms": 0.4462178865343444,
+      "p90_ms": 275.5010814666748,
+      "large_fc2_total_cycles_kcycles": 89072.59,
+      "large_fc2_global_read_instructions": 92170989
+    },
+    "correctness": {
+      "reference_id": "official-ref-fusedmoe-seed-81394-v1",
+      "large_total_values": 58720256,
+      "small_total_values": 29360128,
+      "all_candidate_large_mismatch_count": 0,
+      "all_candidate_small_mismatch_count": 0,
+      "atol": 0.01,
+      "rtol": 0.01,
+      "equal_nan": false
+    },
+    "measurement": {
+      "workloads": ["performance-large", "performance-small"],
+      "warmup": 10,
+      "iterations": 100,
+      "outlier_policy": "none",
+      "ordered_samples": "Embedded in each referenced artifact and hashed in the ABBA record."
+    },
+    "deployment": {
+      "selected_hypothesis": "H4",
+      "change": "FC2 up_logits tile memory scope: fragment -> shared",
+      "target_source_sha256": "c70e328a8d69ca5278fac4ec2ebf85fac1d099696a7f98c392c66b1ff7be1c78"
+    }
+  },
   "formal_protocol": {
     "functional_shapes": ["official-large", "official-small"],
     "performance_shapes": ["official-large", "official-small"],

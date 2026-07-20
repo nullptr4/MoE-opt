@@ -25,7 +25,7 @@ agent 起点：`42e777ff294e742a71e43e6d24e5553a103fd033`
 
 ## 检索过程
 
-本轮使用原生 Web Search 做了十轮定向检索，共 40 条查询。范围包括 TileLang 最新
+本轮使用原生 Web Search 做了十一轮定向检索，共 44 条查询。范围包括 TileLang 最新
 GEMM/grouped GEMM/persistent 实现、TensorRT-LLM/CUTLASS grouped MoE、Triton、
 FlashInfer、DeepSpeed、Megatron、MegaBlocks、Composable Kernel，以及 MetaX/MACA/C500
 公开资料。每个作为证据的页面均打开正文或源码；搜索摘要只用于导航。完整查询逐字保存在
@@ -52,15 +52,18 @@ grouped GEMM 和 persistent primitive。FlashInfer PR #2944 的独立 PR 页面�
 | S10 | [FlashInfer 官方仓库](https://github.com/flashinfer-ai/flashinfer) | 提供 fused MoE、grouped GEMM、routing，并公开 grouped-GEMM/combine fusion 方向。 | Apache-2.0；可借鉴概念，不能导入 CUDA-only kernel。 | 支持 routing metadata 与 combine/scale 融合假设 H2/H3。 |
 | S11 | [FlashInfer occupancy issue](https://github.com/flashinfer-ai/flashinfer/issues/3031) | NVIDIA 后端在 profiling 前查询 tactic occupancy 并过滤零 occupancy tactic。 | GitHub issue，社区/工程证据，不是 C500 官方规则。 | 支持在硬件测量前做 register/shared/occupancy 静态审查。 |
 | S12 | [Megatron-LM token dispatcher](https://github.com/NVIDIA/Megatron-LM/blob/main/megatron/core/transformer/moe/token_dispatcher.py) | token/expert metadata 留在 device，支持 fused permute/unpermute，避免 D2H sync。 | 仓库主许可为 BSD 类且含混合许可；仅借鉴 metadata reuse。 | 当前 ABI 输入已 packed、无通信，dispatcher 重写不适用；支持 H2 的局部 metadata cache。 |
-| S13 | [MegaBlocks 仓库](https://github.com/databricks/megablocks) 与 [论文](https://arxiv.org/abs/2211.15841) | block-sparse dropless MoE 避免 padding/drop 的质量—效率权衡；后续路径使用 grouped GEMM。 | Apache-2.0；论文机制可引用。 | 官方 workload 已提供 padded expert stack，改变 packing/drop 会改变 workload；H6 排除。 |
-| S14 | [DeepSpeed MoE 教程](https://www.deepspeed.ai/tutorials/mixture-of-experts/) 与 [NLG MoE 教程](https://www.deepspeed.ai/tutorials/mixture-of-experts-nlg/) | expert parallelism、capacity、token drop/no-drop 是系统级 MoE 机制。 | Apache-2.0 项目；不复制无关代码。 | 当前单卡固定 shapes/seed/输出语义，capacity/drop/通信改造均越过 ABI；排除。 |
-| S15 | [CK Tile grouped GEMM 文档](https://rocm.docs.amd.com/projects/composable_kernel/en/docs-7.1.1/doxygen/html/structck__tile_1_1_grouped_gemm_kernel.html) | 公开 `UsePersistentKernel`、`MaxOccupancyGridSize`、device group lookup、K-loop/tail pipeline 选择和 Split-K offset。 | MIT；只借鉴调度抽象。 | 强支持 H1；Split-K 需额外 reduction/atomic，需结合 C500 证据筛选。 |
-| S16 | [CK Tile 概念文档](https://rocm.docs.amd.com/projects/composable_kernel/en/develop/conceptual/ck_tile/index.html) | tile 编程以协作加载、coalescing 和可组合 pipeline 为核心。 | MIT。 | 支持 H4 的 memory-space/occupancy 实验，但 AMD wave/occupancy 数不能外推。 |
-| S17 | [MetaX C500 官方产品页](https://www.metax-tech.com/en/goods/prod.html?cid=107&id=21) | C500 提供 64GB、ECC、高带宽并使用 MXMACA 软件栈。 | MetaX 官方内容；只引用公开规格。 | 确认目标设备/软件栈，不提供可臆测的 CUDA 等价常数。 |
-| S18 | [MetaX MXMACA release note PDF](https://developer.metax-tech.com/api/client/document/file/222/preview/?file_type=pdf) | 公开版本加入 Group GEMM API、优化 MoE/vLLM Triton kernel、改进 FP16 MMA/分支、提供 mcProfiler；部分原子能力/指标采集有版本限制。 | MetaX 官方文档；不复制闭源实现。 | grouped/MoE 是栈内受支持方向；Split-K 原子路径风险升高；所有候选必须实际 profiler。 |
-| S19 | [MetaX 开发者文档索引](https://developer.metax-tech.com/doc) 与 [快速入门](https://developer.metax-tech.com/api/client/document/preview/459/index.html) | 给出 MXMACA 编程模型与当前文档入口。 | MetaX 官方文档。 | 用于核对 API/版本，不把未公开硬件常数填入 schedule。 |
-| S20 | [MetaX 异步拷贝论坛帖](https://developer.metax-tech.com/forum/t/ru-he-shi-yong-yi-bu-kao-bei-yi-da-dao-you-hua-de-xiao-guo-ni/215/) | 一份社区 C500 示例中 async copy 慢于同步版本。 | 社区、未验证，不能当通用性能事实。 | 只支持“必须实测，不能假设 async 更快”；不据此接受/拒绝候选。 |
-| S21 | [公开 C500 TileLang 赛题分享 PDF](https://developer.metax-tech.com/forum/media/attachments/c7/ec/p921bRvdtxGdMGVlejqB3MWt5vRdjo5Vd9Mdb21bQ3YTuk9JSnNrARaoU14kszzE/yu-han-tilelang-.pdf) | 建议结合 latency、grid/block、register/shared/occupancy 分析，不照搬 NCU stall 模型；async copy 需测量。 | 论坛附件，标注 community，不代表 MetaX 官方承诺。 | 支持本轮以 mcProfiler + resource footprint 判定 H1/H4。 |
+| S13 | [MegaBlocks 仓库](https://github.com/databricks/megablocks) | 公开 block-sparse dropless MoE 与 grouped GEMM 路径。 | Apache-2.0；不复制实现。 | 官方 workload 已提供 padded expert stack，改变 packing/drop 会改变 workload；H6 排除。 |
+| S14 | [MegaBlocks 论文](https://arxiv.org/abs/2211.15841) | block-sparse dropless MoE 避免 padding/drop 的质量—效率权衡。 | 论文机制可引用；实现为 Apache-2.0。 | 当前固定 routing/workload 下不可直接采用。 |
+| S15 | [DeepSpeed MoE 教程](https://www.deepspeed.ai/tutorials/mixture-of-experts/) | expert parallelism、capacity 与 token routing 是系统级 MoE 机制。 | Apache-2.0 项目；不复制无关代码。 | 当前单卡 ABI 无通信路径；排除。 |
+| S16 | [DeepSpeed NLG MoE 教程](https://www.deepspeed.ai/tutorials/mixture-of-experts-nlg/) | capacity factor、token drop/no-drop 会改变系统级 workload/语义。 | Apache-2.0 项目。 | 固定 shapes/seed/输出语义下排除。 |
+| S17 | [CK Tile grouped GEMM 文档](https://rocm.docs.amd.com/projects/composable_kernel/en/docs-7.1.1/doxygen/html/structck__tile_1_1_grouped_gemm_kernel.html) | 公开 `UsePersistentKernel`、`MaxOccupancyGridSize`、device group lookup、K-loop/tail pipeline 选择和 Split-K offset。 | MIT；只借鉴调度抽象。 | 强支持 H1；Split-K 需额外 reduction/atomic，需结合 C500 证据筛选。 |
+| S18 | [CK Tile 概念文档](https://rocm.docs.amd.com/projects/composable_kernel/en/develop/conceptual/ck_tile/index.html) | tile 编程以协作加载、coalescing 和可组合 pipeline 为核心。 | MIT。 | 支持 H4 的 memory-space/occupancy 实验，但 AMD wave/occupancy 数不能外推。 |
+| S19 | [MetaX C500 官方产品页](https://www.metax-tech.com/en/goods/prod.html?cid=107&id=21) | C500 提供 64GB、ECC、高带宽并使用 MXMACA 软件栈。 | MetaX 官方内容；只引用公开规格。 | 确认目标设备/软件栈，不提供可臆测的 CUDA 等价常数。 |
+| S20 | [MetaX MXMACA release note PDF](https://developer.metax-tech.com/api/client/document/file/222/preview/?file_type=pdf) | 公开版本加入 Group GEMM API、优化 MoE/vLLM Triton kernel、改进 FP16 MMA/分支、提供 mcProfiler；部分原子能力/指标采集有版本限制。 | MetaX 官方文档；不复制闭源实现。 | grouped/MoE 是栈内受支持方向；Split-K 原子路径风险升高；所有候选必须实际 profiler。 |
+| S21 | [MetaX 开发者文档索引](https://developer.metax-tech.com/doc) | 给出当前 MXMACA 编程与工具文档入口。 | MetaX 官方文档。 | 用于核对公开能力边界。 |
+| S22 | [MetaX 快速入门](https://developer.metax-tech.com/api/client/document/preview/459/index.html) | 给出 MXMACA 编程模型与 API 配置。 | MetaX 官方文档。 | 不把未公开硬件常数填入 schedule。 |
+| S23 | [MetaX 异步拷贝论坛帖](https://developer.metax-tech.com/forum/t/ru-he-shi-yong-yi-bu-kao-bei-yi-da-dao-you-hua-de-xiao-guo-ni/215/) | 一份社区 C500 示例中 async copy 慢于同步版本。 | 社区、未验证，不能当通用性能事实。 | 只支持“必须实测，不能假设 async 更快”；不据此接受/拒绝候选。 |
+| S24 | [公开 C500 TileLang 赛题分享 PDF](https://developer.metax-tech.com/forum/media/attachments/c7/ec/p921bRvdtxGdMGVlejqB3MWt5vRdjo5Vd9Mdb21bQ3YTuk9JSnNrARaoU14kszzE/yu-han-tilelang-.pdf) | 建议结合 latency、grid/block、register/shared/occupancy 分析，不照搬 NCU stall 模型；async copy 需测量。 | 论坛附件，标注 community，不代表 MetaX 官方承诺。 | 支持本轮以 mcProfiler + resource footprint 判定 H1/H4。 |
 
 许可证原文核对：TileLang、Triton、CK 为 MIT；CUTLASS 主 C++ 为 BSD-3-Clause、CuTeDSL
 另受 NVIDIA EULA；FlashInfer、MegaBlocks、DeepSpeed 为 Apache-2.0；Megatron-LM 含混合
@@ -78,7 +81,7 @@ grouped GEMM 和 persistent primitive。FlashInfer PR #2944 的独立 PR 页面�
   profiler 再决定是否扩展到 FC1 或双阶段。
 - 数值风险：低；逻辑 tile 与每 tile 的算术顺序不变。性能风险：中，物理 grid 过小或
   tile 顺序不合适会降低并行度。
-- 来源：S01、S02、S04、S05、S06、S08、S15。
+- 来源：S01、S02、S04、S05、S06、S08、S17。
 
 ### H2 / P2：FC2 route-weight 显式缓存与广播
 
@@ -111,22 +114,22 @@ grouped GEMM 和 persistent primitive。FlashInfer PR #2944 的独立 PR 页面�
   shared footprint 提高到约 32 KiB/block 并降低 occupancy；这是单一机制、需 profiler 判定。
 - 实现：只改变 FC2 A tile 的 memory scope，保持 tile shape/MMA/epilogue 不变。
 - 数值风险：低；性能风险：中。
-- 来源：S01、S02、S11、S16、S18、S21。
+- 来源：S01、S02、S11、S18、S20、S24。
 
 ## 静态排除与延后方向
 
-- **Split-K**（S15、S18）：当前 FC2 已有大量 M×N tile；Split-K 需要额外 workspace 或
+- **Split-K**（S17、S20）：当前 FC2 已有大量 M×N tile；Split-K 需要额外 workspace 或
   atomic reduction，并受 MetaX release note 所述原子版本限制影响。当前 ABI 没有合法
   workspace，故第一批不实现；只有 persistent profiler 证明 K 维并行是主瓶颈时再审议。
 - **ptr-table grouped GEMM**（S03、S04、S07、S08）：最新实现以 problem descriptor/pointer
   table 为接口；当前 submission ABI 不允许增加 descriptor，且当前 kernel 已把 expert
   维并入 grid。保留来源，但不改变 ABI。
-- **block-sparse、dropless、capacity/token drop**（S13、S14）：会改变官方 padding、routing
+- **block-sparse、dropless、capacity/token drop**（S13、S14、S15、S16）：会改变官方 padding、routing
   或 workload，违反固定 shape/seed/语义。
 - **dense experts/FP4**（S09）：改变工作量和精度，且依赖 Blackwell SM100/103。
 - **TMA/WGMMA/warp specialization**（S05、S08）：CUDA/Hopper/Blackwell 专用，当前
   TileLang-MACA 无对应能力。
-- **盲目增加 pipeline/async copy**（S20、S21）：没有 C500 普适收益证据；上一轮已有相关
+- **盲目增加 pipeline/async copy**（S23、S24）：没有 C500 普适收益证据；上一轮已有相关
   失败。本轮只在新的 profiler 证据指向 memory-latency 且 resource 可行时提出定向候选。
 
 ## 正式实验协议

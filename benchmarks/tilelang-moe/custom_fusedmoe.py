@@ -457,7 +457,7 @@ def _moe_forward_tilelang_routed(
 
         # Step 2: Compute down logits
         with T.Kernel(M, T.ceildiv(dhidden, s2_bn), threads=threads) as (bx, by):
-            up_logits_shared = T.alloc_fragment((block_token, s2_bk), dtype=dtype)
+            up_logits_shared = T.alloc_shared((block_token, s2_bk), dtype=dtype)
             routed_expert_down_shared = T.alloc_shared((s2_bn, s2_bk), dtype=dtype)
             output_local = T.alloc_fragment((block_token, s2_bn), dtype=accum_dtype)
 
