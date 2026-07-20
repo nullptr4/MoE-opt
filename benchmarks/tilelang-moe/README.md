@@ -79,14 +79,20 @@ C500 已经上传过相同 workload 的结果，autoheuristic 会优先排列该
 `block_dhidden` / `block_dexpert` / `num_stages*` 参数保留为兼容入口；
 新实验应使用显式阶段参数或固定 preset，避免 FC1/FC2 变量混杂。
 
-| 编号 | 相对 E0 的唯一变化 |
-|---|---|
-| E0 | FC1/FC2 均为 BN128 / BK128 / stage1 |
-| E1 | FC1 BK64 |
-| E2 | FC1 BN64 |
-| E3 | FC2 BK64 / stage1 |
-| E4 | FC2 BK64 / stage2 |
-| E5 | FC2 BN256 |
+| 编号 | 相对 E0 的变化 | 类型 / 结论 |
+|---|---|---|
+| E0 | FC1/FC2 均为 BN128 / BK128 / stage1 | canonical 对照 |
+| E1 | FC1 BK64 | canonical，拒绝 |
+| E2 | FC1 BN64 | canonical，拒绝 |
+| E3 | FC2 BK64 / stage1 | canonical，单独未达 1% |
+| E4 | FC2 BK64 / stage2 | canonical，拒绝 |
+| E5 | FC2 BN256 | canonical，拒绝 |
+| E6 | 已发射的空 metadata CTA 内跳过 FC1/FC2 工作，grid 不变 | 非 canonical，拒绝 |
+| E7 | 按各 expert 实际 128-row tile 数构造 exact metadata grid，减少空 CTA | 非 canonical，单独拒绝；与 E3 组合接受 |
+
+E0–E5 可直接通过 `--experiment` 复现；E6 是已回退的诊断候选，E7 使用
+`--compact-metadata-grid`。逐项定义、测量口径与原始数据入口见
+[`reports/2026-07-20-moe-e0-e7-summary.md`](../../reports/2026-07-20-moe-e0-e7-summary.md)。
 
 单组功能对拍：
 
@@ -95,6 +101,14 @@ python tune_moe.py --experiment E4 --mode functional --warmup 0 --iteration 1
 ```
 
 硬件 profiler 需要隔离某个规格时，增加 `--shape large` 或 `--shape small`。
+
+## 6. 当前 C500 默认
+
+`fusedmoe_benchmark.custom_kernel` 使用经过五进程验证的 E3+E7 组合：FC1 保持
+`BK=128`，FC2 使用 `BK=64`，并按每个 expert 的实际 128-row tile 数构造 metadata
+grid，避免末尾空 CTA。该组合相对 E0 的 Large / Small 中位数分别快 1.3110% / 1.3458%。
+原始基准、mcProfiler 和提交 ABI 结果见
+[`reports/2026-07-20-moe-e3e7-promotion.md`](../../reports/2026-07-20-moe-e3e7-promotion.md)。
 
 六组正式实验（每组 3 个独立性能进程，输出 median/MAD/P95）：
 

@@ -176,6 +176,7 @@ def _moe_forward_tilelang_routed(
     gemm_policy_down=None,
     single_weight_buffer=True,
     min_blocks_per_sm=None,
+    metadata_m=None,
     s1_bn=None,
     s1_bk=None,
     s1_stages=None,
@@ -239,7 +240,13 @@ def _moe_forward_tilelang_routed(
     if metadata_block_token % block_token != 0:
         raise ValueError("block_token must divide the benchmark metadata tile (128)")
     tiles_per_metadata_block = metadata_block_token // block_token
-    metadata_M = math.ceil(group_sum / metadata_block_token) + group_count
+    metadata_M = (
+        math.ceil(group_sum / metadata_block_token) + group_count
+        if metadata_m is None
+        else metadata_m
+    )
+    if metadata_M <= 0:
+        raise ValueError("metadata_m must be positive")
     M = metadata_M * tiles_per_metadata_block
     accum_dtype = T.float32
 
@@ -500,6 +507,9 @@ class RoutedMoEKernel:
         self.gemm_policy_down = gemm_policy if gemm_policy_down is None else gemm_policy_down
         self.single_weight_buffer = single_weight_buffer
         self.min_blocks_per_sm = min_blocks_per_sm
+        # Internal launch metadata may be specialized by the benchmark's
+        # packing path without changing the public constructor ABI.
+        self.metadata_m = None
         self.backend = backend
 
         # Defer compilation/tuning until real tensors are available.  This
@@ -636,6 +646,8 @@ class RoutedMoEKernel:
                 "group_count": self.group_count,
                 "block_token": self.block_token,
             }
+            if self.metadata_m is not None:
+                compile_kwargs["metadata_m"] = self.metadata_m
             manual_schedule = {
                 "s1_bn": self.s1_bn,
                 "s1_bk": self.s1_bk,

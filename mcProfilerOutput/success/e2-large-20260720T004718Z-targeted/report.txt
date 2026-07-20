@@ -1,0 +1,393 @@
+##############################
+Sub-module: Summary
+------------------------------
+Name: Total Instructions
+Description: number of all instructions
+Value: 19,220,657,979
+------------------------------
+Name: Compute Instructions
+Description: number of compute instructions
+Value: 16,537,977,666
+------------------------------
+Name: Memory Instructions
+Description: number of memory instructions
+Value: 2,682,680,313
+------------------------------
+Name: Total Cycles
+Description: cycles use by kernel
+Value: 16,811,304.54(Kcycles)
+------------------------------
+Name: Memory Access per Second
+Description: memory access per second
+Value: 368,473.34(MB/s)
+------------------------------
+Name: Average AP busy cycles
+Description: Average busy cycles per AP
+Value: 653,144,817.0
+------------------------------
+Name: AP busy Duty
+Description: average AP busy duty of total cycles
+Value: 3.89%
+------------------------------
+Name: Compute Instructions busy Duty
+Description: Compute Instructions busy duty of total AP cycles
+Value: 31.69%
+------------------------------
+Name: RoofLine
+Description: 
+Value: {
+    "processed_data": {
+        "all_ops": 231209015488.0,
+        "all_memacs": 280396736512.0,
+        "during": 653144817.0,
+        "block_num": 104,
+        "vl1_memacs": 201004462986.65594,
+        "l2c_memacs": 970280035360.412
+    },
+    "data": {
+        "all_ops": 231209015488.0,
+        "all_memacs": 280396736512.0,
+        "block_num": 104,
+        "during": 653144817.0,
+        "core_clk": 1.125,
+        "MAX_Flops_base": 1,
+        "case_flops": 3.4037835907094682,
+        "MAX_Bandwith": 1843.2,
+        "MAX_I": 260.0,
+        "case_I": 7.047676289330833,
+        "case_bandwith": 482.9653705665094,
+        "case_VL1_I": 9.831351016581943,
+        "case_L2C_I": 2.0366753509334297,
+        "mc_clk": 0.9
+    },
+    "filename": "/opt/mcProfiler-ubuntu18.04/output20260720004718/RoofLine20260720004808915.png"
+}
+##############################
+Sub-module: CE Statistics
+------------------------------
+Name: WORKGROUPS
+Description: ce send workgroup
+Value: 13,295,013.0
+------------------------------
+Name: WAVES
+Description: ce send waves
+Value: 27,309,486.0
+------------------------------
+Name: Average Wave life cycles
+Description: average life cycles per wave from start to end
+Value: 31,094.56
+##############################
+Sub-module: ISU Statistics
+------------------------------
+Name: Compute Instructions Cycles Rate
+Description: rate between compute instructions cycles
+Value: {
+    "data": {
+        "MTE_4CYCLES": 33887182813.76624,
+        "MTE_16CYCLES": 10352902.390204592,
+        "MMA_16CYCLES": 182065665129.03223,
+        "MMA_32CYCLES": 0.0
+    },
+    "filename": "/opt/mcProfiler-ubuntu18.04/output20260720004718/Compute_Instructions_Cycles_Rate20260720004809910.png"
+}
+------------------------------
+Name: DPC Computing cycles comparison
+Description: Comparison on AP computing cycles
+Value: {
+    "data": {
+        "0": 828073504.0
+    },
+    "filename": "/opt/mcProfiler-ubuntu18.04/output20260720004718/DPC_Computing_cycles_comparison20260720004810038.png"
+}
+------------------------------
+Name: ISU stall cycles layout
+Description: ISU stall cycles layout
+Value: {
+    "data": {
+        "wsm_stall": 3649884305.9025664,
+        "vls_pipeline_stall": 19526724.03001463,
+        "vls_wdata_stall": 1062625761.2685676,
+        "valu_stall": 0.0
+    },
+    "filename": "/opt/mcProfiler-ubuntu18.04/output20260720004718/ISU_stall_cycles_layout20260720004810323.png"
+}
+------------------------------
+Name: Instructions Comparison
+Description: Comparison between all instructions
+Value: {
+    "data": {
+        "MTE": 8561806657.375634,
+        "MMA": 1141912.685957488,
+        "STE": 4457113610.269294,
+        "GVM": 846335050.1726142,
+        "BSM": 1630093169.4424784,
+        "LDU": 206252094.27858755,
+        "MISC": 3517915486.0300264
+    },
+    "filename": "/opt/mcProfiler-ubuntu18.04/output20260720004718/Instructions_Comparison20260720004810148.png"
+}
+##############################
+Sub-module: Memory Statistics
+------------------------------
+Name: Global Read Instructions
+Description: Number of global read instructions in all APs
+Value: 669,952,571
+------------------------------
+Name: Global Write Instructions
+Description: Number of global write instructions in all APs
+Value: 23,193
+------------------------------
+Name: Global Atomic Instructions
+Description: Number of global atomic instructions in all APs
+Value: 117,681,286.94
+------------------------------
+Name: Private Read Instructions
+Description: Number of private read instructions in all APs
+Value: 0
+------------------------------
+Name: Private Write Instructions
+Description: Number of private write instructions in all APs
+Value: 0
+------------------------------
+Name: Constant Read Instructions
+Description: Number of smem instructions in all APs
+Value: 206,252,094
+------------------------------
+Name: Constant Read SL1 Instructions
+Description: Num of LDU instructions in all SL1s
+Value: 206,080,293
+------------------------------
+Name: Constant Read L2 Instructions
+Description: Num of SL1 data miss requests
+Value: 1,667,158
+------------------------------
+Name: Constant SL1 Hit Rate
+Description: Total LDU instructions hit rate in all SL1s
+Value: 99.31%
+------------------------------
+Name: VL1 Read Instructions
+Description: total read instructions in all VL1s
+Value: 671,499,207
+------------------------------
+Name: VL1 Write Instructions
+Description: total write instructions in all VL1s
+Value: 57,288,791
+------------------------------
+Name: VL1 Atomic Instructions
+Description: total atomic instructions in all VL1s
+Value: 118,156,355.86
+------------------------------
+Name: VL1 Hit Rate
+Description: hit rate of all instructions in all VL1s
+Value: 83.17%
+------------------------------
+Name: L2C Read Instructions
+Description: total read instructions in all L2Cs
+Value: 7,605,495,808
+------------------------------
+Name: L2C Write Instructions
+Description: total write instructions in all L2Cs
+Value: 658,354,496
+------------------------------
+Name: L2C Atomic Instructions
+Description: total atomic instructions in all L2Cs
+Value: 234,880,000.0
+------------------------------
+Name: L2C Hit Rate
+Description: hit rate of all instructions in all L2Cs
+Value: 73.54%
+------------------------------
+Name: Total Atomic Instructions
+Description: total atomic instructions in memory access, include global atomic and shared memory atomic
+Value: 117,915,736.80
+------------------------------
+Name: Dnoc Read Req
+Description: number of dnoc read requests
+Value: 1,899,333,632.0
+------------------------------
+Name: Dnoc Write Req
+Description: number of dnoc write requests
+Value: 320,719,648.0
+------------------------------
+Name: Global Memory Read bytes
+Description: bytes read from global memory
+Value: 239,346,055,168.0byte
+------------------------------
+Name: Global Memory Write bytes
+Description: bytes write from global memory
+Value: 41,050,681,344.0byte
+------------------------------
+Name: Dnoc Read Average Latency
+Description: average latency of dnoc read request
+Value: 280.80
+------------------------------
+Name: Memory Data Flow Chart
+Description: 
+Value: {
+    "data": {
+        "vl1c": 83.17064748911785,
+        "l2c": 73.53984695666132,
+        "sl1": 99.3146153236993,
+        "global_kernel_rd": 669952571,
+        "global_kernel_wr": 23193,
+        "private_kernel_rd": 0,
+        "private_kernel_wr": 0,
+        "generic_kernel_rd": 0,
+        "generic_kernel_wr": 0,
+        "const_kernel_rd": 206252094,
+        "shared_kernel_rd": 1434609806,
+        "shared_kernel_wr": 190220145,
+        "Ggeneric_vl1c_rd": 671499207,
+        "Ggeneric_vl1c_wr": 57288791,
+        "const_sl1c_rd": 206080293,
+        "sl1_l2c_rd": 1667158,
+        "vl1c_l2c_rd": 7605495808,
+        "vl1c_l2c_wr": 658354496,
+        "l2c_Gmemory_rd": null,
+        "l2c_Gmemory_wr": null
+    },
+    "filename": "/opt/mcProfiler-ubuntu18.04/output20260720004718/Memory_Data_Flow_Chart20260720004810488.png"
+}
+------------------------------
+Name: Dnoc Read Latency Histogram
+Description: histogram of dnoc read latency
+Value: {
+    "data": {
+        "0-255": 1263464064.0,
+        "256-511": 618667776.0,
+        "512-1k": 65080448.0,
+        "1k-2k": 1156064.0,
+        "2k-": 8576.0
+    },
+    "filename": "/opt/mcProfiler-ubuntu18.04/output20260720004718/Dnoc_Read_Latency_Histogram20260720004810759.png"
+}
+------------------------------
+Name: VL1 partition stall cycles layout
+Description: VL1 partition access stall cycles layout
+Value: {
+    "data": {
+        "pt0": 1352961391.9629426,
+        "pt1": 1217565255.1111524,
+        "pt2": 1110365140.0752146,
+        "pt3": 1048651474.3224282
+    },
+    "filename": "/opt/mcProfiler-ubuntu18.04/output20260720004718/VL1_partition_stall_cycles_layout20260720004810903.png"
+}
+##############################
+Sub-module: Workgroup Memory
+------------------------------
+Name: load instructions
+Description: number of total workgroup memory load instructions
+Value: 1,434,609,806.31
+------------------------------
+Name: store instructions
+Description: number of total workgroup memory write instructions
+Value: 190,220,145.80
+------------------------------
+Name: atomic instructions
+Description: number of total workgroup memory atomic instructions
+Value: 512,329.27
+------------------------------
+Name: total instructions
+Description: number of total workgroup memory instructions
+Value: 1,630,093,169.44
+------------------------------
+Name: average latency per load instruction
+Description: average latency per WG-load from issue to mem-ops done
+Value: 0.04
+------------------------------
+Name: average latency per store instruction
+Description: average latency per WG-store from issue to memops done
+Value: 55.17
+------------------------------
+Name: average latency per atomic instruction
+Description: average latency per WG-atom from issue to memops done
+Value: 103.54
+------------------------------
+Name: average latency of all stages per instruction
+Description: average latency of all WG-inst from issue to memops done
+Value: 99.91
+------------------------------
+Name: average cycles per load instruction
+Description: average cycles per WG-load when issuing (with bank conflict)
+Value: 0.00
+------------------------------
+Name: average cycles per store instruction
+Description: average cycles per WG-store when issuing (with bank conflict)
+Value: 7.54
+------------------------------
+Name: average cycles per atomic instruction
+Description: average cycles per WG-atom when issuing (with bank conflict)
+Value: 51.43
+------------------------------
+Name: average conflict cycles per instruction
+Description: average conflict cycles per WG-inst when bank conflict happens
+Value: 3.49
+------------------------------
+Name: average cycles per instruction
+Description: average cycles per WG-inst when issuing (with bank conflict)
+Value: 0.90
+------------------------------
+Name: shared memory access efficiency
+Description: Proportion of NON-CONFLICT access
+Value: -288.67%
+##############################
+Sub-module: Occupancy
+------------------------------
+Name: Achieved waves
+Description: number of achieved waves
+Value: 27,309,486.0
+------------------------------
+Name: Dispatched waves
+Description: number of dispatched waves
+Value: 27,309,480.0
+##############################
+Sub-module: GPU Throughput Statistics
+------------------------------
+Name: AP active cycles
+Description: number of wave instruction cycles executed on the AP
+Value: 67,806,526,453.61
+------------------------------
+Name: AP MTE Duty ratio
+Description: MTE Duty ratio relative to AP active
+Value: 12.49%
+------------------------------
+Name: AP STE Duty ratio
+Description: STE Duty ratio relative to AP active
+Value: 6.57%
+------------------------------
+Name: AP MMA Duty ratio
+Description: MMA Duty ratio relative to AP active
+Value: 16.83%
+------------------------------
+Name: VLS Duty ratio
+Description: VLS Duty ratio relative to AP active
+Value: 0.0%
+------------------------------
+Name: L2C Duty ratio
+Description: L2C Duty ratio relative to L2C active
+Value: 1.58%
+##############################
+Sub-module: Compute workload
+------------------------------
+Name: instruction per cycle
+Description: The number of instructions per busy cycle across all sub-unit instances
+Value: 29.43
+------------------------------
+Name: instruction throughput
+Description: The percent of achieved instructions and theoretical instructions during all busy cycles 
+Value: 0.28
+------------------------------
+Name: instruction throughput efficiency
+Description: The percentage of the maximum instruction throughput achieved during all busy cycles 
+Value: 7.07%
+##############################
+Sub-module: Instruction Statistics
+------------------------------
+Name: instruction number
+Description: The total number of instructions
+Value: 19,220,657,980.25
+------------------------------
+Name: instructions per AP
+Description: The number of instructions per PEU
+Value: 184,814,019.04
