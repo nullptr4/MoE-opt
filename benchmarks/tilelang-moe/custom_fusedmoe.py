@@ -297,9 +297,6 @@ def _moe_forward_tilelang_routed(
                 gate_up_logits_local = T.alloc_fragment(
                     (block_token, 2 * s1_bn), dtype=accum_dtype
                 )
-                combined_up_logits_local = T.alloc_fragment(
-                    (block_token, s1_bn), dtype=accum_dtype
-                )
             else:
                 routed_expert_gate_shared = T.alloc_shared((s1_bn, s1_bk), dtype=dtype)
                 if single_weight_buffer:
@@ -359,19 +356,40 @@ def _moe_forward_tilelang_routed(
                         policy=gemm_policy_stage1,
                     )
 
-                # The MACA layout inferencer requires one affine access pattern
-                # per fragment in a Parallel op. Split the physical Up half
-                # before applying SwiGLU instead of reading j and j+BN in one
-                # expression.
-                for i, j in T.Parallel(block_token, s1_bn):
-                    combined_up_logits_local[i, j] = gate_up_logits_local[i, j + s1_bn]
+                # The combined weight tile is dead after the K mainloop. Reuse
+                # its exact 256x64 shared allocation as two affine 128x64 Up
+                # halves. Each Parallel region has one access pattern per
+                # buffer, as required by the installed MACA layout inferencer.
+                for i, j in T.Parallel(block_token, s1_bk):
+                    routed_expert_gate_up_shared[2 * i, j] = (
+                        gate_up_logits_local[i, j + s1_bn]
+                    )
+                for i, j in T.Parallel(block_token, s1_bk):
+                    routed_expert_gate_up_shared[2 * i + 1, j] = (
+                        gate_up_logits_local[i, j + s1_bn + s1_bk]
+                    )
 
-                for i, j in T.Parallel(block_token, s1_bn):
+                for i, j in T.Parallel(block_token, s1_bk):
                     gate_up_logits_local[i, j] = gate_up_logits_local[i, j] * (
                         1.0 / (1.0 + T.exp2(-gate_up_logits_local[i, j] * scale))
                     )
-                    combined_up_logits_local[i, j] = (
-                        combined_up_logits_local[i, j] * gate_up_logits_local[i, j]
+                    routed_expert_gate_up_shared[2 * i, j] = (
+                        routed_expert_gate_up_shared[2 * i, j] * gate_up_logits_local[i, j]
+                    )
+                for i, j in T.Parallel(block_token, s1_bk):
+                    gate_up_logits_local[i, j + s1_bk] = (
+                        gate_up_logits_local[i, j + s1_bk]
+                        * (
+                            1.0
+                            / (
+                                1.0
+                                + T.exp2(-gate_up_logits_local[i, j + s1_bk] * scale)
+                            )
+                        )
+                    )
+                    routed_expert_gate_up_shared[2 * i + 1, j] = (
+                        routed_expert_gate_up_shared[2 * i + 1, j]
+                        * gate_up_logits_local[i, j + s1_bk]
                     )
             else:
                 T.clear(gate_logits_local)
@@ -451,11 +469,20 @@ def _moe_forward_tilelang_routed(
                     )
                     up_logits_local[i, j] = up_logits_local[i, j] * gate_logits_local[i, j]
 
-            for i, j in T.Parallel(block_token, s1_bn):
-                if i < actual_rows:
-                    if combine_gate_up:
-                        up_logits[m_start + i, by * s1_bn + j] = combined_up_logits_local[i, j]
-                    else:
+            if combine_gate_up:
+                for i, j in T.Parallel(block_token, s1_bk):
+                    if i < actual_rows:
+                        up_logits[m_start + i, by * s1_bn + j] = (
+                            routed_expert_gate_up_shared[2 * i, j]
+                        )
+                for i, j in T.Parallel(block_token, s1_bk):
+                    if i < actual_rows:
+                        up_logits[m_start + i, by * s1_bn + j + s1_bk] = (
+                            routed_expert_gate_up_shared[2 * i + 1, j]
+                        )
+            else:
+                for i, j in T.Parallel(block_token, s1_bn):
+                    if i < actual_rows:
                         up_logits[m_start + i, by * s1_bn + j] = up_logits_local[i, j]
 
         # Step 2: Compute down logits
