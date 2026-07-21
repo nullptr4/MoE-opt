@@ -65,11 +65,11 @@ no-op，H13F2/H13F3 是独立负向 lowering；不存在外部来源或 profiler
 ## 目标验证
 
 - `source scripts/activate-maca.sh` 后，以 MetaX C ABI backend 运行 `python -m pytest -q`：
-  `86 passed in 25.06s`；
-- `python scripts/check_repository.py`：通过，检查 `3382 tracked files`；
+  `89 passed in 25.21s`；
+- `python scripts/check_repository.py`：通过，检查 `3383 tracked files`；
 - `scripts/verify-maca.sh`：通过，识别 MetaX C500、driver `3.8.30`、MACA `3.7.1.5`；
 - `scripts/run-moe.sh`：official functional Large/Small `2/2` 通过；diagnostic timing
-  `198.93847656/31.74616455 ms`，不作正式性能对照；
+  `198.73246094/31.58094238 ms`，不作正式性能对照；
 - `scripts/test-moe-submission.sh --public-shape --fuzz`：submission policy、uneven smoke、
   official public shape 和五个 fuzz case 全部通过；
 - `git diff --check`：通过。
