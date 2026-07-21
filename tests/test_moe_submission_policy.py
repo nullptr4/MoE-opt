@@ -27,10 +27,10 @@ class MoeSubmissionPolicyTest(unittest.TestCase):
     def test_checked_in_submission_satisfies_policy(self):
         self.assertEqual(check_submission(self.submission), [])
 
-    def test_rejects_fp32_route_weight_annotation(self):
+    def test_rejects_uncontrolled_route_weight_annotation(self):
         mutated = self.source.replace(
-            "routed_expert_weights: T.Tensor((total_valid_tokens,), dtype)",
-            "routed_expert_weights: T.Tensor((total_valid_tokens,), T.float32)",
+            "routed_expert_weights: T.Tensor((route_rows,), route_dtype)",
+            "routed_expert_weights: T.Tensor((route_rows,), T.int32)",
         )
         self.assertNotEqual(mutated, self.source)
         errors = self.check_mutation(mutated)
@@ -48,10 +48,10 @@ class MoeSubmissionPolicyTest(unittest.TestCase):
             errors,
         )
 
-    def test_rejects_online_native_crashing_assume(self):
+    def test_rejects_assume_in_conservative_online_profile(self):
         mutated = self.source.replace(
-            "            T.clear(gate_up_local)",
-            "            T.assume(0 <= expert_id)\n            T.clear(gate_up_local)",
+            "            T.clear(gate_local)",
+            "            T.assume(0 <= expert_id)\n            T.clear(gate_local)",
             1,
         )
         self.assertNotEqual(mutated, self.source)

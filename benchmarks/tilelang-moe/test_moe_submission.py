@@ -44,6 +44,7 @@ class PaddedCase:
     group_offsets: torch.Tensor
     group_padded_offsets: torch.Tensor
     group_idx_for_bx: torch.Tensor
+    compact_storage: bool
 
 
 def make_case(
@@ -54,6 +55,9 @@ def make_case(
     seed: int,
     route_weights_mode: str = "random",
     terminal_offsets: bool = False,
+    compact_storage: bool = False,
+    route_dtype: str = "float16",
+    extra_metadata_blocks: int = 0,
 ) -> PaddedCase:
     device = torch.device("cuda")
     experts = len(group_sizes_list)
@@ -77,21 +81,41 @@ def make_case(
             start = padded_offsets[expert_id]
             tokens[start : start + size] = torch.randn((size, hidden), device=device, dtype=torch.float16, generator=generator)
 
+    if compact_storage:
+        compact_tokens = torch.empty(
+            (total_valid, hidden),
+            device=device,
+            dtype=torch.float16,
+        )
+        for expert_id, size in enumerate(group_sizes_list):
+            if size:
+                compact_tokens[
+                    raw_offsets[expert_id] : raw_offsets[expert_id + 1]
+                ] = tokens[
+                    padded_offsets[expert_id] : padded_offsets[expert_id] + size
+                ]
+        tokens = compact_tokens
+
+    route_torch_dtype = torch.float32 if route_dtype == "float32" else torch.float16
+
     # Match the public operator's scale range so the numerical check is useful
     # without making the small synthetic test prone to overflow.
     gate = torch.randn((experts, intermediate, hidden), device=device, dtype=torch.float16, generator=generator) / math.sqrt(hidden)
     up = torch.randn((experts, intermediate, hidden), device=device, dtype=torch.float16, generator=generator) / math.sqrt(hidden)
     down = torch.randn((experts, hidden, intermediate), device=device, dtype=torch.float16, generator=generator) / math.sqrt(intermediate)
     if route_weights_mode == "random":
-        route_weights = torch.rand((total_valid,), device=device, dtype=torch.float16, generator=generator)
+        route_weights = torch.rand((total_valid,), device=device, dtype=route_torch_dtype, generator=generator)
     elif route_weights_mode == "zero":
-        route_weights = torch.zeros((total_valid,), device=device, dtype=torch.float16)
+        route_weights = torch.zeros((total_valid,), device=device, dtype=route_torch_dtype)
     elif route_weights_mode == "one":
-        route_weights = torch.ones((total_valid,), device=device, dtype=torch.float16)
+        route_weights = torch.ones((total_valid,), device=device, dtype=route_torch_dtype)
     elif route_weights_mode == "tiny":
-        route_weights = torch.full((total_valid,), 2**-10, device=device, dtype=torch.float16)
+        route_weights = torch.full((total_valid,), 2**-10, device=device, dtype=route_torch_dtype)
     else:
         raise ValueError(f"unsupported route_weights_mode: {route_weights_mode}")
+
+    if extra_metadata_blocks:
+        block_experts.extend([experts - 1] * extra_metadata_blocks)
 
     return PaddedCase(
         name=name,
@@ -118,6 +142,7 @@ def make_case(
             dtype=torch.int32,
         ),
         group_idx_for_bx=torch.tensor(block_experts, device=device, dtype=torch.int32),
+        compact_storage=compact_storage,
     )
 
 
@@ -135,7 +160,8 @@ def reference(case: PaddedCase) -> torch.Tensor:
             continue
         padded_start = padded_offsets[expert_id]
         raw_start = raw_offsets[expert_id]
-        x = case.tokens[padded_start : padded_start + size].float()
+        data_start = raw_start if case.compact_storage else padded_start
+        x = case.tokens[data_start : data_start + size].float()
         gate = F.silu(x @ case.gate[expert_id].float().T)
         up = x @ case.up[expert_id].float().T
         # The kernel persists this product as the FP16 up_logits workspace
@@ -144,7 +170,7 @@ def reference(case: PaddedCase) -> torch.Tensor:
         value = (intermediate @ case.down[expert_id].float().T) * case.route_weights[
             raw_start : raw_start + size, None
         ].float()
-        result[padded_start : padded_start + size] = value.to(torch.float16)
+        result[data_start : data_start + size] = value.to(torch.float16)
     return result
 
 
@@ -177,16 +203,18 @@ def check_case(case: PaddedCase) -> None:
         )
     for expert_id, size in enumerate(case.group_sizes_list):
         padded_start = padded_offsets[expert_id]
+        raw_start = sum(case.group_sizes_list[:expert_id])
+        data_start = raw_start if case.compact_storage else padded_start
         if size:
             torch.testing.assert_close(
-                out[padded_start : padded_start + size].float(),
-                expected[padded_start : padded_start + size].float(),
+                out[data_start : data_start + size].float(),
+                expected[data_start : data_start + size].float(),
                 atol=1e-2,
                 rtol=1e-2,
                 equal_nan=False,
             )
         padding_end = padded_offsets[expert_id + 1]
-        if padding_end > padded_start + size:
+        if not case.compact_storage and padding_end > padded_start + size:
             torch.testing.assert_close(
                 out[padded_start + size : padding_end],
                 torch.zeros_like(out[padded_start + size : padding_end]),
@@ -196,7 +224,8 @@ def check_case(case: PaddedCase) -> None:
 
     print(
         f"PASS {case.name}: H={case.hidden} I={case.intermediate} "
-        f"groups={case.group_sizes_list} padded={case.tokens.shape[0]} "
+        f"groups={case.group_sizes_list} storage={'compact' if case.compact_storage else 'padded'} "
+        f"rows={case.tokens.shape[0]} route_dtype={case.route_weights.dtype} "
         f"blocks={case.group_idx_for_bx.numel()} offsets={case.group_offsets.numel()}",
         flush=True,
     )
@@ -218,6 +247,29 @@ def main() -> None:
 
     if not args.fuzz_only:
         check_case(make_case("uneven-smoke", hidden=256, intermediate=128, group_sizes_list=[129, 17, 0], seed=20260711))
+        check_case(
+            make_case(
+                "compact-ee6db-smoke",
+                hidden=256,
+                intermediate=128,
+                group_sizes_list=[129, 17, 0],
+                seed=20260718,
+                compact_storage=True,
+                extra_metadata_blocks=2,
+            )
+        )
+        check_case(
+            make_case(
+                "compact-fp32-route",
+                hidden=256,
+                intermediate=128,
+                group_sizes_list=[127, 129],
+                seed=20260719,
+                compact_storage=True,
+                route_dtype="float32",
+                extra_metadata_blocks=1,
+            )
+        )
         if args.public_shape:
             check_case(
                 make_case(
@@ -226,6 +278,17 @@ def main() -> None:
                     intermediate=8192,
                     group_sizes_list=[142] * 16,
                     seed=20260712,
+                )
+            )
+            check_case(
+                make_case(
+                    "official-case-1-compact-ee6db",
+                    hidden=2048,
+                    intermediate=8192,
+                    group_sizes_list=[142] * 16,
+                    seed=20260712,
+                    compact_storage=True,
+                    extra_metadata_blocks=2,
                 )
             )
 

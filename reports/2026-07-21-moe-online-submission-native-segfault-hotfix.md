@@ -1,5 +1,10 @@
 # Online evaluator native-segfault compatibility hotfix
 
+> **Superseded by the second online result:** the exact pre-assumption SHA
+> `c44f7f4dcffe67d63a7ce1eed76c5570ac73654b76e6fb55fbf4721db64a1b9d` also exited 11 with the
+> same native traceback-handler segfault. Therefore `T.assume` was not established as the root
+> cause. See `2026-07-21-moe-online-compact-padded-compatibility-baseline.md`.
+
 Date: 2026-07-21
 
 ## Incident

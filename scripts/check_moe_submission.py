@@ -185,7 +185,7 @@ def check_submission(path: Path) -> list[str]:
             if call_name == "T.assume":
                 errors.append(
                     f"line {node.lineno}: T.assume() is not allowed in the online "
-                    "submission compatibility profile; it caused a native evaluator crash"
+                    "submission conservative compatibility profile"
                 )
             if call_name and call_name.startswith("torch.") and call_name != "torch.empty":
                 errors.append(
@@ -211,12 +211,15 @@ def check_submission(path: Path) -> list[str]:
                         continue
                     route_dtype = annotation.args[1]
                     if not (
-                        (isinstance(route_dtype, ast.Name) and route_dtype.id == "dtype")
+                        (
+                            isinstance(route_dtype, ast.Name)
+                            and route_dtype.id in {"dtype", "route_dtype"}
+                        )
                         or dotted_name(route_dtype) == "T.float16"
                     ):
                         errors.append(
                             f"line {argument.lineno}: routed_expert_weights must use "
-                            "the FP16 submission dtype"
+                            "the controlled FP16/FP32 route dtype"
                         )
 
     return errors

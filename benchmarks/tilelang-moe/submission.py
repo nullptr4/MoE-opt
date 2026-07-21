@@ -1,8 +1,10 @@
-"""Standalone MetaX C500 TileLang Fused-MoE submission.
+"""Conservative standalone MetaX C500 TileLang Fused-MoE submission.
 
-This file is self-contained and exposes only the required ``run_kernel`` entry
-point.  The input/intermediate/output tensors use padded expert-token storage,
-while routed weights use compact storage indexed through ``group_offsets``.
+The ten-argument OJ ABI has appeared with both compact storage (the cited
+``ee6db437`` benchmark) and expert-padded storage (the tutorial contract).
+This compatibility baseline selects the address contract from tensor shapes,
+supports FP16 or FP32 route weights and E or E+1 offset tensors, and otherwise
+keeps the original two-stage TileLang kernel structure.
 """
 
 import torch
@@ -19,25 +21,26 @@ def _make_moe_kernel(
     hidden,
     intermediate,
     num_experts,
-    total_padded_tokens,
-    total_valid_tokens,
+    storage_rows,
+    route_rows,
     num_blocks_m,
     group_offsets_len,
     group_padded_offsets_len,
+    compact_storage,
+    route_weight_fp32,
 ):
     scale = 1.44269504
     dtype = T.float16
+    route_dtype = T.float32 if route_weight_fp32 else T.float16
     accum_dtype = T.float32
 
     block_token = 128
-    stage1_bn = 128
-    stage1_bk = 64
-    stage2_bn = 128
-    stage2_bk = 64
+    block_hidden = 128
+    block_intermediate = 128
     threads = 256
 
-    input_shape = (total_padded_tokens, hidden)
-    intermediate_shape = (total_padded_tokens, intermediate)
+    input_shape = (storage_rows, hidden)
+    intermediate_shape = (storage_rows, intermediate)
     gate_shape = (num_experts, intermediate, hidden)
     up_shape = (num_experts, intermediate, hidden)
     down_shape = (num_experts, hidden, intermediate)
@@ -48,7 +51,7 @@ def _make_moe_kernel(
         gate_w: T.Tensor(gate_shape, dtype),
         up_w: T.Tensor(up_shape, dtype),
         down_w: T.Tensor(down_shape, dtype),
-        routed_expert_weights: T.Tensor((total_valid_tokens,), dtype),
+        routed_expert_weights: T.Tensor((route_rows,), route_dtype),
         group_sizes: T.Tensor((num_experts,), T.int32),
         group_offsets: T.Tensor((group_offsets_len,), T.int32),
         group_padded_offsets: T.Tensor((group_padded_offsets_len,), T.int32),
@@ -56,136 +59,40 @@ def _make_moe_kernel(
         up_logits: T.Tensor(intermediate_shape, dtype),
         out: T.Tensor(input_shape, dtype),
     ):
-        # Stage 1: one combined Gate/Up GEMM.  The stage-1 K loop uses the
-        # C500-validated same-buffer pipeline.  After the mainloop, the dead
-        # 256x64 weight tile is reused as two affine 128x64 FP16 Up halves.
+        # Keep the simple kernel organization from the cited ee6db437 source.
+        # In compact mode padded metadata addresses are translated back through
+        # raw group offsets.  In padded mode the block address is already the
+        # physical tensor address.
         with T.Kernel(
             num_blocks_m,
-            T.ceildiv(intermediate, stage1_bn),
+            T.ceildiv(intermediate, block_intermediate),
             threads=threads,
         ) as (bx, by):
-            input_local = T.alloc_fragment((block_token, stage1_bk), dtype=dtype)
-            gate_up_shared = T.alloc_shared((2 * stage1_bn, stage1_bk), dtype=dtype)
-            gate_up_local = T.alloc_fragment(
-                (block_token, 2 * stage1_bn),
+            input_shared = T.alloc_fragment(
+                (block_token, block_hidden),
+                dtype=dtype,
+            )
+            gate_shared = T.alloc_shared(
+                (block_intermediate, block_hidden),
+                dtype=dtype,
+            )
+            up_shared = T.alloc_shared(
+                (block_intermediate, block_hidden),
+                dtype=dtype,
+            )
+            gate_local = T.alloc_fragment(
+                (block_token, block_intermediate),
+                dtype=accum_dtype,
+            )
+            up_local = T.alloc_fragment(
+                (block_token, block_intermediate),
                 dtype=accum_dtype,
             )
 
-            T.use_swizzle(panel_size=8, order="row")
+            T.use_swizzle(10)
 
-            expert_id = group_idx_for_bx[bx]
             block_start = bx * block_token
-            group_size = group_sizes[expert_id]
-            padded_start = group_padded_offsets[expert_id]
-            token_offset = block_start - padded_start
-            actual_rows = T.max(
-                0,
-                T.min(block_token, group_size - token_offset),
-            )
-
-            T.clear(gate_up_local)
-
-            for k in T.Pipelined(
-                T.ceildiv(hidden, stage1_bk),
-                num_stages=1,
-            ):
-                T.copy(
-                    stacked_expert_tokens[
-                        block_start : block_start + block_token,
-                        k * stage1_bk : (k + 1) * stage1_bk,
-                    ],
-                    input_local,
-                )
-                T.copy(
-                    gate_w[
-                        expert_id,
-                        by * stage1_bn : (by + 1) * stage1_bn,
-                        k * stage1_bk : (k + 1) * stage1_bk,
-                    ],
-                    gate_up_shared[0:stage1_bn, 0:stage1_bk],
-                )
-                T.copy(
-                    up_w[
-                        expert_id,
-                        by * stage1_bn : (by + 1) * stage1_bn,
-                        k * stage1_bk : (k + 1) * stage1_bk,
-                    ],
-                    gate_up_shared[stage1_bn : 2 * stage1_bn, 0:stage1_bk],
-                )
-                T.gemm(
-                    input_local,
-                    gate_up_shared,
-                    gate_up_local,
-                    transpose_B=True,
-                    policy=T.GemmWarpPolicy.FullRow,
-                )
-
-            # H10F5 shared-buffer reuse.  Separate Parallel regions keep one
-            # affine access pattern per region for the installed MACA lowerer.
-            for i, j in T.Parallel(block_token, stage1_bk):
-                gate_up_shared[2 * i, j] = gate_up_local[i, j + stage1_bn]
-            for i, j in T.Parallel(block_token, stage1_bk):
-                gate_up_shared[2 * i + 1, j] = (
-                    gate_up_local[i, j + stage1_bn + stage1_bk]
-                )
-
-            for i, j in T.Parallel(block_token, stage1_bk):
-                gate_up_local[i, j] = gate_up_local[i, j] * (
-                    1.0 / (1.0 + T.exp2(-gate_up_local[i, j] * scale))
-                )
-                gate_up_shared[2 * i, j] = (
-                    gate_up_shared[2 * i, j] * gate_up_local[i, j]
-                )
-            for i, j in T.Parallel(block_token, stage1_bk):
-                gate_up_local[i, j + stage1_bk] = (
-                    gate_up_local[i, j + stage1_bk]
-                    * (
-                        1.0
-                        / (
-                            1.0
-                            + T.exp2(
-                                -gate_up_local[i, j + stage1_bk] * scale
-                            )
-                        )
-                    )
-                )
-                gate_up_shared[2 * i + 1, j] = (
-                    gate_up_shared[2 * i + 1, j]
-                    * gate_up_local[i, j + stage1_bk]
-                )
-
-            for i, j in T.Parallel(block_token, stage1_bk):
-                if i < actual_rows:
-                    up_logits[
-                        block_start + i,
-                        by * stage1_bn + j,
-                    ] = gate_up_shared[2 * i, j]
-            for i, j in T.Parallel(block_token, stage1_bk):
-                if i < actual_rows:
-                    up_logits[
-                        block_start + i,
-                        by * stage1_bn + j + stage1_bk,
-                    ] = gate_up_shared[2 * i + 1, j]
-
-        # Stage 2: shared FC2 activation tile plus one cached route weight per
-        # row.  Output addresses are padded; route-weight addresses are compact.
-        with T.Kernel(
-            num_blocks_m,
-            T.ceildiv(hidden, stage2_bn),
-            threads=threads,
-        ) as (bx, by):
-            up_shared = T.alloc_shared((block_token, stage2_bk), dtype=dtype)
-            down_shared = T.alloc_shared((stage2_bn, stage2_bk), dtype=dtype)
-            out_local = T.alloc_fragment(
-                (block_token, stage2_bn),
-                dtype=accum_dtype,
-            )
-            route_weight_local = T.alloc_fragment((block_token,), dtype=dtype)
-
-            T.use_swizzle(panel_size=16, order="row")
-
             expert_id = group_idx_for_bx[bx]
-            block_start = bx * block_token
             group_size = group_sizes[expert_id]
             raw_start = group_offsets[expert_id]
             padded_start = group_padded_offsets[expert_id]
@@ -194,25 +101,120 @@ def _make_moe_kernel(
                 0,
                 T.min(block_token, group_size - token_offset),
             )
+            if compact_storage:
+                data_start = raw_start + token_offset
+            else:
+                data_start = block_start
+
+            T.clear(gate_local)
+            T.clear(up_local)
+
+            for k in T.Pipelined(
+                T.ceildiv(hidden, block_hidden),
+                num_stages=1,
+            ):
+                T.copy(
+                    stacked_expert_tokens[
+                        data_start : data_start + block_token,
+                        k * block_hidden : (k + 1) * block_hidden,
+                    ],
+                    input_shared,
+                )
+                T.copy(
+                    gate_w[
+                        expert_id,
+                        by * block_intermediate : (by + 1) * block_intermediate,
+                        k * block_hidden : (k + 1) * block_hidden,
+                    ],
+                    gate_shared,
+                )
+                T.gemm(
+                    input_shared,
+                    gate_shared,
+                    gate_local,
+                    transpose_B=True,
+                )
+                T.copy(
+                    up_w[
+                        expert_id,
+                        by * block_intermediate : (by + 1) * block_intermediate,
+                        k * block_hidden : (k + 1) * block_hidden,
+                    ],
+                    up_shared,
+                )
+                T.gemm(
+                    input_shared,
+                    up_shared,
+                    up_local,
+                    transpose_B=True,
+                )
+
+            for i, j in T.Parallel(block_token, block_intermediate):
+                gate_local[i, j] = gate_local[i, j] * (
+                    1.0 / (1.0 + T.exp2(-gate_local[i, j] * scale))
+                )
+                up_local[i, j] = up_local[i, j] * gate_local[i, j]
+
+            for i, j in T.Parallel(block_token, block_intermediate):
+                if i < actual_rows:
+                    up_logits[
+                        data_start + i,
+                        by * block_intermediate + j,
+                    ] = up_local[i, j]
+
+        with T.Kernel(
+            num_blocks_m,
+            T.ceildiv(hidden, block_hidden),
+            threads=threads,
+        ) as (bx, by):
+            up_shared = T.alloc_fragment(
+                (block_token, block_intermediate),
+                dtype=dtype,
+            )
+            down_shared = T.alloc_shared(
+                (block_hidden, block_intermediate),
+                dtype=dtype,
+            )
+            out_local = T.alloc_fragment(
+                (block_token, block_hidden),
+                dtype=accum_dtype,
+            )
+
+            T.use_swizzle(10)
+
+            block_start = bx * block_token
+            expert_id = group_idx_for_bx[bx]
+            group_size = group_sizes[expert_id]
+            raw_start = group_offsets[expert_id]
+            padded_start = group_padded_offsets[expert_id]
+            token_offset = block_start - padded_start
+            actual_rows = T.max(
+                0,
+                T.min(block_token, group_size - token_offset),
+            )
+            if compact_storage:
+                data_start = raw_start + token_offset
+            else:
+                data_start = block_start
 
             T.clear(out_local)
 
             for k in T.Pipelined(
-                T.ceildiv(intermediate, stage2_bk),
+                T.ceildiv(intermediate, block_intermediate),
                 num_stages=1,
             ):
                 T.copy(
                     up_logits[
-                        block_start : block_start + block_token,
-                        k * stage2_bk : (k + 1) * stage2_bk,
+                        data_start : data_start + block_token,
+                        k * block_intermediate : (k + 1) * block_intermediate,
                     ],
                     up_shared,
                 )
                 T.copy(
                     down_w[
                         expert_id,
-                        by * stage2_bn : (by + 1) * stage2_bn,
-                        k * stage2_bk : (k + 1) * stage2_bk,
+                        by * block_hidden : (by + 1) * block_hidden,
+                        k * block_intermediate : (k + 1) * block_intermediate,
                     ],
                     down_shared,
                 )
@@ -221,22 +223,24 @@ def _make_moe_kernel(
                     down_shared,
                     out_local,
                     transpose_B=True,
-                    policy=T.GemmWarpPolicy.FullRow,
                 )
 
-            for i in T.Parallel(block_token):
-                if i < actual_rows:
-                    route_weight_local[i] = routed_expert_weights[
-                        raw_start + token_offset + i
-                    ]
-
-            for i, j in T.Parallel(block_token, stage2_bn):
-                if i < actual_rows:
-                    out[block_start + i, by * stage2_bn + j] = (
-                        out_local[i, j] * route_weight_local[i]
-                    )
-                else:
-                    out[block_start + i, by * stage2_bn + j] = 0.0
+            if compact_storage:
+                for i, j in T.Parallel(block_token, block_hidden):
+                    if i < actual_rows:
+                        out[data_start + i, by * block_hidden + j] = (
+                            out_local[i, j]
+                            * routed_expert_weights[raw_start + token_offset + i]
+                        )
+            else:
+                for i, j in T.Parallel(block_token, block_hidden):
+                    if i < actual_rows:
+                        out[data_start + i, by * block_hidden + j] = (
+                            out_local[i, j]
+                            * routed_expert_weights[raw_start + token_offset + i]
+                        )
+                    else:
+                        out[data_start + i, by * block_hidden + j] = 0.0
 
     return kernel
 
@@ -245,21 +249,25 @@ def _get_kernel(
     hidden,
     intermediate,
     num_experts,
-    total_padded_tokens,
-    total_valid_tokens,
+    storage_rows,
+    route_rows,
     num_blocks_m,
     group_offsets_len,
     group_padded_offsets_len,
+    compact_storage,
+    route_weight_fp32,
 ):
     key = (
         int(hidden),
         int(intermediate),
         int(num_experts),
-        int(total_padded_tokens),
-        int(total_valid_tokens),
+        int(storage_rows),
+        int(route_rows),
         int(num_blocks_m),
         int(group_offsets_len),
         int(group_padded_offsets_len),
+        bool(compact_storage),
+        bool(route_weight_fp32),
     )
     kernel = _KERNEL_CACHE.get(key)
     if kernel is None:
@@ -272,6 +280,8 @@ def _get_kernel(
             key[5],
             key[6],
             key[7],
+            key[8],
+            key[9],
         )
         _KERNEL_CACHE[key] = kernel
     return kernel
@@ -313,22 +323,29 @@ def run_kernel(
     hidden = int(stacked_expert_tokens.shape[1])
     intermediate = int(gate_w.shape[1])
     num_experts = int(gate_w.shape[0])
-    total_padded_tokens = int(stacked_expert_tokens.shape[0])
-    total_valid_tokens = int(routed_expert_weights.shape[0])
+    storage_rows = int(stacked_expert_tokens.shape[0])
+    route_rows = int(routed_expert_weights.shape[0])
     num_blocks_m = int(group_idx_for_bx.shape[0])
     group_offsets_len = int(group_offsets.shape[0])
     group_padded_offsets_len = int(group_padded_offsets.shape[0])
+
+    # The cited benchmark is compact and therefore has one input row per route.
+    # The tutorial-padded ABI has more physical rows than compact route weights.
+    compact_storage = storage_rows == route_rows
+    route_weight_fp32 = routed_expert_weights.dtype == torch.float32
 
     up_logits = _get_workspace(stacked_expert_tokens, intermediate)
     kernel = _get_kernel(
         hidden,
         intermediate,
         num_experts,
-        total_padded_tokens,
-        total_valid_tokens,
+        storage_rows,
+        route_rows,
         num_blocks_m,
         group_offsets_len,
         group_padded_offsets_len,
+        compact_storage,
+        route_weight_fp32,
     )
     kernel(
         stacked_expert_tokens,

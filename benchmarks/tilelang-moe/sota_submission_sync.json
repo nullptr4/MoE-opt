@@ -4,38 +4,49 @@
     "id": "H17F2",
     "deployment_commit": "2a94659f4a0c7c65bd191367fd48d50fef47ce2f",
     "source_path": "benchmarks/tilelang-moe/custom_fusedmoe.py",
-    "source_sha256": "e9f83f74fe702d7adea33e3754fa618b5adfe7e103e68daaa58499e806fd0de9"
+    "source_sha256": "e9f83f74fe702d7adea33e3754fa618b5adfe7e103e68daaa58499e806fd0de9",
+    "abi": "compact-eleven-tensor-routed-moe-harness"
   },
   "submission": {
     "source_path": "benchmarks/tilelang-moe/submission.py",
-    "source_sha256": "c44f7f4dcffe67d63a7ce1eed76c5570ac73654b76e6fb55fbf4721db64a1b9d",
-    "abi": "online-padded-ten-argument-run_kernel",
-    "sync_status": "online-compatible-fallback-formal-assumes-disabled"
+    "source_sha256": "51100f0d155fad1b1958134e710e116122db7190cbc295c56fa6c263049420a4",
+    "abi": "online-ten-argument-run_kernel-compact-or-padded",
+    "sync_status": "online-compatibility-baseline-ee6db-compact-padded"
+  },
+  "compatibility_baseline": {
+    "reason": "The exact pre-assumption rollback still exited 11 online. The cited ee6db437 benchmark allocates compact group_sum rows, while the tutorial text says padded rows. This baseline supports both layouts from host-visible tensor shapes and reverts kernel scheduling to the cited compiler-compatible two-stage organization.",
+    "address_selection": "storage_rows == routed_weight_rows selects compact raw_start+token_offset; otherwise padded block_start",
+    "route_dtype_selection": "supports FP16 and FP32 route-weight tensors",
+    "offset_lengths": "specializes independently for E or E+1 tensors",
+    "formal_sota_retained": "H17F2 remains the compact research SOTA but is not claimed as online-deployed performance"
   },
   "online_incident": {
-    "symptom": "native Python evaluator segmentation fault without a recoverable Python exception",
-    "first_observed_after_submission_sha256": "dd21d0940706ddb30023819d69c2a1405bf88a00433915ff330e03763114388b",
-    "isolated_delta": "ten T.assume calls adapted from H17F2",
-    "mitigation": "restore exact pre-assume submission bytes and reject T.assume in the online compatibility policy",
-    "causal_status": "strongly_suspected_not_proven_without_online_core_or_exact_toolchain"
+    "reported_symptom": "OJCHAL v1 followed by native Python traceback-handler segfault and exit code 11",
+    "first_failed_submission_sha256": "dd21d0940706ddb30023819d69c2a1405bf88a00433915ff330e03763114388b",
+    "second_failed_submission_sha256": "c44f7f4dcffe67d63a7ce1eed76c5570ac73654b76e6fb55fbf4721db64a1b9d",
+    "corrected_causal_assessment": "Removing T.assume did not fix the online crash, so assumptions are not established as the root cause. Layout mismatch or old online lowerer incompatibility remains the leading explanation.",
+    "re_enable_optimized_schedule_only_with": "successful evidence from the exact online evaluator"
   },
   "synchronized_mechanisms": [
     {
-      "id": "h10f5-compute-and-memory-schedule",
-      "formal": "combined Gate/Up, FC2 shared activation, route fragment cache, pipelined FC1, and dead-shared Up exchange",
-      "submission_adaptation": "retained in the padded online ABI"
+      "formal": "H17F2 remains the measured compact research baseline",
+      "submission_adaptation": "conservative original-style two-stage schedule selected because exact-online native failures invalidate deployment of the optimized schedule"
     },
     {
-      "id": "h17f2-range-assumes",
-      "formal": "expert-index and compact-row T.assume contracts remain enabled in the measured compact formal kernel",
-      "submission_adaptation": "disabled because the first online evaluation of the adapted assumptions produced a native segmentation fault"
+      "formal": "compact group metadata translates padded block coordinates through raw group offsets",
+      "submission_adaptation": "runtime specialization supports compact raw_start+token_offset and tutorial padded block_start address spaces"
+    },
+    {
+      "formal": "route weights are compact",
+      "submission_adaptation": "compact route indexing is retained with controlled FP16 or FP32 route tensor annotation"
     }
   ],
   "required_submission_snippets": {
-    "raw_start = group_offsets[expert_id]": 1,
-    "padded_start = group_padded_offsets[expert_id]": 2,
-    "if i < actual_rows": 4,
-    "out[block_start + i, by * stage2_bn + j] = 0.0": 1
+    "compact_storage = storage_rows == route_rows": 1,
+    "route_weight_fp32 = routed_expert_weights.dtype == torch.float32": 1,
+    "data_start = raw_start + token_offset": 2,
+    "data_start = block_start": 2,
+    "out[data_start + i, by * block_hidden + j] = 0.0": 1
   },
-  "policy": "Every formal SOTA must be adapted to submission.py when the online ABI and toolchain can safely express it. A mechanism that causes a native online failure must be disabled, documented as an incompatible fallback, guarded by policy, and re-enabled only after exact online-toolchain evidence. Compact and padded address contracts must never be copied blindly."
+  "promotion_policy": "A formal SOTA and ten-argument submission must be integrated together. When the exact online contract or lowerer is ambiguous or native-crashes, deploy a hash-bound conservative compatibility baseline, validate every plausible ABI locally on real C500, and do not claim formal benchmark speedup as online performance."
 }
