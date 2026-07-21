@@ -1,0 +1,105 @@
+{
+  "schema_version": "1.0",
+  "campaign_id": "h17f2-warp-copy-vector-followups-20260721",
+  "status": "complete_no_winner",
+  "device": "MetaX C500 64GiB",
+  "baseline": {
+    "id": "H17F2",
+    "target_commit_before_campaign": "696b5d4f45be33092507ec8cb7eaa64baf1f44e9",
+    "kernel_origin_commit": "2a94659f4a0c7c65bd191367fd48d50fef47ce2f",
+    "source_sha256": "e9f83f74fe702d7adea33e3754fa618b5adfe7e103e68daaa58499e806fd0de9",
+    "formal_artifact": "artifacts/p9/baseline-237df83431a8d6d8f9575f08.json",
+    "formal_mean_median_ms": [219.32423692703247, 219.380615234375],
+    "formal_profiler_cycles_kcycles": {"fc1": [113378.19, 111648.35], "fc2": [47189.13, 49928.35]},
+    "h19f4_commit_matched_artifact": "artifacts/p9/baseline-b2e53827a5d86f5c2723ec0c.json",
+    "h19f4_commit_matched_mean_median_ms": [220.26211372375488, 220.59122562408447],
+    "h19f4_commit_matched_profiler_cycles_kcycles": {"fc1": [113152.48, 114020.23], "fc2": [49085.75, 47663.78]}
+  },
+  "protocol": {
+    "functional_shapes": ["functional-large", "functional-small"],
+    "performance_shapes": ["performance-large", "performance-small"],
+    "seed": 81394,
+    "dtype": "float16",
+    "accumulate_dtype": "float32",
+    "atol": 0.01,
+    "rtol": 0.01,
+    "warmup": 10,
+    "iterations": 100,
+    "outlier_policy": "none",
+    "samples": "all ordered samples retained in agent experiment artifacts",
+    "acceptance": "mean and median both improve at least 0.5%, stable variance and profiler consistency, then full replication and adjacent ABBA"
+  },
+  "sources": [
+    {"id": "N79", "url": "https://gitee.com/metax-maca/mxmaca-performance-tuning-guide/blob/main/guide/ch2.%E6%9B%A6%E4%BA%91C500%E8%8A%AF%E7%89%87%E6%9E%B6%E6%9E%84.md", "license": "license URL inaccessible; facts only, no copied code", "candidates": ["H19F1", "H19F3", "H19F4"]},
+    {"id": "N80", "url": "https://raw.githubusercontent.com/tile-ai/tilelang/main/tilelang/language/builtin.py; https://raw.githubusercontent.com/tile-ai/tilelang/main/tilelang/language/loop.py; https://raw.githubusercontent.com/tile-ai/tilelang/main/src/op/parallel.cc", "license": "MIT", "candidates": ["H19F1", "H19F2", "H19F3", "H19F4"]},
+    {"id": "N81", "url": "https://github.com/NVIDIA/cutlass/blob/main/media/docs/cpp/gemm_api_3x.md", "license": "BSD-3-Clause", "candidates": ["H19F2"]},
+    {"id": "N82", "url": "https://developer.metax-tech.com/forum/media/attachments/c7/ec/p921bRvdtxGdMGVlejqB3MWt5vRdjo5Vd9Mdb21bQ3YTuk9JSnNrARaoU14kszzE/yu-han-tilelang-.pdf", "license": "no explicit PDF reuse license; facts only", "candidates": ["H19S2"]}
+  ],
+  "experiments": [
+    {
+      "id": "H19F1",
+      "artifact": "artifacts/p9/experiment-d2b90c333d4bfb0c816e4ed0.json",
+      "candidate_commit": "4bed1d88a790749df9516cd40cf54b462910fed4",
+      "diff_sha256": "b6f07f73bec6c737318036ac4cd6e77dfcc3543a604d75467d2504e034db886d",
+      "correctness_mismatches": {"large": 0, "small": 0},
+      "mean_median_ms": [246.3470640182495, 246.49202919006348],
+      "mean_median_improvement": [-0.12320948869963391, -0.12358162970198636],
+      "stddev_ms": 1.1542214048714303,
+      "profiler_cycles_kcycles": {"fc1": [138260.19, 138115.19], "fc2": [50390.67, 51262.83]},
+      "decision": "rejected_severe_cycle_and_endpoint_regression"
+    },
+    {
+      "id": "H19F2",
+      "artifact": "artifacts/p9/experiment-22b0eb980811e5e71eb123f3.json",
+      "candidate_commit": "65e350a768a3ab043c8b12af62c9dfb1ac30811a",
+      "diff_sha256": "3d25a510d31340b5002de2c7ff5072a69fb2c379fccbdc9f8b5406d475da025d",
+      "correctness_mismatches": {"large": 0, "small": 0},
+      "mean_median_ms": [221.16429000854492, 221.40953254699707],
+      "mean_median_improvement": [-0.008389647707401453, -0.009248389199995993],
+      "stddev_ms": 1.4425648938608004,
+      "profiler_cycles_kcycles": {"fc1": [112190.08, 113948.6], "fc2": [48717.15, 49469.29]},
+      "decision": "rejected_below_both_gates"
+    },
+    {
+      "id": "H19F3",
+      "artifact": "artifacts/p9/experiment-37706cb3f6daf26ab704bf07.json",
+      "candidate_commit": "6e534d66df61901121312c729fafcdd758222126",
+      "diff_sha256": "f13fc00bf4548fd3b1da9434ecb56d2e0288e50e6b642b2100c68167ec5a8a1d",
+      "correctness_mismatches": {"large": 0, "small": 0},
+      "mean_median_ms": [219.62570497512817, 219.51027297973633],
+      "mean_median_improvement": [-0.0013745313893238158, -0.0005910173295065675],
+      "stddev_ms": 1.3389152189969775,
+      "profiler_cycles_kcycles": {"fc1": [111300.05, 114149.59], "fc2": [46260.92, 49545.67]},
+      "generated_source": "byte_identical_to_H17F2",
+      "decision": "rejected_below_both_gates_and_backend_noop"
+    },
+    {
+      "id": "H19F4",
+      "artifact": "artifacts/p9/experiment-be7a347c7ba687c03b771b06.json",
+      "candidate_commit": "667240453051511f43bedd221a70d244bf6c9dd2",
+      "diff_sha256": "93609ad9fb79b77af27621092c6c2c2e05274797b359bd33be5f4051ad9a5ce4",
+      "correctness_mismatches": {"large": 0, "small": 0},
+      "mean_median_ms": [290.54778884887696, 290.6330852508545],
+      "mean_median_improvement": [-0.3191001572484315, -0.31751879263833577],
+      "stddev_ms": 1.5903873244154334,
+      "profiler_cycles_kcycles": {"fc1": [183207.02, 183633.02], "fc2": [49074.47, 46553.63]},
+      "generated_vector_occurrences": {"baseline": {"uint4": 24, "uint2": 40}, "candidate": {"uint4": 16, "uint2": 48}},
+      "decision": "rejected_severe_realized_mechanism_regression"
+    }
+  ],
+  "static_exclusions": {
+    "H19S1": "synchronous-copy eviction policy is an exact MACA backend no-op",
+    "H19S2": "new sources did not overturn async, deeper-stage, broad-grid, persistent, Split-K, descriptor or workspace boundaries"
+  },
+  "abba": {"performed": false, "reason": "no candidate passed both initial gates"},
+  "deployment": {"selected": "H17F2", "kernel_changed": false, "kernel_sha256": "e9f83f74fe702d7adea33e3754fa618b5adfe7e103e68daaa58499e806fd0de9"},
+  "target_validation": {
+    "pytest_metax": "89 passed in 25.12s with CAMP_TEST_BACKEND=metax",
+    "repository_check": "3397 tracked files inspected",
+    "verify_maca": "passed on MetaX C500; driver 3.8.30; MACA 3.7.1.5; TileLang 0.1.12+maca.gitec48829b",
+    "functional": "official Large/Small 2 of 2 passed",
+    "run_moe_performance": "diagnostic only: 190.39873047/30.86630859 ms",
+    "submission_public_fuzz": "submission policy, uneven smoke, official public shape and five fuzz/terminal-offset cases passed",
+    "git_diff_check": "passed before target report commit"
+  }
+}
