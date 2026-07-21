@@ -314,10 +314,14 @@ def _moe_forward_tilelang_routed(
 
             metadata_bx = bx // tiles_per_metadata_block
             cur_group_idx = group_idx_for_bx[metadata_bx]
+            T.assume(0 <= cur_group_idx)
+            T.assume(cur_group_idx < n_routed_experts)
 
             cur_group_size = group_sizes[cur_group_idx]
             m_start = m_start_padded - group_padded_offsets[cur_group_idx] + group_offsets[cur_group_idx]
             actual_rows = T.max(0, T.min(block_token, cur_group_size - (m_start_padded - group_padded_offsets[cur_group_idx])))
+            T.assume(0 <= m_start)
+            T.assume(m_start + actual_rows <= group_sum)
 
             if combine_gate_up:
                 T.clear(gate_up_logits_local)
@@ -498,10 +502,14 @@ def _moe_forward_tilelang_routed(
 
             metadata_bx = bx // tiles_per_metadata_block
             cur_group_idx = group_idx_for_bx[metadata_bx]
+            T.assume(0 <= cur_group_idx)
+            T.assume(cur_group_idx < n_routed_experts)
 
             cur_group_size = group_sizes[cur_group_idx]
             m_start = m_start_padded - group_padded_offsets[cur_group_idx] + group_offsets[cur_group_idx]
             actual_rows = T.max(0, T.min(block_token, cur_group_size - (m_start_padded - group_padded_offsets[cur_group_idx])))
+            T.assume(0 <= m_start)
+            T.assume(m_start + actual_rows <= group_sum)
 
             T.clear(output_local)
 

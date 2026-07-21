@@ -1,0 +1,131 @@
+{
+  "schema_version": "1.0",
+  "campaign_id": "h10f5-sync-bounds-fc1-clear-followups-20260721",
+  "status": "complete_winner_deployed",
+  "device": "MetaX C500 64GiB",
+  "protocol": {
+    "functional_shapes": ["functional-large", "functional-small"],
+    "performance_shapes": ["performance-large", "performance-small"],
+    "seed": 81394,
+    "dtype": "float16",
+    "accumulate_dtype": "float32",
+    "atol": 0.01,
+    "rtol": 0.01,
+    "warmup": 10,
+    "iterations": 100,
+    "outlier_policy": "none",
+    "acceptance": "mean and median both improve at least 0.5%, stable variance and mechanism-consistent profiler, two complete accepts, then adjacent ABBA"
+  },
+  "baseline": {
+    "id": "H10F5",
+    "target_commit": "ba3747b3b03349ec3a67c40c71d7dc92ac63f4f8",
+    "source_sha256": "338b4d93cadc69a12e49690efc5d3030630b8cf412ee0a0691a6ef44db8bedfe",
+    "agent_commit": "a1106b9b7df3248190be663f5fe7e38ee9d2aed7",
+    "artifact": "artifacts/p9/baseline-9b307633fb38d3c976591db6.json",
+    "environment_fingerprint": "sha256:4de1de3d1bb5cd6321d5440a3c3041c044a115312f35e20d7f9bc4325b708019",
+    "correctness_mismatches": {"large": 0, "small": 0},
+    "mean_ms": 228.83289794921876,
+    "median_ms": 228.80601501464844,
+    "stddev_ms": 1.3619691172783746,
+    "p90_ms": 230.39529037475586,
+    "profiler_cycles_kcycles": {"fc1": [117535.05, 119011.17], "fc2": [51432.83, 53807.4]}
+  },
+  "sources": [
+    {"id": "N73", "url": "https://tilelang.com/programming_guides/instructions.html", "license": "MIT", "candidate": "H17F1"},
+    {"id": "N74", "url": "https://github.com/tile-ai/tilelang/releases/tag/v0.1.10", "license": "MIT", "candidate": "H17F2"},
+    {"id": "N74-api", "url": "https://tilelang.com/autoapi/tilelang/language/tir/op/index.html", "license": "MIT", "candidate": "H17F2"},
+    {"id": "N75", "url": "https://github.com/tile-ai/tilelang/blob/main/tilelang/language/gemm_op.py", "license": "MIT", "candidate": "H17F3"}
+  ],
+  "experiments": [
+    {
+      "id": "H17F1",
+      "artifact": "artifacts/p9/experiment-2ff872277829bcaa5b73b89d.json",
+      "experiment_id": "experiment-5368dd6700a8ed92e6a4dbbe",
+      "candidate_commit": "98c08bbd0e684821a1b179af57b9bd8e0f6ab2ab",
+      "diff_sha256": "7463fa41458e8db44c35ee20427bc7b4cd1f475b8cd4dc2a8433b956c9b774aa",
+      "correctness_mismatches": {"large": 0, "small": 0},
+      "mean_ms": 230.96840171813966,
+      "median_ms": 230.84364700317383,
+      "stddev_ms": 1.1874764962985322,
+      "mean_improvement": -0.009332153672217168,
+      "median_improvement": -0.00890550009533158,
+      "profiler_attempt": "artifacts/profiler/H17F1-20260721T085236685313Z/mcprofiler-attempt.json",
+      "profiler_cycles_kcycles": {"fc1": [121555.13, 120444.17], "fc2": [51659.71, 52756.23]},
+      "decision": "rejected_realized_barrier_reduction_but_endpoint_regressed"
+    },
+    {
+      "id": "H17F2",
+      "artifact": "artifacts/p9/experiment-c89b40d903e360eef8da888a.json",
+      "experiment_id": "experiment-04a71a7c87b8574999427a25",
+      "candidate_commit": "e8f424787ea2d7e4c6efeea55e8db585a2423680",
+      "diff_sha256": "f594bd4e4383564c653de6ee458df328e6da64abe63976fdae31bbe7f54f23b8",
+      "correctness_mismatches": {"large": 0, "small": 0},
+      "mean_ms": 219.08062984466554,
+      "median_ms": 219.33107089996338,
+      "stddev_ms": 1.3017751817073842,
+      "mean_improvement": 0.042617421672985975,
+      "median_improvement": 0.04141038037867344,
+      "profiler_attempt": "artifacts/profiler/H17F2-20260721T085837088626Z/mcprofiler-attempt.json",
+      "profiler_cycles_kcycles": {"fc1": [112321.79, 111502.84], "fc2": [49507.62, 50286.59]},
+      "decision": "accepted_r1"
+    },
+    {
+      "id": "H17F2-R2",
+      "artifact": "artifacts/p9/experiment-46a9c9564d9fa01077f85158.json",
+      "experiment_id": "experiment-0d107f2f9ad3da181b20174a",
+      "candidate_commit": "4adb3d9476ea28b4b576973c193be30d1ddb9fd8",
+      "diff_sha256": "f594bd4e4383564c653de6ee458df328e6da64abe63976fdae31bbe7f54f23b8",
+      "correctness_mismatches": {"large": 0, "small": 0},
+      "mean_ms": 218.86751945495607,
+      "median_ms": 218.96972846984863,
+      "stddev_ms": 1.3486937178014928,
+      "mean_improvement": 0.04354871429576595,
+      "median_improvement": 0.042989632698992086,
+      "profiler_attempt": "artifacts/profiler/H17F2-R2-20260721T090450628972Z/mcprofiler-attempt.json",
+      "profiler_cycles_kcycles": {"fc1": [112212.17, 112074.77], "fc2": [50517.68, 50456.58]},
+      "decision": "accepted_r2"
+    },
+    {
+      "id": "H17F3",
+      "artifact": "artifacts/p9/experiment-aea6cae55c5527bf012f6bf7.json",
+      "experiment_id": "experiment-69b61055a9b9ee1df5c5662d",
+      "candidate_commit": "de6a7e277c60e769b99997e76b1f84d069048c03",
+      "diff_sha256": "c726e6e000c0003bfb3e941d4a874e56621cda1bde569273750c5fec9b9ce0c8",
+      "correctness_mismatches": {"large": 0, "small": 0},
+      "mean_ms": 231.29637399673462,
+      "median_ms": 231.3141746520996,
+      "stddev_ms": 1.2751604272016401,
+      "mean_improvement": -0.01076539286786699,
+      "median_improvement": -0.010961947994639024,
+      "profiler_attempt": "artifacts/profiler/H17F3-20260721T091009667052Z/mcprofiler-attempt.json",
+      "profiler_cycles_kcycles": {"fc1": [121040.79, 120346.17], "fc2": [53311.67, 52551.68]},
+      "decision": "rejected_private_write_reduction_but_cycle_and_endpoint_regression"
+    }
+  ],
+  "abba": {
+    "artifact": "artifacts/p9/abba-f464c8515ac1e8f7916c4842.json",
+    "order": ["H10F5-r1", "H17F2-r1", "H17F2-r2", "H10F5-r2"],
+    "incumbent_mean_median_ms": [228.89142399787903, 228.98674821853638],
+    "challenger_mean_median_ms": [219.5318747997284, 219.53017663955688],
+    "aggregate_mean_median_improvement": [0.04089078146605161, 0.041297462200539634],
+    "challenger_individual_mean_improvements": [0.041019495199120716, 0.04076206773298249],
+    "challenger_individual_median_improvements": [0.041666690874320636, 0.04092823352675863],
+    "selected": "H17F2"
+  },
+  "static_exclusions": ["H17S1 exact 256-bit-vectorization no-op", "H17S2 unsafe blanket safe-memory disable", "H17S3 blind synchronization/bounds/clear-accumulator grids"],
+  "deployment": {
+    "selected": "H17F2",
+    "kernel_changed": true,
+    "parent_kernel_sha256": "338b4d93cadc69a12e49690efc5d3030630b8cf412ee0a0691a6ef44db8bedfe",
+    "kernel_sha256": "e9f83f74fe702d7adea33e3754fa618b5adfe7e103e68daaa58499e806fd0de9"
+  },
+  "target_validation": {
+    "pytest_metax": "89 passed in 25.55s with CAMP_TEST_BACKEND=metax",
+    "repository_check": "3392 tracked files inspected after final report staging",
+    "verify_maca": "passed on MetaX C500; driver 3.8.30; MACA 3.7.1.5; TileLang 0.1.12+maca.gitec48829b",
+    "functional": "official Large/Small 2 of 2 passed",
+    "run_moe_performance": "diagnostic only: 190.44259766/30.95400391 ms",
+    "submission_public_fuzz": "submission policy, uneven smoke, official public shape and five fuzz/terminal-offset cases passed",
+    "git_diff_check": "passed"
+  }
+}
