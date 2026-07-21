@@ -102,7 +102,8 @@ def main() -> int:
     manifest = json.loads((root / MANIFEST).read_text(encoding="utf-8"))
     print(
         "PASS SOTA/submission sync: "
-        f"{manifest['formal_sota']['id']} -> {manifest['submission']['abi']}"
+        f"{manifest['formal_sota']['id']} -> {manifest['submission']['abi']} "
+        f"[{manifest['submission']['sync_status']}]"
     )
     return 0
 

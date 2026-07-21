@@ -8,28 +8,34 @@
   },
   "submission": {
     "source_path": "benchmarks/tilelang-moe/submission.py",
-    "source_sha256": "dd21d0940706ddb30023819d69c2a1405bf88a00433915ff330e03763114388b",
+    "source_sha256": "c44f7f4dcffe67d63a7ce1eed76c5570ac73654b76e6fb55fbf4721db64a1b9d",
     "abi": "online-padded-ten-argument-run_kernel",
-    "sync_status": "mechanism-adapted-and-c500-validated"
+    "sync_status": "online-compatible-fallback-formal-assumes-disabled"
+  },
+  "online_incident": {
+    "symptom": "native Python evaluator segmentation fault without a recoverable Python exception",
+    "first_observed_after_submission_sha256": "dd21d0940706ddb30023819d69c2a1405bf88a00433915ff330e03763114388b",
+    "isolated_delta": "ten T.assume calls adapted from H17F2",
+    "mitigation": "restore exact pre-assume submission bytes and reject T.assume in the online compatibility policy",
+    "causal_status": "strongly_suspected_not_proven_without_online_core_or_exact_toolchain"
   },
   "synchronized_mechanisms": [
     {
-      "id": "expert-index-range-assumes",
-      "formal": "H17F2 asserts the mapped expert index in both FC1 and FC2",
-      "submission_adaptation": "assert expert_id in [0, num_experts) in both padded-ABI stages"
+      "id": "h10f5-compute-and-memory-schedule",
+      "formal": "combined Gate/Up, FC2 shared activation, route fragment cache, pipelined FC1, and dead-shared Up exchange",
+      "submission_adaptation": "retained in the padded online ABI"
     },
     {
-      "id": "valid-row-address-assumes",
-      "formal": "H17F2 proves each compact valid-row interval remains within group_sum",
-      "submission_adaptation": "prove padded input/workspace/output intervals against total_padded_tokens and compact FC2 route-weight intervals against total_valid_tokens"
+      "id": "h17f2-range-assumes",
+      "formal": "expert-index and compact-row T.assume contracts remain enabled in the measured compact formal kernel",
+      "submission_adaptation": "disabled because the first online evaluation of the adapted assumptions produced a native segmentation fault"
     }
   ],
   "required_submission_snippets": {
-    "T.assume(0 <= expert_id)": 2,
-    "T.assume(expert_id < num_experts)": 2,
-    "T.assume(block_start + actual_rows <= total_padded_tokens)": 2,
-    "T.assume(0 <= raw_start + token_offset)": 1,
-    "raw_start + token_offset + actual_rows <= total_valid_tokens": 1
+    "raw_start = group_offsets[expert_id]": 1,
+    "padded_start = group_padded_offsets[expert_id]": 2,
+    "if i < actual_rows": 4,
+    "out[block_start + i, by * stage2_bn + j] = 0.0": 1
   },
-  "policy": "Every formally promoted SOTA must update the standalone submission, this manifest, submission correctness tests, and C500 validation in the same integration change. Compact and padded address contracts must be adapted semantically, never copied blindly."
+  "policy": "Every formal SOTA must be adapted to submission.py when the online ABI and toolchain can safely express it. A mechanism that causes a native online failure must be disabled, documented as an incompatible fallback, guarded by policy, and re-enabled only after exact online-toolchain evidence. Compact and padded address contracts must never be copied blindly."
 }

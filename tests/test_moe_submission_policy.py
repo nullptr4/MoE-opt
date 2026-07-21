@@ -48,6 +48,19 @@ class MoeSubmissionPolicyTest(unittest.TestCase):
             errors,
         )
 
+    def test_rejects_online_native_crashing_assume(self):
+        mutated = self.source.replace(
+            "            T.clear(gate_up_local)",
+            "            T.assume(0 <= expert_id)\n            T.clear(gate_up_local)",
+            1,
+        )
+        self.assertNotEqual(mutated, self.source)
+        errors = self.check_mutation(mutated)
+        self.assertTrue(
+            any("T.assume() is not allowed" in error for error in errors),
+            errors,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

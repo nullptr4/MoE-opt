@@ -182,6 +182,11 @@ def check_submission(path: Path) -> list[str]:
                 errors.append(
                     f"line {node.lineno}: torch.cuda.synchronize() is not allowed"
                 )
+            if call_name == "T.assume":
+                errors.append(
+                    f"line {node.lineno}: T.assume() is not allowed in the online "
+                    "submission compatibility profile; it caused a native evaluator crash"
+                )
             if call_name and call_name.startswith("torch.") and call_name != "torch.empty":
                 errors.append(
                     f"line {node.lineno}: PyTorch compute call {call_name} is not allowed; "
