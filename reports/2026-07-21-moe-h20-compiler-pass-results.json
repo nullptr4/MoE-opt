@@ -1,0 +1,78 @@
+{
+  "schema_version": "1.0",
+  "campaign_id": "h17f2-constraint-bind-unswitch-followups-20260721",
+  "status": "complete_no_winner",
+  "evidence_kind": "hardware",
+  "formal_kernel": {
+    "id": "H17F2",
+    "origin_commit": "2a94659f4a0c7c65bd191367fd48d50fef47ce2f",
+    "source_sha256": "e9f83f74fe702d7adea33e3754fa618b5adfe7e103e68daaa58499e806fd0de9",
+    "target_control_commit": "6a92944cd1a4d649341f7f3ee4a105d72ae4803e"
+  },
+  "protocol": {
+    "correctness": ["official Large", "official Small"],
+    "warmup": 10,
+    "iterations": 100,
+    "outlier_policy": "none",
+    "acceptance": "mean and median both improve at least 0.5%, stable variance and profiler-consistent mechanism"
+  },
+  "primary_baseline": {
+    "artifact": "artifacts/p9/baseline-be65f93f5e0b927955890fb9.json",
+    "environment_fingerprint": "sha256:ce2efd44d7bfefb08d4718f8b4cbb1d807d0c96792214583cf8bd87ace66a23d",
+    "mean_ms": 219.8653436088562,
+    "median_ms": 219.81951904296875,
+    "stddev_ms": 1.3246871747878946,
+    "correctness_mismatches": {"large": 0, "small": 0},
+    "cycles_kcycles": [113670.7, 47116.08, 111945.94, 48443.9]
+  },
+  "experiments": [
+    {
+      "id": "H20F1",
+      "artifact": "artifacts/p9/experiment-30ff27448a768a90af79cc1d.json",
+      "source_commit": "2c7b43b511f75a30d855de0aca157c0e4c82d738",
+      "diff_sha256": "5f4ba402bb0d1c744f8da8ce5544d902de8e508b6d13a2c37187eb8007595d4e",
+      "environment_fingerprint": "sha256:4aa231e0c03e18d49a2cbba19d9522b740f7af84301eba6ece24818c6f73f98b",
+      "decision": "rejected_command_timeout_before_executable",
+      "correctness_timing_profiler": "not run because build produced no executable"
+    },
+    {
+      "id": "H20F2",
+      "artifact": "artifacts/p9/experiment-364c2deacc77735da822047d.json",
+      "source_commit": "3e1ef7d402f6cea6bd5e1a08de14a00783408052",
+      "diff_sha256": "c6977fdc199610c63a38c467ca1df53a1da05f536b85ae38e2a270e0dce1ab28",
+      "environment_fingerprint": "sha256:ce2efd44d7bfefb08d4718f8b4cbb1d807d0c96792214583cf8bd87ace66a23d",
+      "correctness_mismatches": {"large": 0, "small": 0},
+      "mean_ms": 219.03860723495484,
+      "median_ms": 219.09120273590088,
+      "stddev_ms": 1.28840944083927,
+      "mean_improvement": 0.0037601941276026265,
+      "median_improvement": 0.0033132467500554628,
+      "cycles_kcycles": [113192.54, 47273.07, 112720.16, 47709.66],
+      "private_write_instructions": [5, 0, 5, 0],
+      "decision": "rejected_below_dual_gate_and_mixed_cycles"
+    },
+    {
+      "id": "H20F3",
+      "artifact": "artifacts/p9/experiment-c844fd859dbbb694ec0c0469.json",
+      "source_commit": "2d10a09803c373dbea4b83d400960cc36f117b8d",
+      "diff_sha256": "3b694de57e5f7346cd2b873a190f85d7ff115fbc88f35480265d273d0deb0ce8",
+      "environment_fingerprint": "sha256:ce2efd44d7bfefb08d4718f8b4cbb1d807d0c96792214583cf8bd87ace66a23d",
+      "correctness_mismatches": {"large": 0, "small": 0},
+      "mean_ms": 219.57841400146484,
+      "median_ms": 219.55570697784424,
+      "stddev_ms": 1.4087552566503103,
+      "mean_improvement": 0.0013050240711521982,
+      "median_improvement": 0.0012001302990429328,
+      "cycles_kcycles": [114078.12, 48797.52, 112207.29, 50367.8],
+      "decision": "rejected_below_dual_gate_and_profile_inconsistent"
+    }
+  ],
+  "replication": {"performed": false, "reason": "no candidate passed the initial dual 0.5 percent gate"},
+  "abba": {"performed": false, "reason": "no candidate qualified for replication"},
+  "deployment": {
+    "selected": "H17F2",
+    "kernel_changed": false,
+    "submission_changed_by_h20": false,
+    "kernel_sha256": "e9f83f74fe702d7adea33e3754fa618b5adfe7e103e68daaa58499e806fd0de9"
+  }
+}
