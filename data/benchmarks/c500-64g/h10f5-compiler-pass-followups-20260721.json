@@ -69,6 +69,7 @@
   "followup_review": {"performed": true, "decision": "do_not_execute_noncausal_followups_or_combinations", "reason": "H13F1 is generated-source-identical no-op; H13F2 emits no 256-bit helpers and deterministically regresses; H13F3 strongly regresses with FC2 cycle and code-size inflation"},
   "abba": {"performed": false, "reason": "no executable candidate passed both initial 0.5 percent gates"},
   "deployment": {"selected": "H10F5", "kernel_changed": false, "formal_baseline_target_commit": "ffb0a484da636274d5ff0e13a85da9f83fa93bfc", "kernel_origin_commit": "e60f9b3216d008e342d285cd24f8b6ede1142387", "kernel_sha256": "338b4d93cadc69a12e49690efc5d3030630b8cf412ee0a0691a6ef44db8bedfe"},
+  "target_validation": {"pytest_metax": "86 passed in 25.06s", "repository_check": "3382 tracked files inspected", "verify_maca": "passed on MetaX C500; driver 3.8.30; MACA 3.7.1.5", "functional": "2 of 2 passed", "run_moe_performance": "diagnostic only: 198.93847656/31.74616455 ms", "submission_public_fuzz": "submission policy, uneven smoke, official public shape and five fuzz cases passed", "git_diff_check": "passed"},
   "profiler_integrity": "fresh baseline and all three correctness-passing candidates have workload-matched four-launch profiles; Total Cycles is compared, while incompatible automatically-selected memory-event scales are retained without cross-attribution",
   "conclusion": "H10F5 remains immutable; StorageRewrite is a generated-source no-op, explicit LDG/STG lowering regresses, and eager LetInline causes code bloat plus a strong FC2 regression"
 }

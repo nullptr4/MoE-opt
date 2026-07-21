@@ -62,6 +62,18 @@ no-op，H13F2/H13F3 是独立负向 lowering；不存在外部来源或 profiler
 环境状态和生成源码信息在机器记录及 agent artifact 中。agent control commit
 `c91fecdbcbb7180ece1855e932197fa0df9db456` 早于基线与所有 H13 硬件数据。
 
+## 目标验证
+
+- `source scripts/activate-maca.sh` 后，以 MetaX C ABI backend 运行 `python -m pytest -q`：
+  `86 passed in 25.06s`；
+- `python scripts/check_repository.py`：通过，检查 `3382 tracked files`；
+- `scripts/verify-maca.sh`：通过，识别 MetaX C500、driver `3.8.30`、MACA `3.7.1.5`；
+- `scripts/run-moe.sh`：official functional Large/Small `2/2` 通过；diagnostic timing
+  `198.93847656/31.74616455 ms`，不作正式性能对照；
+- `scripts/test-moe-submission.sh --public-shape --fuzz`：submission policy、uneven smoke、
+  official public shape 和五个 fuzz case 全部通过；
+- `git diff --check`：通过。
+
 未解决方向仅保留未来 TileLang-MACA 新版本真正改变 generated code 的 storage/lowering pass，
 MetaX 官方 resident-grid/bank/occupancy 资料，或 fixed ABI 新增 workspace/descriptor。已收敛的
 H11-H13 与 A1d-A1g 方向不得改名重跑。
