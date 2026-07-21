@@ -38,7 +38,7 @@ profiles were `113670.70/47116.08/111945.94/48443.90 Kcycles`.
 |---|---|---|---|---|
 | H20F1 | Enable full transitive/branch/known-value Simplify over existing H17F2 facts | The source-identical 240-second-boundary baseline passed Large/Small with zero mismatches and measured `219.220800/219.202559 ms`; the isolated candidate did not build within 240 seconds. | No candidate profile exists because no executable was produced. The timeout command result and empty build-artifact count are retained. | Rejected at the deterministic build-feasibility boundary. No timing or profiler result is fabricated. |
 | H20F2 | Preserve replayable scalar Bind scope instead of substituting it into guarded statements | Large/Small zero mismatch; `219.038607/219.091203 ms`; stddev `1.288409 ms`; mean/median gains `0.3760%/0.3313%`. | FC1 private writes fell from `987840/987840` to `5/5`, but cycles were mixed at `113192.54/112720.16` versus `113670.70/111945.94`; FC2 was also mixed at `47273.07/47709.66` versus `47116.08/48443.90 Kcycles`. Global reads were essentially unchanged. | Rejected below both 0.5% gates and without consistent cycle direction. |
-| H20F3 | Disable loop unswitching | Large/Small zero mismatch; `219.578414/219.555707 ms`; stddev `1.408755 ms`; mean/median gains `0.1305%/0.1200%`. | Private/global instruction counts remained effectively unchanged; cycles were `114078.12/48797.52/112207.29/50367.80 Kcycles`, with three of four workload positions worse than the comparator. | Rejected below both gates and profiler-inconsistent. |
+| H20F3 | Disable loop unswitching | Large/Small zero mismatch; `219.578414/219.555707 ms`; stddev `1.408755 ms`; mean/median gains `0.1305%/0.1200%`. | Private/global instruction counts remained effectively unchanged; cycles were `114078.12/48797.52/112207.29/50367.80 Kcycles`, with all four workload positions worse than the comparator. | Rejected below both gates and profiler-inconsistent. |
 
 H20S1 was excluded because explicit zero safe values reproduce the exact installed default. H20S2
 was excluded because the live FC2 shared operands overlap and FC1 has no profitable implicit
@@ -46,7 +46,7 @@ disjoint lifetime; disabling reuse cannot improve the explicit H10F5/H17F2 alias
 no-op or increase pressure.
 
 H20F2 was not combined with H18F1 or H20F3. H18F1 itself reached only `0.0830%/0.2248%` with mixed
-profiles; even the additive mean estimate with H20F2 is below 0.5%. H20F3's three-of-four cycle
+profiles; even the additive mean estimate with H20F2 is below 0.5%. H20F3's all-four cycle
 regression supplies no positive mechanism. Combining rejected, profiler-inconsistent candidates
 would be an unguided noise search.
 
