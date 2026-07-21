@@ -166,6 +166,7 @@ def check_submission(path: Path) -> list[str]:
             if node.attr == "data":
                 errors.append(f"line {node.lineno}: tensor.data is not allowed")
         if isinstance(node, ast.Call):
+            call_name = dotted_name(node.func)
             if isinstance(node.func, ast.Name) and node.func.id in BANNED_CALL_NAMES:
                 errors.append(
                     f"line {node.lineno}: call to {node.func.id!r} is not allowed"
@@ -177,9 +178,14 @@ def check_submission(path: Path) -> list[str]:
                 errors.append(
                     f"line {node.lineno}: call to .{node.func.attr}() is not allowed"
                 )
-            if dotted_name(node.func) == "torch.cuda.synchronize":
+            if call_name == "torch.cuda.synchronize":
                 errors.append(
                     f"line {node.lineno}: torch.cuda.synchronize() is not allowed"
+                )
+            if call_name and call_name.startswith("torch.") and call_name != "torch.empty":
+                errors.append(
+                    f"line {node.lineno}: PyTorch compute call {call_name} is not allowed; "
+                    "only torch.empty workspace allocation is permitted"
                 )
 
     for function in [node for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)]:
@@ -191,6 +197,22 @@ def check_submission(path: Path) -> list[str]:
                         f"line {argument.lineno}: prim_func argument {argument.arg!r} "
                         "must use T.Tensor(shape, dtype)"
                     )
+                elif argument.arg == "routed_expert_weights":
+                    annotation = argument.annotation
+                    if not isinstance(annotation, ast.Call):
+                        errors.append(
+                            f"line {argument.lineno}: routed_expert_weights annotation is invalid"
+                        )
+                        continue
+                    route_dtype = annotation.args[1]
+                    if not (
+                        (isinstance(route_dtype, ast.Name) and route_dtype.id == "dtype")
+                        or dotted_name(route_dtype) == "T.float16"
+                    ):
+                        errors.append(
+                            f"line {argument.lineno}: routed_expert_weights must use "
+                            "the FP16 submission dtype"
+                        )
 
     return errors
 

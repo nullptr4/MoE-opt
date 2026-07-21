@@ -3,7 +3,7 @@
 
 This emulates the interface documented for the OJ rather than the compact
 layout used by fusedmoe_benchmark.py.  It deliberately covers uneven group
-tails and an empty expert, checks that padding remains untouched, and invokes
+tails and an empty expert, checks that padding is zeroed, and invokes
 the cached submission twice.
 """
 
@@ -53,6 +53,7 @@ def make_case(
     group_sizes_list: list[int],
     seed: int,
     route_weights_mode: str = "random",
+    terminal_offsets: bool = False,
 ) -> PaddedCase:
     device = torch.device("cuda")
     experts = len(group_sizes_list)
@@ -82,13 +83,13 @@ def make_case(
     up = torch.randn((experts, intermediate, hidden), device=device, dtype=torch.float16, generator=generator) / math.sqrt(hidden)
     down = torch.randn((experts, hidden, intermediate), device=device, dtype=torch.float16, generator=generator) / math.sqrt(intermediate)
     if route_weights_mode == "random":
-        route_weights = torch.rand((total_valid,), device=device, dtype=torch.float32, generator=generator)
+        route_weights = torch.rand((total_valid,), device=device, dtype=torch.float16, generator=generator)
     elif route_weights_mode == "zero":
-        route_weights = torch.zeros((total_valid,), device=device, dtype=torch.float32)
+        route_weights = torch.zeros((total_valid,), device=device, dtype=torch.float16)
     elif route_weights_mode == "one":
-        route_weights = torch.ones((total_valid,), device=device, dtype=torch.float32)
+        route_weights = torch.ones((total_valid,), device=device, dtype=torch.float16)
     elif route_weights_mode == "tiny":
-        route_weights = torch.full((total_valid,), 2**-10, device=device, dtype=torch.float32)
+        route_weights = torch.full((total_valid,), 2**-10, device=device, dtype=torch.float16)
     else:
         raise ValueError(f"unsupported route_weights_mode: {route_weights_mode}")
 
@@ -103,16 +104,32 @@ def make_case(
         down=down,
         route_weights=route_weights,
         group_sizes=torch.tensor(group_sizes_list, device=device, dtype=torch.int32),
-        group_offsets=torch.tensor(raw_offsets, device=device, dtype=torch.int32),
-        group_padded_offsets=torch.tensor(padded_offsets, device=device, dtype=torch.int32),
+        # The current online example supplies one start offset per expert.
+        # The submission specializes on the actual metadata tensor lengths,
+        # so an evaluator that includes a terminal sentinel is also accepted.
+        group_offsets=torch.tensor(
+            raw_offsets if terminal_offsets else raw_offsets[:-1],
+            device=device,
+            dtype=torch.int32,
+        ),
+        group_padded_offsets=torch.tensor(
+            padded_offsets if terminal_offsets else padded_offsets[:-1],
+            device=device,
+            dtype=torch.int32,
+        ),
         group_idx_for_bx=torch.tensor(block_experts, device=device, dtype=torch.int32),
     )
 
 
 def reference(case: PaddedCase) -> torch.Tensor:
-    result = torch.full_like(case.tokens, float("nan"))
-    raw_offsets = case.group_offsets.cpu().tolist()
-    padded_offsets = case.group_padded_offsets.cpu().tolist()
+    result = torch.zeros_like(case.tokens)
+    raw_offsets = [0]
+    padded_offsets = [0]
+    for size in case.group_sizes_list:
+        raw_offsets.append(raw_offsets[-1] + size)
+        padded_offsets.append(
+            padded_offsets[-1] + math.ceil(size / BLOCK_TOKEN) * BLOCK_TOKEN
+        )
     for expert_id, size in enumerate(case.group_sizes_list):
         if not size:
             continue
@@ -124,7 +141,9 @@ def reference(case: PaddedCase) -> torch.Tensor:
         # The kernel persists this product as the FP16 up_logits workspace
         # before the down projection.
         intermediate = (gate * up).to(torch.float16).float()
-        value = (intermediate @ case.down[expert_id].float().T) * case.route_weights[raw_start : raw_start + size, None]
+        value = (intermediate @ case.down[expert_id].float().T) * case.route_weights[
+            raw_start : raw_start + size, None
+        ].float()
         result[padded_start : padded_start + size] = value.to(torch.float16)
     return result
 
@@ -151,30 +170,45 @@ def check_case(case: PaddedCase) -> None:
         )
         torch.cuda.synchronize()
 
-    padded_offsets = case.group_padded_offsets.cpu().tolist()
+    padded_offsets = [0]
+    for size in case.group_sizes_list:
+        padded_offsets.append(
+            padded_offsets[-1] + math.ceil(size / BLOCK_TOKEN) * BLOCK_TOKEN
+        )
     for expert_id, size in enumerate(case.group_sizes_list):
         padded_start = padded_offsets[expert_id]
         if size:
             torch.testing.assert_close(
                 out[padded_start : padded_start + size].float(),
                 expected[padded_start : padded_start + size].float(),
-                atol=5e-3,
-                rtol=2e-2,
+                atol=1e-2,
+                rtol=1e-2,
+                equal_nan=False,
             )
         padding_end = padded_offsets[expert_id + 1]
         if padding_end > padded_start + size:
-            assert torch.isnan(out[padded_start + size : padding_end]).all(), f"padding modified for expert {expert_id}"
+            torch.testing.assert_close(
+                out[padded_start + size : padding_end],
+                torch.zeros_like(out[padded_start + size : padding_end]),
+                atol=0.0,
+                rtol=0.0,
+            )
 
     print(
         f"PASS {case.name}: H={case.hidden} I={case.intermediate} "
-        f"groups={case.group_sizes_list} padded={case.tokens.shape[0]} blocks={case.group_idx_for_bx.numel()}",
+        f"groups={case.group_sizes_list} padded={case.tokens.shape[0]} "
+        f"blocks={case.group_idx_for_bx.numel()} offsets={case.group_offsets.numel()}",
         flush=True,
     )
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--public-shape", action="store_true", help="also run the public small H/I/E shape with uneven routing")
+    parser.add_argument(
+        "--public-shape",
+        action="store_true",
+        help="also run current online case 1 dimensions under the padded-storage contract",
+    )
     parser.add_argument("--fuzz", action="store_true", help="also run deterministic boundary and skewed-routing cases")
     parser.add_argument("--fuzz-only", action="store_true", help="run only deterministic fuzz cases")
     args = parser.parse_args()
@@ -187,10 +221,10 @@ def main() -> None:
         if args.public_shape:
             check_case(
                 make_case(
-                    "public-small-shape",
-                    hidden=3584,
-                    intermediate=1024,
-                    group_sizes_list=[129, 64, 3, 0],
+                    "official-case-1",
+                    hidden=2048,
+                    intermediate=8192,
+                    group_sizes_list=[142] * 16,
                     seed=20260712,
                 )
             )
@@ -227,6 +261,14 @@ def main() -> None:
                 group_sizes_list=[1, 63, 64, 127],
                 seed=20260716,
                 route_weights_mode="zero",
+            ),
+            make_case(
+                "fuzz-terminal-offset-sentinel",
+                hidden=256,
+                intermediate=128,
+                group_sizes_list=[129, 17, 0],
+                seed=20260717,
+                terminal_offsets=True,
             ),
         )
         for case in fuzz_cases:

@@ -22,6 +22,8 @@ def _make_moe_kernel(
     total_padded_tokens,
     total_valid_tokens,
     num_blocks_m,
+    group_offsets_len,
+    group_padded_offsets_len,
 ):
     scale = 1.44269504
     dtype = T.float16
@@ -46,10 +48,10 @@ def _make_moe_kernel(
         gate_w: T.Tensor(gate_shape, dtype),
         up_w: T.Tensor(up_shape, dtype),
         down_w: T.Tensor(down_shape, dtype),
-        routed_expert_weights: T.Tensor((total_valid_tokens,), T.float32),
+        routed_expert_weights: T.Tensor((total_valid_tokens,), dtype),
         group_sizes: T.Tensor((num_experts,), T.int32),
-        group_offsets: T.Tensor((num_experts + 1,), T.int32),
-        group_padded_offsets: T.Tensor((num_experts + 1,), T.int32),
+        group_offsets: T.Tensor((group_offsets_len,), T.int32),
+        group_padded_offsets: T.Tensor((group_padded_offsets_len,), T.int32),
         group_idx_for_bx: T.Tensor((num_blocks_m,), T.int32),
         up_logits: T.Tensor(intermediate_shape, dtype),
         out: T.Tensor(input_shape, dtype),
@@ -233,6 +235,8 @@ def _make_moe_kernel(
                     out[block_start + i, by * stage2_bn + j] = (
                         out_local[i, j] * route_weight_local[i]
                     )
+                else:
+                    out[block_start + i, by * stage2_bn + j] = 0.0
 
     return kernel
 
@@ -244,6 +248,8 @@ def _get_kernel(
     total_padded_tokens,
     total_valid_tokens,
     num_blocks_m,
+    group_offsets_len,
+    group_padded_offsets_len,
 ):
     key = (
         int(hidden),
@@ -252,6 +258,8 @@ def _get_kernel(
         int(total_padded_tokens),
         int(total_valid_tokens),
         int(num_blocks_m),
+        int(group_offsets_len),
+        int(group_padded_offsets_len),
     )
     kernel = _KERNEL_CACHE.get(key)
     if kernel is None:
@@ -262,6 +270,8 @@ def _get_kernel(
             key[3],
             key[4],
             key[5],
+            key[6],
+            key[7],
         )
         _KERNEL_CACHE[key] = kernel
     return kernel
@@ -306,6 +316,8 @@ def run_kernel(
     total_padded_tokens = int(stacked_expert_tokens.shape[0])
     total_valid_tokens = int(routed_expert_weights.shape[0])
     num_blocks_m = int(group_idx_for_bx.shape[0])
+    group_offsets_len = int(group_offsets.shape[0])
+    group_padded_offsets_len = int(group_padded_offsets.shape[0])
 
     up_logits = _get_workspace(stacked_expert_tokens, intermediate)
     kernel = _get_kernel(
@@ -315,6 +327,8 @@ def run_kernel(
         total_padded_tokens,
         total_valid_tokens,
         num_blocks_m,
+        group_offsets_len,
+        group_padded_offsets_len,
     )
     kernel(
         stacked_expert_tokens,
