@@ -7,7 +7,7 @@ if [[ "${BASH_SOURCE[0]}" == "$0" ]]; then
 fi
 
 export METAX_COMPETITION_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-export TILELANG_HOME="${TILELANG_HOME:-${METAX_COMPETITION_ROOT}/external/tilelang-metax}"
+export TILELANG_HOME="${TILELANG_HOME:-/opt/tilelang-metax}"
 export TILELANG_CACHE_DIR="${TILELANG_CACHE_DIR:-${METAX_COMPETITION_ROOT}/.cache/tilelang}"
 export MOE_HOST_ID="${MOE_HOST_ID:-c500-unknown}"
 export MOE_DATA_ROOT="${MOE_DATA_ROOT:-${METAX_COMPETITION_ROOT}/data}"
