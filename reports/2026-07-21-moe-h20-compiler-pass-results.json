@@ -61,7 +61,7 @@
       "mean_ms": 219.57841400146484,
       "median_ms": 219.55570697784424,
       "stddev_ms": 1.4087552566503103,
-      "mean_improvement": 0.0013050240711521982,
+      "mean_improvement": 0.0013050242602208812,
       "median_improvement": 0.0012001302990429328,
       "cycles_kcycles": [114078.12, 48797.52, 112207.29, 50367.8],
       "decision": "rejected_below_dual_gate_and_profile_inconsistent"
