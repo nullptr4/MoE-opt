@@ -74,6 +74,8 @@ def _make_moe_kernel(
             T.use_swizzle(panel_size=8, order="row")
 
             expert_id = group_idx_for_bx[bx]
+            T.assume(0 <= expert_id)
+            T.assume(expert_id < num_experts)
             block_start = bx * block_token
             group_size = group_sizes[expert_id]
             padded_start = group_padded_offsets[expert_id]
@@ -82,6 +84,10 @@ def _make_moe_kernel(
                 0,
                 T.min(block_token, group_size - token_offset),
             )
+            # H17F2's compact-row proof is adapted to the OJ's padded storage:
+            # stage 1 addresses input/workspace rows through block_start.
+            T.assume(0 <= block_start)
+            T.assume(block_start + actual_rows <= total_padded_tokens)
 
             T.clear(gate_up_local)
 
@@ -185,6 +191,8 @@ def _make_moe_kernel(
             T.use_swizzle(panel_size=16, order="row")
 
             expert_id = group_idx_for_bx[bx]
+            T.assume(0 <= expert_id)
+            T.assume(expert_id < num_experts)
             block_start = bx * block_token
             group_size = group_sizes[expert_id]
             raw_start = group_offsets[expert_id]
@@ -193,6 +201,14 @@ def _make_moe_kernel(
             actual_rows = T.max(
                 0,
                 T.min(block_token, group_size - token_offset),
+            )
+            # Output/workspace rows are padded, while route weights are compact.
+            # Keep both contracts explicit rather than reusing one address space.
+            T.assume(0 <= block_start)
+            T.assume(block_start + actual_rows <= total_padded_tokens)
+            T.assume(0 <= raw_start + token_offset)
+            T.assume(
+                raw_start + token_offset + actual_rows <= total_valid_tokens
             )
 
             T.clear(out_local)

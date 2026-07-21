@@ -1,0 +1,35 @@
+{
+  "schema_version": "1.0",
+  "formal_sota": {
+    "id": "H17F2",
+    "deployment_commit": "2a94659f4a0c7c65bd191367fd48d50fef47ce2f",
+    "source_path": "benchmarks/tilelang-moe/custom_fusedmoe.py",
+    "source_sha256": "e9f83f74fe702d7adea33e3754fa618b5adfe7e103e68daaa58499e806fd0de9"
+  },
+  "submission": {
+    "source_path": "benchmarks/tilelang-moe/submission.py",
+    "source_sha256": "dd21d0940706ddb30023819d69c2a1405bf88a00433915ff330e03763114388b",
+    "abi": "online-padded-ten-argument-run_kernel",
+    "sync_status": "mechanism-adapted-and-c500-validated"
+  },
+  "synchronized_mechanisms": [
+    {
+      "id": "expert-index-range-assumes",
+      "formal": "H17F2 asserts the mapped expert index in both FC1 and FC2",
+      "submission_adaptation": "assert expert_id in [0, num_experts) in both padded-ABI stages"
+    },
+    {
+      "id": "valid-row-address-assumes",
+      "formal": "H17F2 proves each compact valid-row interval remains within group_sum",
+      "submission_adaptation": "prove padded input/workspace/output intervals against total_padded_tokens and compact FC2 route-weight intervals against total_valid_tokens"
+    }
+  ],
+  "required_submission_snippets": {
+    "T.assume(0 <= expert_id)": 2,
+    "T.assume(expert_id < num_experts)": 2,
+    "T.assume(block_start + actual_rows <= total_padded_tokens)": 2,
+    "T.assume(0 <= raw_start + token_offset)": 1,
+    "raw_start + token_offset + actual_rows <= total_valid_tokens": 1
+  },
+  "policy": "Every formally promoted SOTA must update the standalone submission, this manifest, submission correctness tests, and C500 validation in the same integration change. Compact and padded address contracts must be adapted semantically, never copied blindly."
+}

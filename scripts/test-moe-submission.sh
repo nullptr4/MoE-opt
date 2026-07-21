@@ -8,6 +8,7 @@ source "${ROOT}/scripts/activate-maca.sh"
 
 python "${ROOT}/scripts/check_moe_submission.py" \
   "${ROOT}/benchmarks/tilelang-moe/submission.py"
+python "${ROOT}/scripts/check_moe_sota_submission_sync.py" "${ROOT}"
 
 cd "${ROOT}/benchmarks/tilelang-moe"
 exec python test_moe_submission.py "$@"
