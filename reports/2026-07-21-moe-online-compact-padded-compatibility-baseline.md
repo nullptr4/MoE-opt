@@ -1,5 +1,10 @@
 # Online compact/padded compatibility baseline
 
+> **Superseded by published remote ranges:** input, private workspace and output are FP16 compact
+> tensors with exactly `group_sum` rows (2272/4544/9088). The dual-layout version was locally
+> correct but unnecessarily broad and was never claimed as exact-online validated. See
+> `2026-07-21-moe-remote-compact-range-alignment.md`.
+
 Date: 2026-07-21
 
 ## Trigger and corrected diagnosis

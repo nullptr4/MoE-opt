@@ -1,10 +1,8 @@
-"""Conservative standalone MetaX C500 TileLang Fused-MoE submission.
+"""Remote-aligned standalone MetaX C500 TileLang Fused-MoE submission.
 
-The ten-argument OJ ABI has appeared with both compact storage (the cited
-``ee6db437`` benchmark) and expert-padded storage (the tutorial contract).
-This compatibility baseline selects the address contract from tensor shapes,
-supports FP16 or FP32 route weights and E or E+1 offset tensors, and otherwise
-keeps the original two-stage TileLang kernel structure.
+Input, private workspace and output use compact ``group_sum`` rows. Padded
+offsets are scheduling metadata only. All data tensors are FP16 and metadata
+tensors are INT32, matching the published remote evaluator ranges.
 """
 
 import torch
@@ -26,12 +24,9 @@ def _make_moe_kernel(
     num_blocks_m,
     group_offsets_len,
     group_padded_offsets_len,
-    compact_storage,
-    route_weight_fp32,
 ):
     scale = 1.44269504
     dtype = T.float16
-    route_dtype = T.float32 if route_weight_fp32 else T.float16
     accum_dtype = T.float32
 
     block_token = 128
@@ -51,7 +46,7 @@ def _make_moe_kernel(
         gate_w: T.Tensor(gate_shape, dtype),
         up_w: T.Tensor(up_shape, dtype),
         down_w: T.Tensor(down_shape, dtype),
-        routed_expert_weights: T.Tensor((route_rows,), route_dtype),
+        routed_expert_weights: T.Tensor((route_rows,), T.float16),
         group_sizes: T.Tensor((num_experts,), T.int32),
         group_offsets: T.Tensor((group_offsets_len,), T.int32),
         group_padded_offsets: T.Tensor((group_padded_offsets_len,), T.int32),
@@ -60,9 +55,7 @@ def _make_moe_kernel(
         out: T.Tensor(input_shape, dtype),
     ):
         # Keep the simple kernel organization from the cited ee6db437 source.
-        # In compact mode padded metadata addresses are translated back through
-        # raw group offsets.  In padded mode the block address is already the
-        # physical tensor address.
+        # Padded metadata block coordinates are translated to compact rows.
         with T.Kernel(
             num_blocks_m,
             T.ceildiv(intermediate, block_intermediate),
@@ -101,10 +94,7 @@ def _make_moe_kernel(
                 0,
                 T.min(block_token, group_size - token_offset),
             )
-            if compact_storage:
-                data_start = raw_start + token_offset
-            else:
-                data_start = block_start
+            data_start = raw_start + token_offset
 
             T.clear(gate_local)
             T.clear(up_local)
@@ -192,10 +182,7 @@ def _make_moe_kernel(
                 0,
                 T.min(block_token, group_size - token_offset),
             )
-            if compact_storage:
-                data_start = raw_start + token_offset
-            else:
-                data_start = block_start
+            data_start = raw_start + token_offset
 
             T.clear(out_local)
 
@@ -225,22 +212,12 @@ def _make_moe_kernel(
                     transpose_B=True,
                 )
 
-            if compact_storage:
-                for i, j in T.Parallel(block_token, block_hidden):
-                    if i < actual_rows:
-                        out[data_start + i, by * block_hidden + j] = (
-                            out_local[i, j]
-                            * routed_expert_weights[raw_start + token_offset + i]
-                        )
-            else:
-                for i, j in T.Parallel(block_token, block_hidden):
-                    if i < actual_rows:
-                        out[data_start + i, by * block_hidden + j] = (
-                            out_local[i, j]
-                            * routed_expert_weights[raw_start + token_offset + i]
-                        )
-                    else:
-                        out[data_start + i, by * block_hidden + j] = 0.0
+            for i, j in T.Parallel(block_token, block_hidden):
+                if i < actual_rows:
+                    out[data_start + i, by * block_hidden + j] = (
+                        out_local[i, j]
+                        * routed_expert_weights[raw_start + token_offset + i]
+                    )
 
     return kernel
 
@@ -254,8 +231,6 @@ def _get_kernel(
     num_blocks_m,
     group_offsets_len,
     group_padded_offsets_len,
-    compact_storage,
-    route_weight_fp32,
 ):
     key = (
         int(hidden),
@@ -266,8 +241,6 @@ def _get_kernel(
         int(num_blocks_m),
         int(group_offsets_len),
         int(group_padded_offsets_len),
-        bool(compact_storage),
-        bool(route_weight_fp32),
     )
     kernel = _KERNEL_CACHE.get(key)
     if kernel is None:
@@ -280,8 +253,6 @@ def _get_kernel(
             key[5],
             key[6],
             key[7],
-            key[8],
-            key[9],
         )
         _KERNEL_CACHE[key] = kernel
     return kernel
@@ -329,11 +300,6 @@ def run_kernel(
     group_offsets_len = int(group_offsets.shape[0])
     group_padded_offsets_len = int(group_padded_offsets.shape[0])
 
-    # The cited benchmark is compact and therefore has one input row per route.
-    # The tutorial-padded ABI has more physical rows than compact route weights.
-    compact_storage = storage_rows == route_rows
-    route_weight_fp32 = routed_expert_weights.dtype == torch.float32
-
     up_logits = _get_workspace(stacked_expert_tokens, intermediate)
     kernel = _get_kernel(
         hidden,
@@ -344,8 +310,6 @@ def run_kernel(
         num_blocks_m,
         group_offsets_len,
         group_padded_offsets_len,
-        compact_storage,
-        route_weight_fp32,
     )
     kernel(
         stacked_expert_tokens,

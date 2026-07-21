@@ -1,11 +1,5 @@
 #!/usr/bin/env python3
-"""Local ABI test for the standalone padded-layout MoE submission.
-
-This emulates the interface documented for the OJ rather than the compact
-layout used by fusedmoe_benchmark.py.  It deliberately covers uneven group
-tails and an empty expert, checks that padding is zeroed, and invokes
-the cached submission twice.
-"""
+"""Local compact-ABI validation for the remote Fused-MoE evaluator."""
 
 from __future__ import annotations
 
@@ -20,8 +14,7 @@ import torch.nn.functional as F
 
 
 ROOT = Path(__file__).resolve().parent
-MOE_DIR = ROOT
-sys.path.insert(0, str(MOE_DIR))
+sys.path.insert(0, str(ROOT))
 
 import submission  # noqa: E402
 
@@ -30,7 +23,7 @@ BLOCK_TOKEN = 128
 
 
 @dataclass
-class PaddedCase:
+class CompactCase:
     name: str
     hidden: int
     intermediate: int
@@ -44,7 +37,6 @@ class PaddedCase:
     group_offsets: torch.Tensor
     group_padded_offsets: torch.Tensor
     group_idx_for_bx: torch.Tensor
-    compact_storage: bool
 
 
 def make_case(
@@ -55,10 +47,7 @@ def make_case(
     seed: int,
     route_weights_mode: str = "random",
     terminal_offsets: bool = False,
-    compact_storage: bool = False,
-    route_dtype: str = "float16",
-    extra_metadata_blocks: int = 0,
-) -> PaddedCase:
+) -> CompactCase:
     device = torch.device("cuda")
     experts = len(group_sizes_list)
     generator = torch.Generator(device=device)
@@ -66,58 +55,71 @@ def make_case(
 
     raw_offsets = [0]
     padded_offsets = [0]
-    block_experts: list[int] = []
-    for expert_id, size in enumerate(group_sizes_list):
+    for size in group_sizes_list:
         raw_offsets.append(raw_offsets[-1] + size)
-        blocks = math.ceil(size / BLOCK_TOKEN)
-        block_experts.extend([expert_id] * blocks)
+        # This is the exact formula used by the cited ee6db437 benchmark.
+        blocks = math.ceil((size + 1) / BLOCK_TOKEN)
         padded_offsets.append(padded_offsets[-1] + blocks * BLOCK_TOKEN)
 
-    total_valid = raw_offsets[-1]
-    total_padded = padded_offsets[-1]
-    tokens = torch.zeros((total_padded, hidden), device=device, dtype=torch.float16)
-    for expert_id, size in enumerate(group_sizes_list):
-        if size:
-            start = padded_offsets[expert_id]
-            tokens[start : start + size] = torch.randn((size, hidden), device=device, dtype=torch.float16, generator=generator)
+    group_sum = raw_offsets[-1]
+    metadata_blocks = math.ceil(group_sum / BLOCK_TOKEN) + experts
+    block_experts: list[int] = []
+    for bx in range(metadata_blocks):
+        padded_row = bx * BLOCK_TOKEN
+        expert_id = 0
+        for candidate in range(experts):
+            if padded_row >= padded_offsets[candidate]:
+                expert_id = candidate
+        block_experts.append(expert_id)
 
-    if compact_storage:
-        compact_tokens = torch.empty(
-            (total_valid, hidden),
+    tokens = torch.randn(
+        (group_sum, hidden),
+        device=device,
+        dtype=torch.float16,
+        generator=generator,
+    )
+    gate = torch.randn(
+        (experts, intermediate, hidden),
+        device=device,
+        dtype=torch.float16,
+        generator=generator,
+    ) / math.sqrt(hidden)
+    up = torch.randn(
+        (experts, intermediate, hidden),
+        device=device,
+        dtype=torch.float16,
+        generator=generator,
+    ) / math.sqrt(hidden)
+    down = torch.randn(
+        (experts, hidden, intermediate),
+        device=device,
+        dtype=torch.float16,
+        generator=generator,
+    ) / math.sqrt(intermediate)
+
+    if route_weights_mode == "random":
+        route_weights = torch.rand(
+            (group_sum,),
             device=device,
             dtype=torch.float16,
+            generator=generator,
         )
-        for expert_id, size in enumerate(group_sizes_list):
-            if size:
-                compact_tokens[
-                    raw_offsets[expert_id] : raw_offsets[expert_id + 1]
-                ] = tokens[
-                    padded_offsets[expert_id] : padded_offsets[expert_id] + size
-                ]
-        tokens = compact_tokens
-
-    route_torch_dtype = torch.float32 if route_dtype == "float32" else torch.float16
-
-    # Match the public operator's scale range so the numerical check is useful
-    # without making the small synthetic test prone to overflow.
-    gate = torch.randn((experts, intermediate, hidden), device=device, dtype=torch.float16, generator=generator) / math.sqrt(hidden)
-    up = torch.randn((experts, intermediate, hidden), device=device, dtype=torch.float16, generator=generator) / math.sqrt(hidden)
-    down = torch.randn((experts, hidden, intermediate), device=device, dtype=torch.float16, generator=generator) / math.sqrt(intermediate)
-    if route_weights_mode == "random":
-        route_weights = torch.rand((total_valid,), device=device, dtype=route_torch_dtype, generator=generator)
     elif route_weights_mode == "zero":
-        route_weights = torch.zeros((total_valid,), device=device, dtype=route_torch_dtype)
+        route_weights = torch.zeros(
+            (group_sum,), device=device, dtype=torch.float16
+        )
     elif route_weights_mode == "one":
-        route_weights = torch.ones((total_valid,), device=device, dtype=route_torch_dtype)
+        route_weights = torch.ones(
+            (group_sum,), device=device, dtype=torch.float16
+        )
     elif route_weights_mode == "tiny":
-        route_weights = torch.full((total_valid,), 2**-10, device=device, dtype=route_torch_dtype)
+        route_weights = torch.full(
+            (group_sum,), 2**-10, device=device, dtype=torch.float16
+        )
     else:
         raise ValueError(f"unsupported route_weights_mode: {route_weights_mode}")
 
-    if extra_metadata_blocks:
-        block_experts.extend([experts - 1] * extra_metadata_blocks)
-
-    return PaddedCase(
+    return CompactCase(
         name=name,
         hidden=hidden,
         intermediate=intermediate,
@@ -127,10 +129,9 @@ def make_case(
         up=up,
         down=down,
         route_weights=route_weights,
-        group_sizes=torch.tensor(group_sizes_list, device=device, dtype=torch.int32),
-        # The current online example supplies one start offset per expert.
-        # The submission specializes on the actual metadata tensor lengths,
-        # so an evaluator that includes a terminal sentinel is also accepted.
+        group_sizes=torch.tensor(
+            group_sizes_list, device=device, dtype=torch.int32
+        ),
         group_offsets=torch.tensor(
             raw_offsets if terminal_offsets else raw_offsets[:-1],
             device=device,
@@ -141,45 +142,34 @@ def make_case(
             device=device,
             dtype=torch.int32,
         ),
-        group_idx_for_bx=torch.tensor(block_experts, device=device, dtype=torch.int32),
-        compact_storage=compact_storage,
+        group_idx_for_bx=torch.tensor(
+            block_experts, device=device, dtype=torch.int32
+        ),
     )
 
 
-def reference(case: PaddedCase) -> torch.Tensor:
+def reference(case: CompactCase) -> torch.Tensor:
     result = torch.zeros_like(case.tokens)
-    raw_offsets = [0]
-    padded_offsets = [0]
-    for size in case.group_sizes_list:
-        raw_offsets.append(raw_offsets[-1] + size)
-        padded_offsets.append(
-            padded_offsets[-1] + math.ceil(size / BLOCK_TOKEN) * BLOCK_TOKEN
-        )
+    raw_start = 0
     for expert_id, size in enumerate(case.group_sizes_list):
-        if not size:
-            continue
-        padded_start = padded_offsets[expert_id]
-        raw_start = raw_offsets[expert_id]
-        data_start = raw_start if case.compact_storage else padded_start
-        x = case.tokens[data_start : data_start + size].float()
-        gate = F.silu(x @ case.gate[expert_id].float().T)
-        up = x @ case.up[expert_id].float().T
-        # The kernel persists this product as the FP16 up_logits workspace
-        # before the down projection.
-        intermediate = (gate * up).to(torch.float16).float()
-        value = (intermediate @ case.down[expert_id].float().T) * case.route_weights[
-            raw_start : raw_start + size, None
-        ].float()
-        result[data_start : data_start + size] = value.to(torch.float16)
+        if size:
+            x = case.tokens[raw_start : raw_start + size].float()
+            gate = F.silu(x @ case.gate[expert_id].float().T)
+            up = x @ case.up[expert_id].float().T
+            intermediate = (gate * up).to(torch.float16).float()
+            value = (
+                intermediate @ case.down[expert_id].float().T
+            ) * case.route_weights[raw_start : raw_start + size, None].float()
+            result[raw_start : raw_start + size] = value.to(torch.float16)
+        raw_start += size
     return result
 
 
-def check_case(case: PaddedCase) -> None:
+def check_case(case: CompactCase) -> None:
     expected = reference(case)
     out = torch.full_like(case.tokens, float("nan"))
 
-    # First call compiles/caches; the second verifies that cached workspace and
-    # compiled kernel preserve the externally supplied output contract.
+    # First invocation compiles; the second checks the cached kernel/workspace.
     for _ in range(2):
         out.fill_(float("nan"))
         submission.run_kernel(
@@ -196,38 +186,28 @@ def check_case(case: PaddedCase) -> None:
         )
         torch.cuda.synchronize()
 
-    padded_offsets = [0]
-    for size in case.group_sizes_list:
-        padded_offsets.append(
-            padded_offsets[-1] + math.ceil(size / BLOCK_TOKEN) * BLOCK_TOKEN
-        )
-    for expert_id, size in enumerate(case.group_sizes_list):
-        padded_start = padded_offsets[expert_id]
-        raw_start = sum(case.group_sizes_list[:expert_id])
-        data_start = raw_start if case.compact_storage else padded_start
-        if size:
-            torch.testing.assert_close(
-                out[data_start : data_start + size].float(),
-                expected[data_start : data_start + size].float(),
-                atol=1e-2,
-                rtol=1e-2,
-                equal_nan=False,
-            )
-        padding_end = padded_offsets[expert_id + 1]
-        if not case.compact_storage and padding_end > padded_start + size:
-            torch.testing.assert_close(
-                out[padded_start + size : padding_end],
-                torch.zeros_like(out[padded_start + size : padding_end]),
-                atol=0.0,
-                rtol=0.0,
-            )
-
+    torch.testing.assert_close(
+        out.float(),
+        expected.float(),
+        atol=1e-2,
+        rtol=1e-2,
+        equal_nan=False,
+    )
     print(
-        f"PASS {case.name}: H={case.hidden} I={case.intermediate} "
-        f"groups={case.group_sizes_list} storage={'compact' if case.compact_storage else 'padded'} "
-        f"rows={case.tokens.shape[0]} route_dtype={case.route_weights.dtype} "
-        f"blocks={case.group_idx_for_bx.numel()} offsets={case.group_offsets.numel()}",
+        f"PASS {case.name}: E={len(case.group_sizes_list)} H={case.hidden} "
+        f"I={case.intermediate} group_sum={case.tokens.shape[0]} "
+        f"blocks={case.group_idx_for_bx.numel()} offsets={case.group_offsets.numel()} "
+        f"dtype={case.tokens.dtype}/{case.route_weights.dtype}",
         flush=True,
+    )
+
+
+def remote_case_specs() -> tuple[tuple[str, int, int, int], ...]:
+    # Published remote dimensions. Every published group_sum is exactly 142 * E.
+    return (
+        ("remote-case-1", 2048, 8192, 16),
+        ("remote-case-2", 7168, 2048, 32),
+        ("remote-case-3", 7168, 2048, 64),
     )
 
 
@@ -235,62 +215,43 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--public-shape",
+        "--remote-shapes",
         action="store_true",
-        help="also run current online case 1 dimensions under the padded-storage contract",
+        dest="remote_shapes",
+        help="run all three published remote evaluator dimensions",
     )
-    parser.add_argument("--fuzz", action="store_true", help="also run deterministic boundary and skewed-routing cases")
-    parser.add_argument("--fuzz-only", action="store_true", help="run only deterministic fuzz cases")
+    parser.add_argument(
+        "--fuzz", action="store_true", help="run deterministic compact metadata fuzz"
+    )
+    parser.add_argument(
+        "--fuzz-only", action="store_true", help="run only compact metadata fuzz"
+    )
     args = parser.parse_args()
 
     if not torch.cuda.is_available():
         raise RuntimeError("the submission ABI test requires an active C500")
 
     if not args.fuzz_only:
-        check_case(make_case("uneven-smoke", hidden=256, intermediate=128, group_sizes_list=[129, 17, 0], seed=20260711))
         check_case(
             make_case(
-                "compact-ee6db-smoke",
+                "compact-smoke",
                 hidden=256,
                 intermediate=128,
                 group_sizes_list=[129, 17, 0],
-                seed=20260718,
-                compact_storage=True,
-                extra_metadata_blocks=2,
+                seed=20260711,
             )
         )
-        check_case(
-            make_case(
-                "compact-fp32-route",
-                hidden=256,
-                intermediate=128,
-                group_sizes_list=[127, 129],
-                seed=20260719,
-                compact_storage=True,
-                route_dtype="float32",
-                extra_metadata_blocks=1,
-            )
-        )
-        if args.public_shape:
-            check_case(
-                make_case(
-                    "official-case-1",
-                    hidden=2048,
-                    intermediate=8192,
-                    group_sizes_list=[142] * 16,
-                    seed=20260712,
+        if args.remote_shapes:
+            for name, hidden, intermediate, experts in remote_case_specs():
+                check_case(
+                    make_case(
+                        name,
+                        hidden=hidden,
+                        intermediate=intermediate,
+                        group_sizes_list=[142] * experts,
+                        seed=81394,
+                    )
                 )
-            )
-            check_case(
-                make_case(
-                    "official-case-1-compact-ee6db",
-                    hidden=2048,
-                    intermediate=8192,
-                    group_sizes_list=[142] * 16,
-                    seed=20260712,
-                    compact_storage=True,
-                    extra_metadata_blocks=2,
-                )
-            )
 
     if args.fuzz or args.fuzz_only:
         fuzz_cases = (
@@ -318,7 +279,7 @@ def main() -> None:
                 route_weights_mode="tiny",
             ),
             make_case(
-                "fuzz-tail-zero",
+                "fuzz-tail-zero-weight",
                 hidden=256,
                 intermediate=128,
                 group_sizes_list=[1, 63, 64, 127],

@@ -27,10 +27,10 @@ class MoeSubmissionPolicyTest(unittest.TestCase):
     def test_checked_in_submission_satisfies_policy(self):
         self.assertEqual(check_submission(self.submission), [])
 
-    def test_rejects_uncontrolled_route_weight_annotation(self):
+    def test_rejects_non_fp16_route_weight_annotation(self):
         mutated = self.source.replace(
-            "routed_expert_weights: T.Tensor((route_rows,), route_dtype)",
-            "routed_expert_weights: T.Tensor((route_rows,), T.int32)",
+            "routed_expert_weights: T.Tensor((route_rows,), T.float16)",
+            "routed_expert_weights: T.Tensor((route_rows,), T.float32)",
         )
         self.assertNotEqual(mutated, self.source)
         errors = self.check_mutation(mutated)

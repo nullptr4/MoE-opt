@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "record_type": "moe-stage2-profiler-decision-table",
-  "generated_at": "2026-07-21T14:13:12.802799+00:00",
+  "generated_at": "2026-07-21T15:01:01.001983+00:00",
   "host_id": "c500-32g",
   "methodology": {
     "workload": "Large public performance shape",
@@ -1243,7 +1243,7 @@
   },
   "guardrails": {
     "submission_path": "benchmarks/tilelang-moe/submission.py",
-    "submission_sha256": "51100f0d155fad1b1958134e710e116122db7190cbc295c56fa6c263049420a4",
+    "submission_sha256": "729a48729eded5dc6b2e6003a0970e10f00a04bd64a42f40f22ad3c533bf0214",
     "autotune_path": "data/autotune/c500-32g/results.jsonl",
     "autotune_sha256": "af1273e82efa84039e0e0754a17097fcc5be997f0cb45f6832282a50003130e7"
   },
@@ -1260,8 +1260,8 @@
     },
     {
       "path": "benchmarks/tilelang-moe/submission.py",
-      "sha256": "51100f0d155fad1b1958134e710e116122db7190cbc295c56fa6c263049420a4",
-      "bytes": 11583
+      "sha256": "729a48729eded5dc6b2e6003a0970e10f00a04bd64a42f40f22ad3c533bf0214",
+      "bytes": 10043
     },
     {
       "path": "config/moe_stage1_profiler_large_workload.json",

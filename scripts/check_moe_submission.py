@@ -210,16 +210,10 @@ def check_submission(path: Path) -> list[str]:
                         )
                         continue
                     route_dtype = annotation.args[1]
-                    if not (
-                        (
-                            isinstance(route_dtype, ast.Name)
-                            and route_dtype.id in {"dtype", "route_dtype"}
-                        )
-                        or dotted_name(route_dtype) == "T.float16"
-                    ):
+                    if dotted_name(route_dtype) != "T.float16":
                         errors.append(
                             f"line {argument.lineno}: routed_expert_weights must use "
-                            "the controlled FP16/FP32 route dtype"
+                            "the required remote FP16 dtype"
                         )
 
     return errors
