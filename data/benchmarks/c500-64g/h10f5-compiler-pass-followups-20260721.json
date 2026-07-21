@@ -1,0 +1,74 @@
+{
+  "schema_version": "1.0",
+  "campaign_id": "h10f5-compiler-pass-followups-20260721",
+  "evidence_kind": "hardware",
+  "accessed_at": "2026-07-21",
+  "baseline": {
+    "id": "H10F5",
+    "target_commit": "ffb0a484da636274d5ff0e13a85da9f83fa93bfc",
+    "kernel_origin_commit": "e60f9b3216d008e342d285cd24f8b6ede1142387",
+    "source_sha256": "338b4d93cadc69a12e49690efc5d3030630b8cf412ee0a0691a6ef44db8bedfe",
+    "schedule": "combined Gate/Up; FC1/FC2 BN128/BK64/stage1; pipelined FC1; FC2 shared A; route FP16 fragment; explicit interleaved shared Up exchange",
+    "artifact": "/data/metax-c500-autotune-agent/artifacts/p9/baseline-b5a9c321697345c84f10e61f.json",
+    "baseline_id": "p9-baseline-8670b214a8bb657fdc049443",
+    "agent_source_commit": "c91fecdbcbb7180ece1855e932197fa0df9db456",
+    "environment_fingerprint": "sha256:51fa4ca1fb5a34b38a0bf9bda7278bf9fc76692609cb0576c7561a31c6733be0",
+    "correctness_mismatches": {"large": 0, "small": 0},
+    "correctness_max_abs_error": {"large": 0.005859375, "small": 0.0078125},
+    "mean_ms": 228.94399478912354,
+    "median_ms": 228.95948600769043,
+    "stddev_ms": 1.0772493429926047,
+    "p90_ms": 230.34993019104004,
+    "profiler_cycles_kcycles": {"fc1": [118762.11, 117957.30], "fc2": [54446.69, 51788.42]},
+    "profiler_private_rw": {"fc1": [[921984, 921984], [921983, 921984]]}
+  },
+  "protocol": {
+    "functional_shapes": ["functional-large", "functional-small"],
+    "performance_shapes": ["performance-large", "performance-small"],
+    "profile_workload": "performance-large twice; FC1/FC2/FC1/FC2",
+    "seed": 81394,
+    "dtype": "float16",
+    "accumulate_dtype": "float32",
+    "atol": 0.01,
+    "rtol": 0.01,
+    "warmup": 10,
+    "iterations": 100,
+    "outlier_policy": "none",
+    "ordered_samples": "all 100 samples are embedded in every referenced agent artifact",
+    "acceptance": "mean and median both at least 0.5%, stable variance and mechanism-consistent profiler; then full replication and adjacent ABBA"
+  },
+  "software": {"device": "MetaX C500 64GiB", "driver": "3.8.30", "mxmaca": "3.7.1.5", "mxcc": "1.0.0@d9102a1572", "pytorch": "2.8.0+metax3.7.1.3", "tilelang_maca": "0.1.12+maca.gitec48829b@ec48829b", "mcprofiler": "3.8.1.4+575f5a9f6d"},
+  "sources": {
+    "N55": {"url": "https://github.com/tile-ai/tilelang/pull/1089; https://github.com/tile-ai/tilelang/blob/main/LICENSE", "title": "TileLang PR 1089 configurable StorageRewrite in-place detection", "query": "site:github.com/tile-ai/tilelang storage_rewrite_detect_inplace; TileLang latest pass config buffer reuse", "license": "MIT", "access_status": "opened_official_pull_request_body_and_changed_file_summary_2026-07-21"},
+    "N56": {"url": "https://tilelang.com/autoapi/tilelang/transform/pass_config/index.html; https://github.com/tile-ai/tilelang/blob/main/tilelang/transform/pass_config.py; https://github.com/tile-ai/tilelang/blob/main/LICENSE", "title": "TileLang 0.1.12 LDG/STG pass configuration documentation and source", "query": "TileLang 0.1.12 enable_lower_ldgstg official source documentation; TileLang vector global load store lowering", "license": "MIT", "access_status": "opened_official_documentation_and_source_body_2026-07-21"},
+    "N57": {"url": "https://tilelang.com/compiler_internals/letstmt_inline.html; https://tilelang.com/autoapi/tilelang/backend/pass_pipeline/pipeline_utils/index.html; https://github.com/tile-ai/tilelang/blob/main/LICENSE", "title": "TileLang 0.1.12 LetStmt inlining compiler guide", "query": "TileLang force let inline pass config official documentation; TileLang LetStmt inlining code generation performance", "license": "MIT", "access_status": "opened_official_documentation_bodies_2026-07-21"},
+    "L10": {"url": "/opt/tilelang-metax@ec48829bb61fcd55a366407c69355581733cceef", "title": "Installed TileLang-MACA H13 compiler-pass capability audit", "license": "MIT TileLang and Apache-2.0 TVM", "access_status": "opened_installed_source_bodies_2026-07-21"},
+    "M18": {"url": "/data/metax-c500-autotune-agent/kernels/moe/h10_resource_reuse_results.json; /data/metax-c500-autotune-agent/kernels/moe/h11_epilogue_exchange_results.json; /data/metax-c500-autotune-agent/kernels/moe/h12_direct_fusion_results.json", "title": "H10F5 accepted state and H11/H12 C500 lowering closure", "license": "project-owned measured evidence", "access_status": "verified_2026-07-21"}
+  },
+  "hypothesis_to_source": {
+    "H13F1": ["N55", "L10", "M18"],
+    "H13F2": ["N56", "L10", "M18"],
+    "H13F3": ["N57", "L10", "M18"],
+    "H13S1": ["N56", "L10", "M18"],
+    "H13S2": ["N56", "L10"],
+    "H13S3": ["L10", "M18"]
+  },
+  "generation_failures": [
+    {"id": "H13F1-initial", "stage": "candidate_generation_before_build", "reason": "the initial input patch contained stale _maybe_cache context and did not apply", "hardware_run": false, "profiler_required": false, "retention": "/data/metax-c500-autotune-agent/worktrees/quarantine/workspace-9d674bc...; corrected patch was executed as H13F1a"}
+  ],
+  "experiments": [
+    {"id": "H13F1a", "hypothesis_id": "H13F1", "artifact": "/data/metax-c500-autotune-agent/artifacts/p9/experiment-98f986ed3be6a261381ab643.json", "experiment_id": "experiment-068a53fff6b03221ef727ec2", "source_commit": "93a29242780daa1df18f00f9ae7440c652696083", "diff_sha256": "180b948aaae2eb56c7716f70ecdff8b4cd38210cc6e285133c4145c0b9d135ff", "patch_sha256": "a6c6e9a9adb1ce9e0acac6cec037836463d6a6df532fa9af46770709e86403e7", "correctness_mismatches": {"large": 0, "small": 0}, "mean_ms": 229.15789587020873, "median_ms": 229.25990295410156, "stddev_ms": 1.2332545155530583, "p90_ms": 230.63562049865723, "mean_improvement": -0.0009342943512548464, "median_improvement": -0.001312096526985749, "profiler_cycles_kcycles": {"fc1": [118300.95, 120868.86], "fc2": [53683.85, 52182.97]}, "profiler_event_caveat": "private-read 5 is an incompatible automatically-selected event scale and must not be compared with baseline 921984", "generated_source": {"bytes": 33405, "sha256": "6f697d6f6d676a89a4bd23ec1dda9d4c842c876828ef15877838cf2bf4469575", "observed": "byte-identical to H10F5 generated source; pass is a no-op for this kernel"}, "decision": "rejected_below_both_gates_and_generated_source_noop"},
+    {"id": "H13F2", "artifact": "/data/metax-c500-autotune-agent/artifacts/p9/experiment-985e05676b64ad6ee0717dda.json", "experiment_id": "experiment-96de0cdb6a31d10a755ea888", "source_commit": "f79e4081ec886c678e362e73555ce83defc0dadf", "diff_sha256": "bae8bb185481be5646b96ed18badd8a9a308dbdc8699043faf821215b9f9ca63", "patch_sha256": "a62baaac5200414c60982fecc246ff4b089d233b1adb138d399a961917f8c1c7", "correctness_mismatches": {"large": 0, "small": 0}, "mean_ms": 233.63895309448242, "median_ms": 233.55686569213867, "stddev_ms": 1.2517324621229529, "p90_ms": 235.4387149810791, "mean_improvement": -0.020507017, "median_improvement": -0.020079446213876556, "profiler_cycles_kcycles": {"fc1": [121031.33, 122332.51], "fc2": [51422.97, 54413.95]}, "profiler_event_caveat": "automatically-selected memory-event scales are incompatible; raw values retained without cross-attribution", "generated_source": {"bytes": 34855, "sha256": "3bbdd31fdfd5b13c6a7163467fc81817b99d4cfa3e949918158df5c931ccf6cf", "helpers_per_kernel": {"load_global_32": 10, "load_global_64": 2, "load_global_128": 8, "load_global_256": 0, "store_global_64": 1, "store_global_128": 2, "store_global_256": 0}}, "decision": "rejected_deterministic_regression_with_explicit_helpers"},
+    {"id": "H13F3", "artifact": "/data/metax-c500-autotune-agent/artifacts/p9/experiment-729fbafc28723548f244025c.json", "experiment_id": "experiment-c070a0e74bb2b2378f62a33d", "source_commit": "d1f51ab94c539bd9c7d909059ce425e296b777d7", "diff_sha256": "0ff4d454464c54a9db06b31b8598251aeb01b8440505d92288abb98385a37cef", "patch_sha256": "20468b4818eee9b27d43a841006349f4c0bab055a1ca1b64dde42602c128a73a", "correctness_mismatches": {"large": 0, "small": 0}, "mean_ms": 248.3092915725708, "median_ms": 248.36147117614746, "stddev_ms": 0.5773252991935606, "p90_ms": 248.9668067932129, "mean_improvement": -0.084585301, "median_improvement": -0.08473981797725273, "profiler_cycles_kcycles": {"fc1": [119081.79, 118692.80], "fc2": [70023.95, 70206.82]}, "profiler_event_caveat": "automatically-selected memory-event scales are incompatible; raw values retained without cross-attribution", "generated_source": {"bytes": 59708, "sha256": "5f4e14e9993dca565eb09c1dbf428ac67ca0ccde35c2234bbe3792d49465f176", "observed": "code bloat and approximately 189 second first compilation; compilation excluded from GPU endpoint samples"}, "decision": "rejected_strong_regression_and_fc2_cycle_code_bloat"}
+  ],
+  "static_exclusions": [
+    {"id": "H13S1", "reason": "installed predicated-LDG/STG safety rule refuses shared/local-backed H10F5 output values"},
+    {"id": "H13S2", "reason": "fast math violates the numerical contract and the documented switch is CUDA/nvcc-specific"},
+    {"id": "H13S3", "reason": "exact MACA pipeline has no warp specialization or CUDA async pass"}
+  ],
+  "followup_review": {"performed": true, "decision": "do_not_execute_noncausal_followups_or_combinations", "reason": "H13F1 is generated-source-identical no-op; H13F2 emits no 256-bit helpers and deterministically regresses; H13F3 strongly regresses with FC2 cycle and code-size inflation"},
+  "abba": {"performed": false, "reason": "no executable candidate passed both initial 0.5 percent gates"},
+  "deployment": {"selected": "H10F5", "kernel_changed": false, "formal_baseline_target_commit": "ffb0a484da636274d5ff0e13a85da9f83fa93bfc", "kernel_origin_commit": "e60f9b3216d008e342d285cd24f8b6ede1142387", "kernel_sha256": "338b4d93cadc69a12e49690efc5d3030630b8cf412ee0a0691a6ef44db8bedfe"},
+  "profiler_integrity": "fresh baseline and all three correctness-passing candidates have workload-matched four-launch profiles; Total Cycles is compared, while incompatible automatically-selected memory-event scales are retained without cross-attribution",
+  "conclusion": "H10F5 remains immutable; StorageRewrite is a generated-source no-op, explicit LDG/STG lowering regresses, and eager LetInline causes code bloat plus a strong FC2 regression"
+}
