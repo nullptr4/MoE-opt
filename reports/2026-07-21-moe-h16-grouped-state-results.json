@@ -1,0 +1,105 @@
+{
+  "schema_version": "1.0",
+  "campaign_id": "h10f5-grouped-state-clear-broadcast-followups-20260721",
+  "status": "complete_no_winner",
+  "device": "MetaX C500 64GiB",
+  "baseline": {
+    "id": "H10F5",
+    "source_sha256": "338b4d93cadc69a12e49690efc5d3030630b8cf412ee0a0691a6ef44db8bedfe",
+    "target_commit_before_report": "d8ed3c146125af3163036dcec803ba5aa9f5882c",
+    "artifact": "artifacts/p9/baseline-08a8f2328aac4a7d426a34ec.json",
+    "agent_commit": "f2cb7f6d83df0957d701937394c2b5a2d0b1c892",
+    "environment_fingerprint": "sha256:0a9933b52ec094f2c597f2b86543be9db82673ce89eb2dcf70b8de15068eb838",
+    "correctness_mismatches": {"large": 0, "small": 0},
+    "mean_ms": 228.5996212387085,
+    "median_ms": 228.58509349822998,
+    "stddev_ms": 1.133877723855061,
+    "p90_ms": 230.0767292022705,
+    "profiler_cycles_kcycles": {"fc1": [118450.08, 118807.31], "fc2": [54046.69, 50551.81]}
+  },
+  "protocol": {
+    "functional_shapes": ["functional-large", "functional-small"],
+    "performance_shapes": ["performance-large", "performance-small"],
+    "seed": 81394,
+    "dtype": "float16",
+    "accumulate_dtype": "float32",
+    "atol": 0.01,
+    "rtol": 0.01,
+    "warmup": 10,
+    "iterations": 100,
+    "outlier_policy": "none",
+    "acceptance": "mean and median both improve at least 0.5%, stable variance and mechanism-consistent profiler"
+  },
+  "sources": [
+    {"id": "N68", "url": "https://github.com/tile-ai/tilelang/blob/main/examples/grouped_gemm/example_grouped_gemm_fwd.py", "license": "MIT", "candidate": "H16F1"},
+    {"id": "N69", "url": "https://github.com/tile-ai/tilelang/blob/main/tilelang/language/gemm_op.py", "license": "MIT", "candidate": "H16F2"},
+    {"id": "N70", "url": "https://github.com/tile-ai/tilelang/releases", "license": "MIT", "candidate": "H16F1"},
+    {"id": "N71", "url": "https://github.com/flashinfer-ai/flashinfer/pull/2944", "license": "Apache-2.0", "candidate": "H16F3"},
+    {"id": "N72", "url": "https://github.com/NVIDIA/cutlass/blob/main/examples/57_hopper_grouped_gemm/57_hopper_grouped_gemm.cu", "license": "BSD-3-Clause", "candidate": "static boundary only"}
+  ],
+  "experiments": [
+    {
+      "id": "H16F1",
+      "experiment_id": "experiment-665a878b9d762d696272e11c",
+      "artifact": "artifacts/p9/experiment-3a72c308e67d9f3477ad921b.json",
+      "candidate_commit": "ac015963f22a93c41b026e7e4f14ec17289b8302",
+      "diff_sha256": "8eb22afe44775bd57de7b3e10fcdf932892c0a83839a1af0af255929d7f1fd2d",
+      "correctness_mismatches": {"large": 0, "small": 0},
+      "mean_ms": 228.73826082229616,
+      "median_ms": 228.7490577697754,
+      "stddev_ms": 1.109622533317351,
+      "mean_improvement": -0.0006064733739995611,
+      "median_improvement": -0.000717300804860575,
+      "profiler_attempt": "artifacts/profiler/H16F1-20260721T072700060934Z/mcprofiler-attempt.json",
+      "decision": "rejected_regression_below_both_gates"
+    },
+    {
+      "id": "H16F2",
+      "experiment_id": "experiment-c9e97014c404bef6cbac8653",
+      "artifact": "artifacts/p9/experiment-b9d1e93df88426dfbbee017a.json",
+      "candidate_commit": "e39496686554b45ad8cf068628b745898d93faf4",
+      "diff_sha256": "724c0c5ce9e1993a99d30631e3a3bc414f19e317eabab05501c98f74e58fef14",
+      "correctness_mismatches": {"large": 0, "small": 0},
+      "mean_ms": 228.94179540634156,
+      "median_ms": 228.98060703277588,
+      "stddev_ms": 1.0495392480167345,
+      "mean_improvement": -0.001496827360338256,
+      "median_improvement": -0.0017302682711852382,
+      "profiler_attempt": "artifacts/profiler/H16F2-20260721T073210334881Z/mcprofiler-attempt.json",
+      "decision": "rejected_regression_below_both_gates"
+    },
+    {
+      "id": "H16F3",
+      "experiment_id": "experiment-d9c43369c415cde164032ea4",
+      "artifact": "artifacts/p9/experiment-906788561003f2871cb529ec.json",
+      "candidate_commit": "74dd2d927b88ee3dad9e00da4354709868bee1a6",
+      "diff_sha256": "fa0be3f89bd425171a4f2d0adc6392dd29453ebeab05240f89eda1c0b74b86c3",
+      "correctness_mismatches": {"large": 0, "small": 0},
+      "mean_ms": 231.20142343521118,
+      "median_ms": 231.12076473236084,
+      "stddev_ms": 0.5873100596497258,
+      "mean_improvement": -0.011381480784632766,
+      "median_improvement": -0.011092898470872923,
+      "profiler_attempt": "artifacts/profiler/H16F3-20260721T073729674704Z/mcprofiler-attempt.json",
+      "generated_shared_offsets": {"routed_weight_shared": 0, "up_logits_shared": 0, "routed_expert_down_shared": 16384},
+      "decision": "rejected_stable_regression_and_generated_alias_closes_followup"
+    }
+  ],
+  "static_exclusions": ["H16S1 descriptors/persistent/Stream-K", "H16S2 MACA k_pack no-op", "H16S3 runtime transpose/offline repack", "H16S4 generic compiler/wave/schedule grid"],
+  "replication": {"performed": false, "reason": "no candidate passed both initial gates"},
+  "abba": {"performed": false, "reason": "no candidate qualified"},
+  "deployment": {
+    "selected": "H10F5",
+    "kernel_changed": false,
+    "kernel_sha256": "338b4d93cadc69a12e49690efc5d3030630b8cf412ee0a0691a6ef44db8bedfe"
+  },
+  "target_validation": {
+    "pytest_metax": "89 passed in 25.50s with CAMP_TEST_BACKEND=metax",
+    "repository_check": "3390 tracked files inspected after the H16 reports were tracked",
+    "verify_maca": "passed on MetaX C500; driver 3.8.30; MACA 3.7.1.5; TileLang 0.1.12+maca.gitec48829b",
+    "functional": "official Large/Small 2 of 2 passed",
+    "run_moe_performance": "diagnostic only: 197.45083984/31.32674316 ms",
+    "submission_public_fuzz": "submission policy, uneven smoke, official public shape and five fuzz/terminal-offset cases passed",
+    "git_diff_check": "passed"
+  }
+}
