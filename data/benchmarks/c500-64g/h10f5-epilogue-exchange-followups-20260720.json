@@ -1,0 +1,85 @@
+{
+  "schema_version": "1.0",
+  "campaign_id": "h10f5-epilogue-exchange-followups-20260720",
+  "evidence_kind": "hardware",
+  "accessed_at": "2026-07-20",
+  "baseline": {
+    "id": "H10F5",
+    "target_commit": "4c061a28addd6978b78502b95fd1510c93ad624c",
+    "kernel_origin_commit": "e60f9b3216d008e342d285cd24f8b6ede1142387",
+    "source_sha256": "338b4d93cadc69a12e49690efc5d3030630b8cf412ee0a0691a6ef44db8bedfe",
+    "schedule": "combined Gate/Up; FC1/FC2 BN128/BK64/stage1; pipelined FC1; FC2 shared A; route FP16 fragment; explicit interleaved shared Up exchange"
+  },
+  "protocol": {
+    "functional_shapes": ["functional-large", "functional-small"],
+    "performance_shapes": ["performance-large", "performance-small"],
+    "profile_workload": "performance-large twice; FC1/FC2/FC1/FC2",
+    "seed": 81394,
+    "dtype": "float16",
+    "accumulate_dtype": "float32",
+    "atol": 0.01,
+    "rtol": 0.01,
+    "warmup": 10,
+    "iterations": 100,
+    "outlier_policy": "none",
+    "acceptance": "mean and median both at least 0.5%, stable variance and mechanism-consistent profiler; then full replication and adjacent ABBA"
+  },
+  "software": {
+    "device": "MetaX C500 64GiB",
+    "driver": "3.8.30",
+    "mxmaca": "3.7.1.5",
+    "mxcc": "1.0.0@d9102a1572",
+    "pytorch": "2.8.0+metax3.7.1.3",
+    "tilelang_maca": "0.1.12+maca.gitec48829b@ec48829b",
+    "mcprofiler": "3.8.1.4+575f5a9f6d"
+  },
+  "sources": {
+    "N47": {"url": "https://tilelang.tile-ai.cn/programming_guides/instructions.html; https://tilelang.tile-ai.cn/programming_guides/language_basics.html; https://tilelang.tile-ai.cn/autoapi/tilelang/language/copy_op/index.html; https://github.com/tile-ai/tilelang/blob/main/tilelang/language/copy_op.py; https://github.com/tile-ai/tilelang/blob/main/LICENSE", "title": "TileLang 0.1.12 copy, parallel-layout and synchronization interfaces", "query": "site:github.com/tile-ai/tilelang examples epilogue fragment shared T.copy swizzle GEMM source; site:github.com/tile-ai/tilelang T.annotate_layout T.copy alloc_fragment; TileLang 0.1.12 T.copy coalesced_width loop_layout official", "license": "MIT", "access_status": "opened_official_documentation_source_and_license_bodies_2026-07-20"},
+    "N48": {"url": "https://arxiv.org/abs/2504.17577", "title": "TileLang: A Composable Tiled Programming Model for AI Systems", "query": "TileLang paper fragment shared memory layout inference copy vectorization bank conflict official", "license": "arXiv paper terms; mechanism only", "access_status": "opened_primary_paper_abstract_and_body_2026-07-20_html_retry_failed_after_body_was_opened"},
+    "N49": {"url": "https://github.com/NVIDIA/cutlass/blob/main/include/cutlass/epilogue/collective/sm70_epilogue_vectorized.hpp; https://github.com/NVIDIA/cutlass/blob/main/LICENSE.txt", "title": "CUTLASS vectorized epilogue shared-accumulator repartition", "query": "site:github.com/NVIDIA/cutlass fused epilogue vectorized shared accumulator source; CUTLASS epilogue accumulator shared r2s s2r vector copy official source", "license": "BSD-3-Clause", "access_status": "opened_official_source_and_license_bodies_2026-07-20"},
+    "N50": {"url": "https://developer.metax-tech.com/doc", "title": "MetaX developer materials incremental access review", "query": "site:developer.metax-tech.com C500 shared memory bank conflict register spill TileLang MACA performance; MetaX C500 occupancy programming guide", "license": "linked PDF proprietary/confidential; no borrowing", "access_status": "opened_official_index_and_pdf_2026-07-20_pdf_marked_confidential_and_non_reusable"},
+    "L08": {"url": "/opt/tilelang-metax@ec48829bb61fcd55a366407c69355581733cceef", "title": "Exact installed TileLang-MACA cast, copy and loop-layout capability audit", "license": "MIT", "access_status": "opened_installed_source_and_official_starter_body_2026-07-20"},
+    "M15": {"url": "/data/metax-c500-autotune-agent/kernels/moe/h10_resource_reuse_results.json", "title": "Accepted H10F5 C500 epilogue exchange and private-traffic evidence", "license": "project-owned measured evidence", "access_status": "verified_2026-07-20"},
+    "M16": {"url": "/data/metax-c500-autotune-agent/artifacts/p9", "title": "H11 first-batch C500 shared-layout, lifetime and coalescing evidence", "license": "project-owned measured evidence", "access_status": "verified_2026-07-21"}
+  },
+  "hypothesis_to_source": {
+    "H11F1": ["N47", "N49", "L08", "M15"],
+    "H11F2": ["N47", "N48", "L08", "M15"],
+    "H11F3": ["N48", "N49", "M15"],
+    "H11F4": ["N47", "L08", "M15", "M16"],
+    "H11F5": ["N47", "N49", "L08", "M15", "M16"],
+    "H11S1": ["N47", "L08", "M15"],
+    "H11S2": ["N47", "L08"],
+    "H11S3": ["M15"]
+  },
+  "baselines": [
+    {"id": "B0", "artifact": "/data/metax-c500-autotune-agent/artifacts/p9/baseline-efe4211cc4f0349076778025.json", "agent_source_commit": "9c9fcbfad4d6236b901987c3cd899d75285f7298", "environment_fingerprint": "sha256:895c960cf9d10cba8f4d1b50068d726adbecc43451355b32ba9a536ee308a835", "correctness_mismatches": {"large": 0, "small": 0}, "mean_ms": 229.10031833648682, "median_ms": 229.18605136871338, "stddev_ms": 0.970742278682475, "p90_ms": 230.16486186981203, "profiler_cycles_kcycles": {"fc1": [118695.26, 118150.29], "fc2": [51529.45, 52402.17]}},
+    {"id": "B1", "artifact": "/data/metax-c500-autotune-agent/artifacts/p9/baseline-32844046e0c04ba4f511158e.json", "agent_source_commit": "91306548a382174d0b34965648675980d0f8e409", "environment_fingerprint": "sha256:1743f9edf884e3321ba8ddb9b61a0fb8245016e347ab2e0d164e6a2427b465de", "correctness_mismatches": {"large": 0, "small": 0}, "mean_ms": 228.63052307128908, "median_ms": 228.82880020141602, "stddev_ms": 1.1175662071698904, "p90_ms": 229.95181522369384, "profiler_cycles_kcycles": {"fc1": [117705.83, 118469.63], "fc2": [51286.53, 54008.81]}}
+  ],
+  "experiments": [
+    {"id": "H11F2", "baseline": "B0", "artifact": "/data/metax-c500-autotune-agent/artifacts/p9/experiment-73617603969c00e558cf4637.json", "experiment_id": "experiment-e60b68fdfb93e1b2e1baef37", "source_commit": "c474e3a2ffe98674eadf4b108e843562184711fa", "diff_sha256": "4e17833f2969d97d92d423bda0aba3b888659272be31bcd2a23a223ff2378efb", "correctness_mismatches": {"large": 0, "small": 0}, "mean_ms": 238.32219451904297, "median_ms": 238.4499225616455, "stddev_ms": 1.1630965735168173, "p90_ms": 239.78887557983398, "mean_improvement": -0.040252568174137957, "median_improvement": -0.040420746103908646, "profiler_cycles_kcycles": {"fc1": [127722.21, 126875.77], "fc2": [51244.69, 53075.34]}, "profiler_private_rw": {"fc1": [[30557183, 1185408], [30553828, 1185408]], "fc2": [[0, 0], [0, 0]]}, "decision": "rejected_layout_spill_and_regression"},
+    {"id": "H11F3", "baseline": "B0", "artifact": "/data/metax-c500-autotune-agent/artifacts/p9/experiment-5e06fa70e090e659dc5e074c.json", "experiment_id": "experiment-1c25c28e8553c5c4e12a15f7", "source_commit": "5e96b081520ac7ad363ba5d6586c823dd27f5abf", "diff_sha256": "8152998140330424cb12b422ad1a0a7c6f8446d3d2810890b2314577273d8ae8", "correctness_mismatches": {"large": 0, "small": 0}, "mean_ms": 232.79234966278077, "median_ms": 232.6629123687744, "stddev_ms": 1.185411038806318, "p90_ms": 234.6039031982422, "mean_improvement": -0.016115347866393362, "median_improvement": -0.01517047385430747, "profiler_cycles_kcycles": {"fc1": [120867.78, 120111.98], "fc2": [51912.88, 51242.44]}, "profiler_event_caveat": "global/private write labels selected an incompatible tiny scale and are retained but not interpreted", "decision": "rejected_regression"},
+    {"id": "H11F4a", "baseline": "B0", "artifact": "/data/metax-c500-autotune-agent/artifacts/p9/experiment-436099bd11ef3e2688618051.json", "experiment_id": "experiment-9197793386e5a0c279723fa0", "source_commit": "0b55ee49bdcdfac67ad5a6292574129d16aeb348", "diff_sha256": "ee3e9796597d4c784bcde64138a20fe12829ff4815af611f5417a115ed731c85", "build": "failed", "correctness": "not_run_after_build_failure", "benchmark": "not_run_after_build_failure", "profiler": "not_run_after_build_failure", "failure": "coalesced_width should be an IntImmNode", "decision": "rejected_compile_error"},
+    {"id": "H11F4b", "baseline": "B0", "artifact": "/data/metax-c500-autotune-agent/artifacts/p9/experiment-cbbcedb9e36885209c017bcc.json", "experiment_id": "experiment-cb2a309c15031bd71b9fcdab", "source_commit": "b7d3664270cdf3d8690068113239825c98012242", "diff_sha256": "4ffbf08c19ff345b5799dd1886918ec7bd0fe8a714dde7baa12e2dfe89f60030", "correctness_mismatches": {"large": 0, "small": 0}, "mean_ms": 229.2742862510681, "median_ms": 229.28242874145508, "stddev_ms": 1.0986698302170328, "p90_ms": 230.43812503814695, "mean_improvement": -0.0007593525659173061, "median_improvement": -0.00042052023744956356, "profiler_cycles_kcycles": {"fc1": [118096.23, 118512.22], "fc2": [54153.68, 54017.88]}, "profiler_private_rw": {"fc1": [[921984, 921984], [921984, 921984]], "fc2": [[0, 0], [0, 0]]}, "generated_output_store": "uint4 unchanged", "decision": "rejected_below_both_gates"},
+    {"id": "H11F5", "baseline": "B1", "artifact": "/data/metax-c500-autotune-agent/artifacts/p9/experiment-d218dde24782a64835e94de7.json", "experiment_id": "experiment-774855f42a7a3a7df8854591", "source_commit": "fcaa7f8947fe97b448d9b9de2748ae0c490bb977", "diff_sha256": "73bff856ec97bc6021b281c60058954716e0d52afd2cce2ac69001a17bc2f811", "correctness_mismatches": {"large": 0, "small": 0}, "mean_ms": 229.15606039047242, "median_ms": 229.07251453399658, "stddev_ms": 1.1096897788748858, "p90_ms": 230.5898199081421, "mean_improvement": -0.0022986314868355326, "median_improvement": -0.001065050956724189, "profiler_cycles_kcycles": {"fc1": [118729.94, 117263.8], "fc2": [52188.87, 52903.39]}, "profiler_private_writes": {"fc1": [921984, 921984], "fc2": [0, 0]}, "decision": "rejected_below_both_gates_and_no_profiler_support"}
+  ],
+  "static_exclusions": [
+    {"id": "H11F1", "reason": "direct two-offset accumulator access repeats H10F4 StructuralEqual; another fragment repeats A1c/H9"},
+    {"id": "H11S1", "reason": "residue-safe dynamic T.copy is unproven and whole-tile specialization repeats H5F1"},
+    {"id": "H11S2", "reason": "async/TMA/WGMMA interfaces are CUDA-specific and absent from TileLang-MACA"},
+    {"id": "H11S3", "reason": "no resident-CTA evidence and A1f already rejected FC1 min-blocks=2"}
+  ],
+  "abba": {"performed": false, "reason": "no executable candidate passed both initial 0.5 percent gates"},
+  "deployment": {"selected": "H10F5", "kernel_changed": false, "target_commit_before_report": "4c061a28addd6978b78502b95fd1510c93ad624c", "kernel_origin_commit": "e60f9b3216d008e342d285cd24f8b6ede1142387", "kernel_sha256": "338b4d93cadc69a12e49690efc5d3030630b8cf412ee0a0691a6ef44db8bedfe"},
+  "target_validation": {
+    "pytest_metax": "86 passed in 25.23s",
+    "repository_check_pre_stage": "3371 tracked files inspected",
+    "verify_maca": "passed on MetaX C500; driver 3.8.30; MACA 3.7.1.5",
+    "functional": "2 of 2 passed",
+    "run_moe_performance": "diagnostic only: 199.24789062/31.89778809 ms",
+    "submission_public_fuzz": "6 of 6 passed",
+    "git_diff_check": "passed"
+  },
+  "profiler_integrity": "every correctness-passing candidate has a four-launch profile; H11F4a stopped at build and records exact stderr; incompatible event label scales are retained but not compared",
+  "conclusion": "H10F5 remains the immutable accepted kernel; shared-half layout, half-streamed lifetime, explicit output coalescing and operand-role exchange produced no qualifying gain"
+}
