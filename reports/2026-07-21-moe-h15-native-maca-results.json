@@ -1,0 +1,107 @@
+{
+  "schema_version": "1.0",
+  "campaign_id": "h10f5-maca-l2-async-followups-20260721",
+  "status": "complete_no_winner",
+  "device": "MetaX C500 64GiB",
+  "baseline": {
+    "id": "H10F5",
+    "source_sha256": "338b4d93cadc69a12e49690efc5d3030630b8cf412ee0a0691a6ef44db8bedfe",
+    "target_commit_before_report": "d2f66cb99c847e402161a632dfd7d0dbf4b17dc0",
+    "captures": [
+      {
+        "agent_commit": "00a0e427b4c5839b13508f28b4561d7c433bb42f",
+        "artifact": "artifacts/p9/baseline-12a2d93354b4448acd402a3f.json",
+        "environment_fingerprint": "sha256:7455171240d34b42b179657691be80da63825c43eed89c52346599de86dd9d4e",
+        "mean_ms": 228.89913940429688,
+        "median_ms": 228.79552459716797,
+        "stddev_ms": 1.1219786471768634,
+        "p90_ms": 230.47592544555664
+      },
+      {
+        "agent_commit": "b985d68e6b6ebd0c0e4abacb0c8736b73c04578c",
+        "artifact": "artifacts/p9/baseline-052546c06a881b908490f94b.json",
+        "environment_fingerprint": "sha256:71b29cbd440df8eebb8e1d866585623cd394c63f564a2bf07604324cb31c7328",
+        "mean_ms": 229.0421318626404,
+        "median_ms": 229.24082946777344,
+        "stddev_ms": 1.2688668450744238,
+        "p90_ms": 230.63849067687988
+      }
+    ]
+  },
+  "protocol": {
+    "functional_shapes": ["functional-large", "functional-small"],
+    "performance_shapes": ["performance-large", "performance-small"],
+    "seed": 81394,
+    "dtype": "float16",
+    "accumulate_dtype": "float32",
+    "atol": 0.01,
+    "rtol": 0.01,
+    "warmup": 10,
+    "iterations": 100,
+    "outlier_policy": "none",
+    "acceptance": "mean and median both improve at least 0.5%, stable variance and mechanism-consistent profiler"
+  },
+  "experiments": [
+    {
+      "id": "H15F1",
+      "experiment_id": "experiment-7a23460bc5397b6c0c7d5b6f",
+      "artifact": "artifacts/p9/experiment-43b59daede8383ca3e8c1c6e.json",
+      "candidate_commit": "e2e179f92f964f0396e656d569565d9ec79762ee",
+      "diff_sha256": "f4fda00ed3d8373de5fa22671470ea42d9785e044aa8e4e840f30b55336df45e",
+      "correctness_mismatches": {"large": 0, "small": 0},
+      "mean_ms": 228.85766166687011,
+      "median_ms": 228.9113597869873,
+      "mean_improvement": 0.00018120530087926346,
+      "median_improvement": -0.0005062825858297831,
+      "stddev_ms": 1.038592082140924,
+      "runtime_invalid_value_count": 243,
+      "profiler_attempt": "artifacts/profiler/H15F1-20260721T055048382837Z/mcprofiler-attempt.json",
+      "decision": "rejected_below_gate_and_access_policy_runtime_invalid"
+    },
+    {
+      "id": "H15F2",
+      "experiment_id": "experiment-348d60f6dd7e3ab93005ed97",
+      "artifact": "artifacts/p9/experiment-630841c7603bf1c8fb7d6d57.json",
+      "candidate_commit": "b748bbe14a203ab338e66ac4c4caf9bf32224e85",
+      "diff_sha256": "3ff83f33bd71eae0169756b30b4b6eff7051d5fdec5cb25329d1d2cf2121cac2",
+      "correctness_mismatches": {"large": 0, "small": 0},
+      "mean_ms": 229.20979251861573,
+      "median_ms": 229.16928577423096,
+      "mean_improvement": -0.0013571615652523583,
+      "median_improvement": -0.0016336035318918764,
+      "stddev_ms": 1.2308942603018407,
+      "runtime_invalid_value_count": 243,
+      "profiler_attempt": "artifacts/profiler/H15F2-20260721T055558672922Z/mcprofiler-attempt.json",
+      "decision": "rejected_regression_and_access_policy_runtime_invalid"
+    },
+    {
+      "id": "H15F3",
+      "experiment_id": "experiment-4da93092b9523997dcc4558c",
+      "artifact": "artifacts/p9/experiment-dc3847997bfdcc389fada928.json",
+      "candidate_commit": "3e37381caf9ede3c3300ceff612f66641911cab2",
+      "diff_sha256": "e785f46da048a24543bbf905ecee9a7433ca2bcc2b84371a7876ae7391be6f3c",
+      "correctness": "not_run_build_failed",
+      "profiler": "not_run_build_failed",
+      "compiler_error": "InternalError: Check failed: (a.dtype().is_bool()) is false",
+      "decision": "rejected_compile_error"
+    },
+    {
+      "id": "H15F4",
+      "experiment_id": "experiment-c4857c0ee4363cd926315b00",
+      "artifact": "artifacts/p9/experiment-a9f0a7743ebf2575875ece55.json",
+      "candidate_commit": "45488c87e8f3275aa99e4880e8e4af5c40c96f43",
+      "diff_sha256": "35db1feca49fd1cbb24446703143ea52c08893cf6f33f6fd4470801a0b8aeb11",
+      "correctness": "not_run_build_failed",
+      "profiler": "not_run_build_failed",
+      "compiler_error": "InternalError: Check failed: (a.dtype().is_bool()) is false",
+      "decision": "rejected_compile_error"
+    }
+  ],
+  "replication": {"performed": false, "reason": "no candidate passed both initial gates"},
+  "abba": {"performed": false, "reason": "no candidate qualified"},
+  "deployment": {
+    "selected": "H10F5",
+    "kernel_changed": false,
+    "kernel_sha256": "338b4d93cadc69a12e49690efc5d3030630b8cf412ee0a0691a6ef44db8bedfe"
+  }
+}
