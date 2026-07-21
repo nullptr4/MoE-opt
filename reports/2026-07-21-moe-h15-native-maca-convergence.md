@@ -48,7 +48,7 @@ authorized.
 ## Validation and outcome
 
 H10F5 remains byte-identical and is the only deployed kernel. From this repository, the MetaX
-suite passed `89` tests, repository check inspected `3386` tracked files, `verify-maca.sh` passed
+suite passed `89` tests, final repository check inspected `3388` tracked files, `verify-maca.sh` passed
 on C500/driver `3.8.30`/MACA `3.7.1.5`, both official functional cases passed, the diagnostic
 performance run reported `198.330684/32.663997 ms`, submission public-shape plus all fuzz cases
 passed, and `git diff --check` passed. Diagnostic timings are not formal candidate evidence.
