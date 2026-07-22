@@ -44,19 +44,31 @@ host. `run_kernel` has no explicit synchronization and allocates/caches only the
 ## Real C500 result
 
 All three published dimensions compiled and passed two consecutive invocations against the FP32
-PyTorch reference at `atol=rtol=0.01`:
+PyTorch reference at `atol=rtol=0.01`. The full evaluator screenshot additionally establishes a
+shared warmup count of 5, 30 measured iterations for case 1, and 20 measured iterations for cases
+2 and 3. Because the private `testcase_config.py` is not present locally, the local driver
+deterministically assigns every routed row to a random expert and derives non-uniform counts with
+`bincount`; this reproduces the published random-metadata contract without claiming the private RNG
+sequence is known.
 
 ```text
-remote-case-1: E=16 H=2048 I=8192 group_sum=2272 blocks=34
-remote-case-2: E=32 H=7168 I=2048 group_sum=4544 blocks=68
-remote-case-3: E=64 H=7168 I=2048 group_sum=9088 blocks=135
+remote-case-1: E=16 H=2048 I=8192 group_sum=2272 blocks=34, group range 123..174
+remote-case-2: E=32 H=7168 I=2048 group_sum=4544 blocks=68, group range 117..164
+remote-case-3: E=64 H=7168 I=2048 group_sum=9088 blocks=135, group range 116..174
+```
+
+With CUDA events around `run_kernel` only, and no synchronization inside it, exact-policy local C500
+latencies were:
+
+```text
+remote-case-1: 14.78431600 ms (warmup 5, iterations 30)
+remote-case-2: 25.36275177 ms (warmup 5, iterations 20)
+remote-case-3: 48.96515808 ms (warmup 5, iterations 20)
 ```
 
 Compact boundary, exact-block, skew/tiny, zero-route-weight and E+1 sentinel fuzz also passed. The
 formal H17F2 research kernel remains unchanged; its optimized schedule and measured speedup are not
 claimed for this conservative standalone source.
 
-Warmup/iteration counts are retained as evaluator timing policy rather than correctness dimensions.
-The supplied text unambiguously shows case 1 as warmup 5 / iteration 30, but the pasted formatting
-does not preserve both values for cases 2 and 3. No missing timing values are invented in the local
-report.
+Warmup/iteration counts are evaluator timing policy rather than correctness dimensions. The local
+driver exposes `--benchmark-remote` to run correctness plus all three exact timing policies.

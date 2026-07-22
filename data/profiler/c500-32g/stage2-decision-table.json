@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "record_type": "moe-stage2-profiler-decision-table",
-  "generated_at": "2026-07-21T15:01:01.001983+00:00",
+  "generated_at": "2026-07-22T06:49:50.456279+00:00",
   "host_id": "c500-32g",
   "methodology": {
     "workload": "Large public performance shape",

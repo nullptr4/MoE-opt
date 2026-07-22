@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import gc
 import math
 import sys
 from dataclasses import dataclass
@@ -202,12 +203,56 @@ def check_case(case: CompactCase) -> None:
     )
 
 
-def remote_case_specs() -> tuple[tuple[str, int, int, int], ...]:
-    # Published remote dimensions. Every published group_sum is exactly 142 * E.
+def random_group_sizes(experts: int, group_sum: int, seed: int) -> list[int]:
+    """Generate deterministic, non-uniform routed counts with an exact sum."""
+    generator = torch.Generator(device="cpu")
+    generator.manual_seed(seed)
+    assignments = torch.randint(
+        0, experts, (group_sum,), generator=generator, device="cpu"
+    )
+    return torch.bincount(assignments, minlength=experts).tolist()
+
+
+def benchmark_case(case: CompactCase, warmup: int, iterations: int) -> float:
+    out = torch.empty_like(case.tokens)
+    args = (
+        case.tokens,
+        case.gate,
+        case.up,
+        case.down,
+        case.route_weights,
+        case.group_sizes,
+        case.group_offsets,
+        case.group_padded_offsets,
+        case.group_idx_for_bx,
+        out,
+    )
+
+    for _ in range(warmup):
+        submission.run_kernel(*args)
+
+    start = torch.cuda.Event(enable_timing=True)
+    end = torch.cuda.Event(enable_timing=True)
+    start.record()
+    for _ in range(iterations):
+        submission.run_kernel(*args)
+    end.record()
+    torch.cuda.synchronize()
+    latency_ms = start.elapsed_time(end) / iterations
+    print(
+        f"TIME {case.name}: {latency_ms:.8f} ms "
+        f"warmup={warmup} iters={iterations}",
+        flush=True,
+    )
+    return latency_ms
+
+
+def remote_case_specs() -> tuple[tuple[str, int, int, int, int, int, int], ...]:
+    # Published remote dimensions and timing policy from the evaluator table.
     return (
-        ("remote-case-1", 2048, 8192, 16),
-        ("remote-case-2", 7168, 2048, 32),
-        ("remote-case-3", 7168, 2048, 64),
+        ("remote-case-1", 2048, 8192, 16, 2272, 5, 30),
+        ("remote-case-2", 7168, 2048, 32, 4544, 5, 20),
+        ("remote-case-3", 7168, 2048, 64, 9088, 5, 20),
     )
 
 
@@ -226,7 +271,15 @@ def main() -> None:
     parser.add_argument(
         "--fuzz-only", action="store_true", help="run only compact metadata fuzz"
     )
+    parser.add_argument(
+        "--benchmark-remote",
+        action="store_true",
+        help="run correctness and exact published warmup/iteration timing",
+    )
     args = parser.parse_args()
+
+    if args.benchmark_remote:
+        args.remote_shapes = True
 
     if not torch.cuda.is_available():
         raise RuntimeError("the submission ABI test requires an active C500")
@@ -242,16 +295,27 @@ def main() -> None:
             )
         )
         if args.remote_shapes:
-            for name, hidden, intermediate, experts in remote_case_specs():
-                check_case(
-                    make_case(
-                        name,
-                        hidden=hidden,
-                        intermediate=intermediate,
-                        group_sizes_list=[142] * experts,
-                        seed=81394,
-                    )
+            for case_id, spec in enumerate(remote_case_specs(), start=1):
+                name, hidden, intermediate, experts, group_sum, warmup, iterations = spec
+                sizes = random_group_sizes(experts, group_sum, seed=81394 + case_id)
+                case = make_case(
+                    name,
+                    hidden=hidden,
+                    intermediate=intermediate,
+                    group_sizes_list=sizes,
+                    seed=81394,
                 )
+                print(
+                    f"META {name}: group_min={min(sizes)} group_max={max(sizes)} "
+                    f"group_sum={sum(sizes)}",
+                    flush=True,
+                )
+                check_case(case)
+                if args.benchmark_remote:
+                    benchmark_case(case, warmup, iterations)
+                del case
+                gc.collect()
+                torch.cuda.empty_cache()
 
     if args.fuzz or args.fuzz_only:
         fuzz_cases = (
