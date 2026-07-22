@@ -1,13 +1,16 @@
 import math
+import argparse
 import torch
 import torch.nn as nn
 import json
+from pathlib import Path
 from typing import Dict, Tuple, Optional
 import tilelang
 import tilelang.language as T
 from tilelang.autotuner import *
 from custom_fusedmoe import RoutedMoEKernel
 from ref_fusedmoe import ref_kernel
+from moe_test_config_tools import load_workload_config, local_proxy_guard_configs
 
 
 class Expert(nn.Module):
@@ -355,9 +358,11 @@ def run_moe_test(config: dict, test_type: str, warm_up=10, iteration=100):
     else:
         raise ValueError(f"Unknown test type {test_type}")
 
-def run_from_config_file(config_file: str):
-    with open(config_file, "r") as f:
-        configs = json.load(f)
+def run_from_config_file(config_file: str, *, explicit_local_proxy_guard: bool = False):
+    configs = local_proxy_guard_configs(
+        load_workload_config(Path(config_file)),
+        explicit_opt_in=explicit_local_proxy_guard,
+    )
 
     for test_type in ["functional", "performance"]:
         print(f"\n=== Running {test_type} tests ===")
@@ -378,7 +383,21 @@ def clear_caches():
         print("no tilelang cache found")
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="Run the formal 11-tensor local proxy guard (not the remote objective)."
+    )
+    parser.add_argument(
+        "--local-proxy-guard",
+        action="store_true",
+        help="explicitly opt in to the old formal Large/Small guard workloads",
+    )
+    args = parser.parse_args()
+    if not args.local_proxy_guard:
+        parser.error(
+            "the default objective is remote_submission; use scripts/run-moe.sh, or pass "
+            "--local-proxy-guard explicitly for the formal 11-tensor guard"
+        )
     # tilelang.disable_cache()
     clear_caches()
     config_file = "moe_test_configs.json"
-    run_from_config_file(config_file)
+    run_from_config_file(config_file, explicit_local_proxy_guard=True)

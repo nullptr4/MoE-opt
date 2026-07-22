@@ -52,14 +52,26 @@ scripts/verify-maca.sh
 scripts/run-moe.sh
 ```
 
-也可以直接运行：
+该默认入口执行 ten-argument `submission.run_kernel` 的三组 published dimensions，
+逐 case 使用 5/30、5/20、5/20；远程 aggregate scoring 仍为 unknown，因此不计算总分。
+无 GPU 检查入口选择可运行：
 
 ```bash
-cd benchmarks/tilelang-moe
-python fusedmoe_benchmark.py
+python scripts/run_moe_evaluation.py --describe-target
 ```
 
-优化边界：保持 `RoutedMoEKernel.__init__` 与 `RoutedMoEKernel.__call__` 的外部接口稳定，主要修改 `custom_fusedmoe.py` 内部 kernel 实现；每次改动后依次执行正确性测试、benchmark 并记录结果。
+旧 formal Large/Small 是 11-tensor `RoutedMoEKernel` 的 local proxy guard，只有显式
+选择时才运行：
+
+```bash
+scripts/run-moe.sh --local-proxy-guard
+python benchmarks/tilelang-moe/tune_moe.py \
+  --evaluation-target local-proxy-guard --experiment E0
+```
+
+`moe_test_configs.json` 是 role-aware 主配置：`default_evaluation_target` 固定为
+`remote_submission`，remote cases 与 `remote_contract.json` 由 checker 深度校验；旧
+functional/performance 位于 `local_proxy_guard`，不得作为默认 remote objective。
 
 
 ## 贡献与维护
@@ -82,19 +94,22 @@ fast-math 方案。E0–E5 显式 preset 仍保留，用于可重复的单变量
 
 ```bash
 python benchmarks/tilelang-moe/tune_moe.py \
+  --evaluation-target local-proxy-guard \
   --block-dhidden 128 --block-dexpert 128 --mode all
 ```
 
 解耦后的单变量实验使用 `--experiment E0` 到 `E5`；正式三进程对比使用：
 
 ```bash
-python scripts/run_moe_stage1_experiments.py --host-id "${MOE_HOST_ID}"
+python scripts/run_moe_stage1_experiments.py \
+  --evaluation-target local-proxy-guard --host-id "${MOE_HOST_ID}"
 ```
 
 生成正式基线统计产物时：
 
 ```bash
-python scripts/run_moe_baseline.py --host-id "${MOE_HOST_ID}"
+python scripts/run_moe_baseline.py \
+  --evaluation-target local-proxy-guard --host-id "${MOE_HOST_ID}"
 ```
 
 提交 ABI 的本地对拍（compact group_sum 10-argument `submission.run_kernel`；

@@ -24,10 +24,20 @@ from moe_schedule import (  # noqa: E402
     experiment_stage_schedule,
     resolve_stage_schedule,
 )
+from moe_test_config_tools import (  # noqa: E402
+    load_workload_config,
+    local_proxy_guard_configs,
+)
 
 
 def main() -> None:
     parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--evaluation-target",
+        choices=("local-proxy-guard",),
+        required=True,
+        help="explicit opt-in; this formal schedule tuner cannot evaluate submission ABI",
+    )
     parser.add_argument("--block-token", type=int, default=128)
     parser.add_argument("--block-dhidden", type=int, default=128, help="legacy shared tile: FC1 BK and FC2 BN")
     parser.add_argument("--block-dexpert", type=int, default=128, help="legacy shared tile: FC1 BN and FC2 BK")
@@ -226,7 +236,10 @@ def main() -> None:
         return moe(input_tensor)
 
     benchmark.custom_kernel = candidate_kernel
-    configs = benchmark.json.load(open(MOE_DIR / "moe_test_configs.json"))
+    configs = local_proxy_guard_configs(
+        load_workload_config(MOE_DIR / "moe_test_configs.json"),
+        explicit_opt_in=args.evaluation_target == "local-proxy-guard",
+    )
     modes = ("functional", "performance") if args.mode == "all" else (args.mode,)
     results = []
     for mode in modes:

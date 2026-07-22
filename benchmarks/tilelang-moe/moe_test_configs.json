@@ -1,42 +1,105 @@
 {
-  "functional": [
-    {
-      "dhidden": 7168,
-      "dexpert": 2048,
-      "nroutedexperts": 8,
-      "nexpertspertoken": 4,
-      "bs": 1,
-      "seqlen": 8192,
-      "seed": 81394
+  "schema_version": "2.0",
+  "config_id": "metax-c500-routed-moe-workloads",
+  "default_evaluation_target": "remote_submission",
+  "remote_submission": {
+    "role": "remote_objective",
+    "contract_reference": "remote_contract.json",
+    "abi": {
+      "name": "submission-compact-ten-argument",
+      "entrypoint": "run_kernel",
+      "argument_count": 10
     },
-    {
-      "dhidden": 3584,
-      "dexpert": 1024,
-      "nroutedexperts": 4,
-      "nexpertspertoken": 2,
-      "bs": 2,
-      "seqlen": 4096,
-      "seed": 81394
+    "cases": [
+      {
+        "case_id": "remote-case-1",
+        "hidden": 2048,
+        "intermediate": 8192,
+        "experts": 16,
+        "group_sum": 2272,
+        "warmup": 5,
+        "iterations": 30
+      },
+      {
+        "case_id": "remote-case-2",
+        "hidden": 7168,
+        "intermediate": 2048,
+        "experts": 32,
+        "group_sum": 4544,
+        "warmup": 5,
+        "iterations": 20
+      },
+      {
+        "case_id": "remote-case-3",
+        "hidden": 7168,
+        "intermediate": 2048,
+        "experts": 64,
+        "group_sum": 9088,
+        "warmup": 5,
+        "iterations": 20
+      }
+    ],
+    "aggregate_scoring": {
+      "status": "unknown",
+      "value": null
     }
-  ],
-  "performance": [
-    {
-      "dhidden": 7168,
-      "dexpert": 2048,
-      "nroutedexperts": 8,
-      "nexpertspertoken": 4,
-      "bs": 4,
-      "seqlen": 8192,
-      "seed": 81394
+  },
+  "local_proxy_guard": {
+    "role": "local_proxy_guard",
+    "remote_equivalent": false,
+    "abi": {
+      "name": "formal-compact-eleven-tensor",
+      "entrypoint": "RoutedMoEKernel",
+      "argument_count": 11
     },
-    {
-      "dhidden": 3584,
-      "dexpert": 1024,
-      "nroutedexperts": 4,
-      "nexpertspertoken": 2,
-      "bs": 8,
-      "seqlen": 4096,
-      "seed": 81394
+    "timing": {
+      "warmup": 10,
+      "iterations": 100
+    },
+    "functional": [
+      {
+        "dhidden": 7168,
+        "dexpert": 2048,
+        "nroutedexperts": 8,
+        "nexpertspertoken": 4,
+        "bs": 1,
+        "seqlen": 8192,
+        "seed": 81394
+      },
+      {
+        "dhidden": 3584,
+        "dexpert": 1024,
+        "nroutedexperts": 4,
+        "nexpertspertoken": 2,
+        "bs": 2,
+        "seqlen": 4096,
+        "seed": 81394
+      }
+    ],
+    "performance": [
+      {
+        "dhidden": 7168,
+        "dexpert": 2048,
+        "nroutedexperts": 8,
+        "nexpertspertoken": 4,
+        "bs": 4,
+        "seqlen": 8192,
+        "seed": 81394
+      },
+      {
+        "dhidden": 3584,
+        "dexpert": 1024,
+        "nroutedexperts": 4,
+        "nexpertspertoken": 2,
+        "bs": 8,
+        "seqlen": 4096,
+        "seed": 81394
+      }
+    ],
+    "aggregate_scoring": {
+      "status": "local_assumption",
+      "value": "legacy_two_shape_arithmetic_comparison",
+      "remote_applicability": false
     }
-  ]
+  }
 }

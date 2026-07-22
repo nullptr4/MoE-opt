@@ -35,4 +35,7 @@ scripts/verify-maca.sh
 scripts/run-moe.sh
 ```
 
+该无参数入口固定选择 `remote_submission` 三 case。复现旧 formal Large/Small 必须使用
+`scripts/run-moe.sh --local-proxy-guard`；它只产生 local proxy/guard 证据。
+
 `rebuild-tilelang.sh` 会删除 `${TILELANG_HOME}/build` 并重装 editable package，只应在明确需要重编译时执行。

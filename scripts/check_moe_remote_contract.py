@@ -19,10 +19,15 @@ from remote_contract_tools import (  # noqa: E402
     remote_case_specs,
     submission_abi_fingerprint,
 )
+from moe_test_config_tools import (  # noqa: E402
+    load_workload_config,
+    remote_submission_specs,
+)
 
 
 def main() -> int:
     contract = load_contract()
+    workload_config = load_workload_config()
     print(
         json.dumps(
             {
@@ -31,6 +36,17 @@ def main() -> int:
                 "contract_fingerprint": contract_fingerprint(contract),
                 "submission_abi_fingerprint": submission_abi_fingerprint(contract),
                 "published_cases": [list(item) for item in remote_case_specs(contract)],
+                "workload_config": {
+                    "schema_version": workload_config["schema_version"],
+                    "default_evaluation_target": workload_config["default_evaluation_target"],
+                    "remote_submission_cases": [
+                        list(item) for item in remote_submission_specs(workload_config)
+                    ],
+                    "aggregate_scoring": workload_config["remote_submission"][
+                        "aggregate_scoring"
+                    ],
+                    "legacy_role": workload_config["local_proxy_guard"]["role"],
+                },
                 "parity": local_parity_summary(contract),
             },
             ensure_ascii=False,

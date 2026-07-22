@@ -11,16 +11,18 @@
 2. 内部实现可重写调整。
 
 ## 2. 使用
-如下命令可以自动跑功能和性能测试,结果输出在终端
-```bash
-python fusedmoe_benchmark.py
-```
-或者
+默认命令运行 ten-argument submission 的三组 published remote dimensions/timing：
 ```bash
 bash run.sh
 ```
+旧 formal 11-tensor Large/Small 只作为显式 local proxy guard：
+```bash
+python fusedmoe_benchmark.py --local-proxy-guard
+```
 ## 3. 测试用例
-可以在`moe_test_configs.json`中直接添加测试case，目前有性能和功能各两个
+`moe_test_configs.json` schema v2 直接列出默认 `remote_submission` 三 case，并把旧
+功能/性能各两个 case 放在 `local_proxy_guard`。checker 要求前者与
+`remote_contract.json` 的 order/dimensions/timing 完全一致；后者不得静默回落为默认目标。
 当前默认：input float16, output float32
 
 功能测试正确输出
@@ -49,10 +51,10 @@ source scripts/activate-maca.sh
 scripts/run-moe.sh
 ```
 
-默认配置适合日常迭代；需要扩大搜索空间时使用：
+formal local proxy 调优必须显式选择；需要扩大其搜索空间时使用：
 
 ```bash
-MOE_AUTOTUNE_MODE=full scripts/run-moe.sh
+MOE_AUTOTUNE_MODE=full scripts/run-moe.sh --local-proxy-guard
 ```
 
 调优报告和原始候选记录位于仓库根目录的 `reports/` 与 `logs/`。正式
@@ -75,7 +77,12 @@ fingerprint。当前 `group_sizes`/route weights 是确定性的本地随机 fix
 routing、offset sentinel、stride/contiguity、workspace policy、case cache lifecycle、
 评分聚合与 exact toolchain 仍未知，因此即使三组本地 C500 correctness 通过也只能称
 `LOCAL_PROXY_ONLY`，不能称 submit-ready、remote-equivalent 或 remote SOTA。旧
-`moe_test_configs.json` Large/Small 仍是正式 kernel guard/proxy，不是远程 workload。
+`moe_test_configs.json` 的默认目标是上述 remote submission matrix；旧 Large/Small
+明确位于 `local_proxy_guard`，不是远程 workload。
+
+本次 remote-first 默认入口的真实 C500 5/30、5/20、5/20 重测保存在
+`data/benchmarks/c500-64g/remote-submission-default-v2-20260722.json`；报告绑定
+submission、role-aware config 与 harness 哈希，并诚实记录运行时 tracked source 为 dirty。
 
 可用环境变量：`MOE_AUTOTUNE=0` 关闭实测调优，`MOE_AUTOHEURISTIC=0`
 关闭 shape 启发式但保留 autotune，`TILELANG_AUTO_TUNING_DISABLE_CACHE=1`
@@ -112,7 +119,8 @@ E0–E5 可直接通过 `--experiment` 复现；E6 是已回退的诊断候选�
 单组功能对拍：
 
 ```bash
-python tune_moe.py --experiment E4 --mode functional --warmup 0 --iteration 1
+python tune_moe.py --evaluation-target local-proxy-guard \
+  --experiment E4 --mode functional --warmup 0 --iteration 1
 ```
 
 硬件 profiler 需要隔离某个规格时，增加 `--shape large` 或 `--shape small`。
@@ -132,7 +140,8 @@ FC1/FC2 `BN128/BK64/stage1`、FC2 activation shared tile 和 FP16 route-weight f
 六组正式实验（每组 3 个独立性能进程，输出 median/MAD/P95）：
 
 ```bash
-python ../../scripts/run_moe_stage1_experiments.py --host-id "${MOE_HOST_ID}"
+python ../../scripts/run_moe_stage1_experiments.py \
+  --evaluation-target local-proxy-guard --host-id "${MOE_HOST_ID}"
 ```
 
 runner 只在单组 functional 通过后启动该组性能进程，并校验 JSON 中的

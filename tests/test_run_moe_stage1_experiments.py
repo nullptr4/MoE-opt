@@ -191,7 +191,15 @@ class Stage1CliTest(unittest.TestCase):
         ):
             with self.subTest(flags=flags):
                 result = subprocess.run(
-                    [sys.executable, str(self.TUNER), "--experiment", "E0", *flags],
+                    [
+                        sys.executable,
+                        str(self.TUNER),
+                        "--evaluation-target",
+                        "local-proxy-guard",
+                        "--experiment",
+                        "E0",
+                        *flags,
+                    ],
                     text=True,
                     capture_output=True,
                     check=False,
@@ -208,6 +216,16 @@ class Stage1CliTest(unittest.TestCase):
             'os.environ["MOE_RECORD_RESULTS"] = "0"',
         ):
             self.assertLess(source.index(assignment), kernel_import)
+
+    def test_formal_tuner_requires_explicit_local_proxy_opt_in(self):
+        result = subprocess.run(
+            [sys.executable, str(self.TUNER), "--experiment", "E0"],
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("--evaluation-target", result.stderr)
 
     def test_stage1_snapshot_includes_both_orchestration_runners(self):
         paths = {item["path"] for item in stage1_source_snapshot()}

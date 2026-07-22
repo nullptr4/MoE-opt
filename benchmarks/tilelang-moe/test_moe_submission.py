@@ -30,8 +30,11 @@ from remote_contract_tools import (  # noqa: E402
     contract_fingerprint,
     load_contract,
     local_parity_summary,
-    remote_case_specs as contract_case_specs,
     submission_abi_fingerprint,
+)
+from moe_test_config_tools import (  # noqa: E402
+    load_workload_config,
+    remote_submission_specs,
 )
 
 
@@ -54,6 +57,7 @@ def load_submission_module():
 
 submission, SUBMISSION_SOURCE = load_submission_module()
 REMOTE_CONTRACT = load_contract()
+REMOTE_WORKLOAD_CONFIG = load_workload_config()
 
 
 BLOCK_TOKEN = 128
@@ -325,7 +329,8 @@ def benchmark_case(case: CompactCase, warmup: int, iterations: int) -> dict[str,
 
 
 def remote_case_specs() -> tuple[tuple[str, int, int, int, int, int, int], ...]:
-    return contract_case_specs(REMOTE_CONTRACT)
+    # load_workload_config validates this ordered matrix against REMOTE_CONTRACT.
+    return remote_submission_specs(REMOTE_WORKLOAD_CONFIG)
 
 
 def environment_fingerprint() -> tuple[str, dict[str, object]]:
@@ -341,6 +346,16 @@ def environment_fingerprint() -> tuple[str, dict[str, object]]:
     )
     if commit.returncode != 0:
         raise RuntimeError("cannot capture source commit for hardware evidence")
+    tracked_status = subprocess.run(
+        ("git", "status", "--porcelain", "--untracked-files=no"),
+        cwd=ROOT.parents[1],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        check=False,
+    )
+    if tracked_status.returncode != 0:
+        raise RuntimeError("cannot capture tracked source status for hardware evidence")
     components = {
         "python": platform.python_version(),
         "torch": torch.__version__,
@@ -349,7 +364,13 @@ def environment_fingerprint() -> tuple[str, dict[str, object]]:
         "submission_source": SUBMISSION_SOURCE.as_posix(),
         "submission_sha256": hashlib.sha256(SUBMISSION_SOURCE.read_bytes()).hexdigest(),
         "contract_fingerprint": contract_fingerprint(REMOTE_CONTRACT),
+        "workload_config_sha256": hashlib.sha256(
+            (ROOT / "moe_test_configs.json").read_bytes()
+        ).hexdigest(),
+        "evaluation_target": REMOTE_WORKLOAD_CONFIG["default_evaluation_target"],
         "source_commit": commit.stdout.strip(),
+        "source_tracked_dirty": bool(tracked_status.stdout.strip()),
+        "harness_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
     }
     digest = hashlib.sha256(
         json.dumps(components, sort_keys=True, separators=(",", ":")).encode("utf-8")

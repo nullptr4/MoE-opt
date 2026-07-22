@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import hashlib
 import json
 from pathlib import Path
 import sys
@@ -88,6 +89,34 @@ class MoeRemoteContractTest(unittest.TestCase):
             self.assertTrue(
                 case["parameter_fingerprint"]["parameter_fingerprint"].startswith("sha256:")
             )
+
+    def test_default_v2_hardware_report_binds_role_aware_workload_config(self):
+        report_path = (
+            ROOT
+            / "data/benchmarks/c500-64g/remote-submission-default-v2-20260722.json"
+        )
+        report = json.loads(report_path.read_text())
+        config_path = MOE_ROOT / "moe_test_configs.json"
+        self.assertEqual(report["evidence_kind"], "hardware")
+        self.assertEqual(report["parity"]["status"], "LOCAL_PROXY_ONLY")
+        self.assertEqual(report["scoring"], {
+            "per_case_metrics": True,
+            "aggregate_status": "unknown",
+            "aggregate_value": None,
+        })
+        self.assertEqual(report["environment"]["evaluation_target"], "remote_submission")
+        self.assertEqual(
+            report["environment"]["workload_config_sha256"],
+            hashlib.sha256(config_path.read_bytes()).hexdigest(),
+        )
+        self.assertEqual(
+            [case["parameter_fingerprint"]["timing"] for case in report["cases"]],
+            [
+                {"warmup": 5, "iterations": 30},
+                {"warmup": 5, "iterations": 20},
+                {"warmup": 5, "iterations": 20},
+            ],
+        )
 
 
 if __name__ == "__main__":

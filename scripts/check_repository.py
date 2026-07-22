@@ -21,10 +21,24 @@ REQUIRED_FILES = (
     "SECURITY.md",
     ".github/CODEOWNERS",
     ".github/pull_request_template.md",
+    "benchmarks/tilelang-moe/moe_test_config_tools.py",
+    "benchmarks/tilelang-moe/moe_test_configs.json",
+    "scripts/run_moe_evaluation.py",
 )
 MAINTAINED_PREFIXES = ("benchmarks/", "config/", "docs/", "scripts/", ".github/")
 TEXT_SUFFIXES = {".md", ".py", ".sh", ".json", ".yml", ".yaml", ".toml"}
 CONFLICT_MARKERS = ("<<<<<<< ", "=======", ">>>>>>> ")
+
+
+def check_moe_workload_config(errors: list[str]) -> None:
+    moe_root = ROOT / "benchmarks" / "tilelang-moe"
+    sys.path.insert(0, str(moe_root))
+    try:
+        from moe_test_config_tools import load_workload_config
+
+        load_workload_config()
+    except (ImportError, ValueError) as exc:
+        errors.append(f"invalid Routed-MoE workload config: {exc}")
 
 
 def tracked_files() -> list[Path]:
@@ -95,6 +109,7 @@ def main() -> int:
     check_required(errors)
     check_syntax(files, errors)
     check_conflict_markers(files, errors)
+    check_moe_workload_config(errors)
     if errors:
         print("repository checks failed:", file=sys.stderr)
         for error in errors:

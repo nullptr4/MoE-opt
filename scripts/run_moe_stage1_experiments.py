@@ -24,6 +24,10 @@ from moe_schedule import (  # noqa: E402
     EXPERIMENT_PRESETS,
     canonical_experiment_schedule,
 )
+from moe_test_config_tools import (  # noqa: E402
+    load_workload_config,
+    local_proxy_guard_configs,
+)
 from run_moe_baseline import (  # noqa: E402
     _display_path,
     _git,
@@ -59,7 +63,10 @@ def expected_schedule(experiment: str) -> dict[str, Any]:
 
 
 def expected_functional_workload_keys() -> set[str]:
-    configs = json.loads((MOE_DIR / "moe_test_configs.json").read_text())
+    configs = local_proxy_guard_configs(
+        load_workload_config(MOE_DIR / "moe_test_configs.json"),
+        explicit_opt_in=True,
+    )
     return {
         json.dumps(config, sort_keys=True, separators=(",", ":"))
         for config in configs["functional"]
@@ -67,7 +74,10 @@ def expected_functional_workload_keys() -> set[str]:
 
 
 def expected_performance_workload_keys() -> set[str]:
-    configs = json.loads((MOE_DIR / "moe_test_configs.json").read_text())
+    configs = local_proxy_guard_configs(
+        load_workload_config(MOE_DIR / "moe_test_configs.json"),
+        explicit_opt_in=True,
+    )
     return {
         json.dumps(config, sort_keys=True, separators=(",", ":"))
         for config in configs["performance"]
@@ -210,6 +220,8 @@ def _command(
     return [
         python,
         str(MOE_DIR / "tune_moe.py"),
+        "--evaluation-target",
+        "local-proxy-guard",
         "--experiment",
         experiment,
         "--mode",
@@ -260,6 +272,12 @@ def _load_record(path: Path) -> tuple[dict[str, Any] | None, str | None]:
 
 def main() -> None:
     parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--evaluation-target",
+        choices=("local-proxy-guard",),
+        required=True,
+        help="explicit opt-in to historical formal 11-tensor Stage-1 research",
+    )
     parser.add_argument("--runs", type=int, default=3, help="independent performance processes per experiment")
     parser.add_argument("--warmup", type=int, default=10)
     parser.add_argument("--iteration", type=int, default=100)

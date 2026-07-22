@@ -6,6 +6,7 @@ schedule 放在三个独立 Python 进程中运行，并生成一份可审计 JS
 ```bash
 source scripts/activate-maca.sh
 python scripts/run_moe_baseline.py \
+  --evaluation-target local-proxy-guard \
   --host-id c500-32g \
   --profiler-run-id <run-id>
 ```
@@ -59,6 +60,7 @@ E0–E5 使用独立 runner，共享相同的 warmup / iteration 与统计方法
 ```bash
 source scripts/activate-maca.sh
 python scripts/run_moe_stage1_experiments.py \
+  --evaluation-target local-proxy-guard \
   --host-id c500-32g \
   --runs 3 --warmup 10 --iteration 100
 ```

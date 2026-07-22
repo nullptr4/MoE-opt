@@ -47,6 +47,9 @@ SOURCE_SNAPSHOT_PATHS = (
     "benchmarks/tilelang-moe/custom_fusedmoe.py",
     "benchmarks/tilelang-moe/fusedmoe_benchmark.py",
     "benchmarks/tilelang-moe/moe_test_configs.json",
+    "benchmarks/tilelang-moe/moe_test_config_tools.py",
+    "benchmarks/tilelang-moe/remote_contract.json",
+    "benchmarks/tilelang-moe/remote_contract_tools.py",
     "benchmarks/tilelang-moe/moe_schedule.py",
     "benchmarks/tilelang-moe/submission.py",
     "benchmarks/tilelang-moe/test_moe_submission.py",
@@ -193,6 +196,8 @@ def _baseline_command(python: str, moe_dir: Path, result_json: Path, warmup: int
     return [
         python,
         str(moe_dir / "tune_moe.py"),
+        "--evaluation-target",
+        "local-proxy-guard",
         "--block-token",
         "128",
         "--block-dhidden",
@@ -231,6 +236,12 @@ def _baseline_command(python: str, moe_dir: Path, result_json: Path, warmup: int
 
 def main() -> None:
     parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--evaluation-target",
+        choices=("local-proxy-guard",),
+        required=True,
+        help="explicit opt-in to the historical formal 11-tensor baseline guard",
+    )
     parser.add_argument("--runs", type=int, default=3, help="independent benchmark processes")
     parser.add_argument("--warmup", type=int, default=10)
     parser.add_argument("--iteration", type=int, default=100)

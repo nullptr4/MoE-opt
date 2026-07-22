@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
-# Run the official task-1 preliminary-round Fused MoE functional/performance tests.
+# Run the default ten-argument submission remote matrix, or an explicit formal guard.
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 # shellcheck source=activate-maca.sh
 source "${ROOT}/scripts/activate-maca.sh"
 
-cd "${ROOT}/benchmarks/tilelang-moe"
-exec python fusedmoe_benchmark.py "$@"
+exec python "${ROOT}/scripts/run_moe_evaluation.py" "$@"

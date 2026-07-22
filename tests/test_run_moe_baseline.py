@@ -16,6 +16,7 @@ from run_moe_baseline import (  # noqa: E402
     aggregate_process_records,
     percentile,
     summarize_samples,
+    _baseline_command,
 )
 
 
@@ -84,6 +85,17 @@ class ReproducibilityTest(unittest.TestCase):
         self.assertEqual([item["path"] for item in snapshot], list(SOURCE_SNAPSHOT_PATHS))
         for item in snapshot:
             self.assertEqual(item["content"], (ROOT / item["path"]).read_text())
+
+    def test_baseline_command_is_explicitly_local_proxy_guard(self):
+        command = _baseline_command(
+            sys.executable,
+            ROOT / "benchmarks" / "tilelang-moe",
+            ROOT / "result.json",
+            10,
+            100,
+        )
+        self.assertIn("--evaluation-target", command)
+        self.assertEqual(command[command.index("--evaluation-target") + 1], "local-proxy-guard")
 
 
 if __name__ == "__main__":
