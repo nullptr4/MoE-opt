@@ -98,6 +98,12 @@ profiler 的 local-proxy champion gate 后，Agent 的可恢复双仓事务才�
 文件；任一步测试或提交失败都必须恢复旧字节并形成补偿记录。即使事务成功，结论仍仅是
 `local_proxy_champion`，aggregate 仍为 `unknown/null`，remote promotion 仍为 false。
 
+独立复核已否决 Agent v1 readiness；历史 `READY` 不再授权候选。v2 必须额外以行为测试
+证明生产 worker loop、正常 idle phase 的 watchdog 推进、受限 Codex CLI Planner、tracked
+no-agent cron 入口和长命令 heartbeat/lease。v2 再次通过后也必须停在
+`INFRASTRUCTURE_READY_AWAITING_INDEPENDENT_VERIFICATION`，外部 Hermes job 保持 paused，
+不得自动开始首个 candidate。Target submission 在该复核中保持字节不变。
+
 可用环境变量：`MOE_AUTOTUNE=0` 关闭实测调优，`MOE_AUTOHEURISTIC=0`
 关闭 shape 启发式但保留 autotune，`TILELANG_AUTO_TUNING_DISABLE_CACHE=1`
 关闭 autotune 磁盘缓存，`MOE_CLEAR_CACHE=1` 清空已有缓存。正确性仍由
