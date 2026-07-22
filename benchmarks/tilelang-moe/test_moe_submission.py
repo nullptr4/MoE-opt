@@ -28,6 +28,7 @@ sys.path.insert(0, str(ROOT))
 from remote_contract_tools import (  # noqa: E402
     case_parameter_fingerprint,
     contract_fingerprint,
+    generated_code_fingerprint,
     load_contract,
     local_parity_summary,
     submission_abi_fingerprint,
@@ -262,6 +263,37 @@ def check_case(case: CompactCase) -> tuple[dict[str, object], torch.Tensor]:
     return observation, out
 
 
+def generated_code_observation(case: CompactCase) -> dict[str, object]:
+    """Capture the exact lowered program already compiled by ``check_case``."""
+
+    get_kernel = getattr(submission, "_get_kernel", None)
+    if not callable(get_kernel):
+        raise RuntimeError("submission candidate omitted generated-code inspection boundary")
+    kernel = get_kernel(
+        case.hidden,
+        case.intermediate,
+        len(case.group_sizes_list),
+        int(case.tokens.shape[0]),
+        int(case.route_weights.shape[0]),
+        int(case.group_idx_for_bx.shape[0]),
+        int(case.group_offsets.shape[0]),
+        int(case.group_padded_offsets.shape[0]),
+    )
+    device_source = kernel.get_kernel_source(kernel_only=True)
+    host_source = kernel.get_host_source()
+    prim_func = kernel.prim_func
+    tir_source = (
+        prim_func.script()
+        if callable(getattr(prim_func, "script", None))
+        else str(prim_func)
+    )
+    return generated_code_fingerprint(
+        device_source=device_source,
+        host_source=host_source,
+        tir_source=tir_source,
+    )
+
+
 def random_group_sizes(experts: int, group_sum: int, seed: int) -> list[int]:
     """Generate deterministic, non-uniform routed counts with an exact sum."""
     generator = torch.Generator(device="cpu")
@@ -436,6 +468,11 @@ def main() -> None:
         help="run correctness and exact published warmup/iteration timing",
     )
     parser.add_argument(
+        "--codegen-remote",
+        action="store_true",
+        help="run three-case correctness and retain generated source/IR without timing",
+    )
+    parser.add_argument(
         "--report-json",
         help="write a repository-relative hardware evidence report",
     )
@@ -443,8 +480,12 @@ def main() -> None:
 
     if args.benchmark_remote:
         args.remote_shapes = True
-    if args.report_json and not args.benchmark_remote:
-        parser.error("--report-json requires --benchmark-remote complete evidence")
+    if args.codegen_remote:
+        args.remote_shapes = True
+    if args.report_json and not (args.benchmark_remote or args.codegen_remote):
+        parser.error("--report-json requires --benchmark-remote or --codegen-remote")
+    if args.benchmark_remote and args.codegen_remote:
+        parser.error("--benchmark-remote and --codegen-remote are mutually exclusive")
 
     if not torch.cuda.is_available():
         raise RuntimeError("the submission ABI test requires an active C500")
@@ -477,6 +518,7 @@ def main() -> None:
                     flush=True,
                 )
                 correctness, out = check_case(case)
+                generated_code = generated_code_observation(case)
                 workspace = submission._get_workspace(case.tokens, intermediate)
                 parameter = case_parameter_fingerprint(
                     contract=REMOTE_CONTRACT,
@@ -505,6 +547,7 @@ def main() -> None:
                         "case_id": name,
                         "correctness": correctness,
                         "benchmark": benchmark,
+                        "generated_code": generated_code,
                         "parameter_fingerprint": parameter,
                     }
                 )
@@ -575,6 +618,8 @@ def main() -> None:
                 "per published case: correctness/compile cache check, published warmup, "
                 "then contiguous run_kernel calls with adjacent CUDA-event boundaries; "
                 "all per-call samples retained and no outliers removed"
+                if args.benchmark_remote
+                else "three-case correctness and exact generated source/host/TIR capture; no timing"
             ),
             "case_order": [item[0] for item in remote_case_specs()],
             "cases": case_results,

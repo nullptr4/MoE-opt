@@ -16,6 +16,7 @@ sys.path.insert(0, str(MOE_ROOT))
 from remote_contract_tools import (  # noqa: E402  # pyright: ignore[reportMissingImports]
     ContractError,
     contract_fingerprint,
+    generated_code_fingerprint,
     load_contract,
     local_parity_summary,
     remote_case_specs,
@@ -24,6 +25,24 @@ from remote_contract_tools import (  # noqa: E402  # pyright: ignore[reportMissi
 
 
 class MoeRemoteContractTest(unittest.TestCase):
+    def test_generated_code_fingerprint_retains_text_hashes_and_resource_markers(self):
+        device = """extern __shared__ char buf_dyn_shmem[];\n__global__ void k0() __launch_bounds__(256, 1) { auto p = buf_dyn_shmem + 32768; }\n"""
+        result = generated_code_fingerprint(
+            device_source=device,
+            host_source="launch k0",
+            tir_source="@T.prim_func\ndef kernel(): pass",
+        )
+        self.assertEqual(
+            result["sources"]["device"]["sha256"],
+            hashlib.sha256(device.encode()).hexdigest(),
+        )
+        self.assertEqual(result["sources"]["device"]["text"], device)
+        self.assertEqual(result["resource_markers"]["launch_bounds"], ["256, 1"])
+        self.assertEqual(
+            result["resource_markers"]["dynamic_shared_offsets_bytes"], [32768]
+        )
+        self.assertEqual(result["resource_markers"]["extern_shared_declarations"], 1)
+
     def test_canonical_fingerprints_and_published_cases_are_stable(self):
         contract = load_contract()
         self.assertEqual(

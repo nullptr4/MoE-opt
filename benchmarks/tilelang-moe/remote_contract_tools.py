@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
+import re
 from typing import Any, Mapping, Sequence
 
 
@@ -54,6 +55,59 @@ def hash_integer_sequence(values: Sequence[int]) -> str:
     if any(isinstance(value, bool) or not isinstance(value, int) for value in values):
         raise ContractError("integer sequence contains a non-integer")
     return "sha256:" + _canonical_hash(list(values))
+
+
+def generated_code_fingerprint(
+    *,
+    device_source: str,
+    host_source: str,
+    tir_source: str,
+) -> dict[str, Any]:
+    """Retain exact generated text plus stable hashes and resource markers."""
+
+    sources = {
+        "device": device_source,
+        "host": host_source,
+        "tir": tir_source,
+    }
+    if any(not isinstance(value, str) or not value for value in sources.values()):
+        raise ContractError("generated code sources must be non-empty strings")
+
+    def observation(value: str) -> dict[str, Any]:
+        encoded = value.encode("utf-8")
+        return {
+            "sha256": hashlib.sha256(encoded).hexdigest(),
+            "bytes": len(encoded),
+            "lines": len(value.splitlines()),
+            "text": value,
+        }
+
+    launch_bounds = re.findall(
+        r"__launch_bounds__\s*\(([^)]*)\)", device_source
+    )
+    shared_offsets = sorted(
+        {
+            int(value)
+            for value in re.findall(
+                r"buf_dyn_shmem\s*\+\s*([0-9]+)", device_source
+            )
+        }
+    )
+    device_functions = re.findall(
+        r"__global__\s+void\s+([A-Za-z_][A-Za-z0-9_]*)", device_source
+    )
+    return {
+        "schema_version": SCHEMA_VERSION,
+        "sources": {name: observation(value) for name, value in sources.items()},
+        "resource_markers": {
+            "launch_bounds": launch_bounds,
+            "dynamic_shared_offsets_bytes": shared_offsets,
+            "extern_shared_declarations": len(
+                re.findall(r"extern\s+__shared__", device_source)
+            ),
+            "device_functions": device_functions,
+        },
+    }
 
 
 def contiguous_strides(shape: Sequence[int]) -> list[int]:
