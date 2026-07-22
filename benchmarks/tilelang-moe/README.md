@@ -84,6 +84,20 @@ routing、offset sentinel、stride/contiguity、workspace policy、case cache li
 `data/benchmarks/c500-64g/remote-submission-default-v2-20260722.json`；报告绑定
 submission、role-aware config 与 harness 哈希，并诚实记录运行时 tracked source 为 dirty。
 
+### Remote-first Agent readiness 边界
+
+新的 standalone submission 候选只能由 `/data/metax-c500-autotune-agent` 的持久化
+RemoteCampaignController 在确定性 readiness report 为 `READY` 后创建。readiness 前真实
+C500 只允许对当前已验证 submission baseline 做三 case correctness/timing 和两次
+mcProfiler diagnostic；Prompt、文档或手工脚本不能替代该 gate。H21F3 已在 Agent 侧标记
+`quarantined_pre_readiness`，不得复制到本仓库。
+
+候选评测期间不得修改本仓库。只有完成两次全量三 case、ABBA、generated-code 和兼容
+profiler 的 local-proxy champion gate 后，Agent 的可恢复双仓事务才允许同时更新
+`submission.py` 和 `sota_submission_sync.json`。事务不会修改/纳入本仓库现有 untracked
+文件；任一步测试或提交失败都必须恢复旧字节并形成补偿记录。即使事务成功，结论仍仅是
+`local_proxy_champion`，aggregate 仍为 `unknown/null`，remote promotion 仍为 false。
+
 可用环境变量：`MOE_AUTOTUNE=0` 关闭实测调优，`MOE_AUTOHEURISTIC=0`
 关闭 shape 启发式但保留 autotune，`TILELANG_AUTO_TUNING_DISABLE_CACHE=1`
 关闭 autotune 磁盘缓存，`MOE_CLEAR_CACHE=1` 清空已有缓存。正确性仍由
