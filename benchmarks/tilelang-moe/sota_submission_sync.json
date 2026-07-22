@@ -14,45 +14,20 @@
     "sync_status": "remote-range-aligned-compact-fp16-baseline"
   },
   "remote_contract": {
-    "storage": "input, private up_logits workspace and output each have compact group_sum rows",
-    "metadata": "group_padded_offsets and group_idx_for_bx map padded scheduling coordinates back to compact rows",
-    "dtypes": "all data tensors are FP16 and all group metadata tensors are INT32",
-    "block_token": 128,
-    "published_cases": [
-      {
-        "id": 1,
-        "n_routed_experts": 16,
-        "d_hidden": 2048,
-        "d_expert": 8192,
-        "group_sum": 2272,
-        "warmup": 5,
-        "iterations": 30
-      },
-      {
-        "id": 2,
-        "n_routed_experts": 32,
-        "d_hidden": 7168,
-        "d_expert": 2048,
-        "group_sum": 4544,
-        "warmup": 5,
-        "iterations": 20
-      },
-      {
-        "id": 3,
-        "n_routed_experts": 64,
-        "d_hidden": 7168,
-        "d_expert": 2048,
-        "group_sum": 9088,
-        "warmup": 5,
-        "iterations": 20
-      }
-    ]
+    "source_path": "benchmarks/tilelang-moe/remote_contract.json",
+    "source_sha256": "e0d22e065379513140f35702a504950ae08909b47e2c2d635008ccbb7e9235c6",
+    "contract_fingerprint": "sha256:76213668b712444f98522210534bd01faba7b1d4c09bee17f44ff9fe76c6b1d8",
+    "submission_abi_fingerprint": "sha256:f4151e2be522b52490ef26bf2c204e1e0b66bb2fff69f84950de01be124f8fa2",
+    "status": "LOCAL_PROXY_ONLY",
+    "known": "three published dimensions and case order; ten-argument run_kernel order; compact group_sum data/output rows; FP16 data and INT32 metadata; warmup/iterations 5/30, 5/20, 5/20",
+    "derived": "private compact workspace rows and scheduling-metadata formulas used by the cited/local implementation",
+    "unknown": "remote routing distribution and weights, offset sentinel, tensor strides/contiguity, workspace policy, cache lifecycle, scoring aggregate, and exact online toolchain"
   },
   "online_incident": {
     "reported_symptom": "OJCHAL v1 followed by native Python traceback-handler segfault and exit code 11",
     "first_failed_submission_sha256": "dd21d0940706ddb30023819d69c2a1405bf88a00433915ff330e03763114388b",
     "second_failed_submission_sha256": "c44f7f4dcffe67d63a7ce1eed76c5570ac73654b76e6fb55fbf4721db64a1b9d",
-    "corrected_causal_assessment": "Removing T.assume did not fix the online crash. The published group_sum ranges and FP16 workspace/output contract establish compact storage and invalidate the earlier padded local fixture.",
+    "corrected_causal_assessment": "Removing T.assume did not fix the online crash. Both incidents remain exit-11 observations with unknown root cause; local published-dimension fixtures do not establish exact remote routing or toolchain parity.",
     "re_enable_optimized_schedule_only_with": "successful evidence from the exact online evaluator"
   },
   "synchronized_mechanisms": [
@@ -75,5 +50,5 @@
     "storage_rows = int(stacked_expert_tokens.shape[0])": 1,
     "up_logits = _get_workspace(stacked_expert_tokens, intermediate)": 1
   },
-  "promotion_policy": "The local submission gate must reproduce all published remote dimensions, compact group_sum storage, FP16 data/workspace/output and exact INT32 metadata construction before a source can be called submit-ready."
+  "promotion_policy": "Published-dimension local C500 checks are local_proxy evidence only. submit-ready, remote-equivalent and remote-SOTA claims fail closed until every policy-required unknown in remote_contract.json is closed by published or remotely observed evidence."
 }

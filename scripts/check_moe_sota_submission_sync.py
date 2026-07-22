@@ -86,6 +86,41 @@ def check_sync(root: Path) -> list[str]:
     if not isinstance(mechanisms, list) or not mechanisms:
         errors.append("synchronized_mechanisms must document at least one adapted mechanism")
 
+    remote = manifest.get("remote_contract")
+    if not isinstance(remote, dict):
+        errors.append("missing remote_contract binding")
+    else:
+        required_remote = {
+            "source_path", "source_sha256", "contract_fingerprint",
+            "submission_abi_fingerprint", "status", "known", "derived", "unknown",
+        }
+        if set(remote) != required_remote:
+            errors.append("remote_contract binding fields differ from the v1 sync policy")
+        else:
+            remote_path = (root / remote["source_path"]).resolve()
+            if not remote_path.is_relative_to(root.resolve()) or not remote_path.is_file():
+                errors.append("remote contract mirror is missing or escapes the repository")
+            elif sha256(remote_path) != remote["source_sha256"]:
+                errors.append("remote contract mirror SHA differs from the sync manifest")
+            else:
+                sys.path.insert(0, str(remote_path.parent))
+                try:
+                    from remote_contract_tools import (  # type: ignore
+                        contract_fingerprint,
+                        load_contract,
+                        submission_abi_fingerprint,
+                    )
+
+                    contract = load_contract(remote_path)
+                    if contract_fingerprint(contract) != remote["contract_fingerprint"]:
+                        errors.append("remote contract canonical fingerprint differs")
+                    if submission_abi_fingerprint(contract) != remote["submission_abi_fingerprint"]:
+                        errors.append("remote submission ABI fingerprint differs")
+                    if remote["status"] != "LOCAL_PROXY_ONLY":
+                        errors.append("unresolved remote contract must stay LOCAL_PROXY_ONLY")
+                except (ImportError, ValueError) as exc:
+                    errors.append(f"cannot validate remote contract binding: {exc}")
+
     return errors
 
 

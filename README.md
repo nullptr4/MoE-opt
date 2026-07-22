@@ -97,11 +97,18 @@ python scripts/run_moe_stage1_experiments.py --host-id "${MOE_HOST_ID}"
 python scripts/run_moe_baseline.py --host-id "${MOE_HOST_ID}"
 ```
 
-提交 ABI 的本地对拍：
+提交 ABI 的本地对拍（compact group_sum 10-argument `submission.run_kernel`；
+不要与 formal compact 11-tensor `RoutedMoEKernel` 混称）：
 
 ```bash
-scripts/test-moe-submission.sh --public-shape
+scripts/test-moe-submission.sh --remote-shapes
+python scripts/check_moe_remote_contract.py
 ```
+
+published dimensions 的本地 mirror 使用本地随机 routing，当前契约状态为
+`LOCAL_PROXY_ONLY`；远程 routing/metadata sentinel/cache lifecycle/aggregate scoring/
+exact toolchain 等未知项在 `benchmarks/tilelang-moe/remote_contract.json` 中逐字段记录。
+因此旧 Large/Small 性能和三组本地 mirror 性能都不得冒充 remote-equivalent 分数。
 
 两台服务器共享实验数据时，分别设置：
 

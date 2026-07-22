@@ -4,8 +4,16 @@
 from __future__ import annotations
 
 import argparse
+from datetime import datetime, timezone
 import gc
+import hashlib
+import importlib.util
+import json
 import math
+import os
+import platform
+from statistics import mean, median, pstdev
+import subprocess
 import sys
 from dataclasses import dataclass
 from pathlib import Path
@@ -17,7 +25,35 @@ import torch.nn.functional as F
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
 
-import submission  # noqa: E402
+from remote_contract_tools import (  # noqa: E402
+    case_parameter_fingerprint,
+    contract_fingerprint,
+    load_contract,
+    local_parity_summary,
+    remote_case_specs as contract_case_specs,
+    submission_abi_fingerprint,
+)
+
+
+def load_submission_module():
+    reference = os.environ.get("MOE_SUBMISSION_SOURCE")
+    source = ROOT / "submission.py" if reference is None else Path(reference)
+    source = source.resolve()
+    allowed_roots = (ROOT, Path.cwd().resolve())
+    if not source.is_file() or not any(source.is_relative_to(root) for root in allowed_roots):
+        raise RuntimeError("submission source must be a file below the harness or current worktree")
+    spec = importlib.util.spec_from_file_location("moe_submission_candidate", source)
+    if spec is None or spec.loader is None:
+        raise RuntimeError("could not create submission module specification")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    if not callable(getattr(module, "run_kernel", None)):
+        raise RuntimeError("submission source omitted callable run_kernel")
+    return module, source
+
+
+submission, SUBMISSION_SOURCE = load_submission_module()
+REMOTE_CONTRACT = load_contract()
 
 
 BLOCK_TOKEN = 128
@@ -166,7 +202,24 @@ def reference(case: CompactCase) -> torch.Tensor:
     return result
 
 
-def check_case(case: CompactCase) -> None:
+def correctness_observation(actual: torch.Tensor, expected: torch.Tensor) -> dict[str, object]:
+    actual32 = actual.float()
+    expected32 = expected.float()
+    absolute = torch.abs(actual32 - expected32)
+    close = torch.isclose(actual32, expected32, atol=1e-2, rtol=1e-2, equal_nan=False)
+    denominator = torch.clamp(torch.abs(expected32), min=1e-2)
+    return {
+        "atol": 1e-2,
+        "rtol": 1e-2,
+        "equal_nan": False,
+        "total_values": int(expected.numel()),
+        "mismatch_count": int((~close).sum().item()),
+        "max_abs_error": float(absolute.max().item()),
+        "max_rel_error": float((absolute / denominator).max().item()),
+    }
+
+
+def check_case(case: CompactCase) -> tuple[dict[str, object], torch.Tensor]:
     expected = reference(case)
     out = torch.full_like(case.tokens, float("nan"))
 
@@ -194,6 +247,7 @@ def check_case(case: CompactCase) -> None:
         rtol=1e-2,
         equal_nan=False,
     )
+    observation = correctness_observation(out, expected)
     print(
         f"PASS {case.name}: E={len(case.group_sizes_list)} H={case.hidden} "
         f"I={case.intermediate} group_sum={case.tokens.shape[0]} "
@@ -201,6 +255,7 @@ def check_case(case: CompactCase) -> None:
         f"dtype={case.tokens.dtype}/{case.route_weights.dtype}",
         flush=True,
     )
+    return observation, out
 
 
 def random_group_sizes(experts: int, group_sum: int, seed: int) -> list[int]:
@@ -213,7 +268,24 @@ def random_group_sizes(experts: int, group_sum: int, seed: int) -> list[int]:
     return torch.bincount(assignments, minlength=experts).tolist()
 
 
-def benchmark_case(case: CompactCase, warmup: int, iterations: int) -> float:
+def benchmark_statistics(samples: list[float]) -> dict[str, object]:
+    ordered = sorted(samples)
+    rank = 0.9 * (len(ordered) - 1)
+    lower = math.floor(rank)
+    upper = math.ceil(rank)
+    p90 = ordered[lower] + (ordered[upper] - ordered[lower]) * (rank - lower)
+    return {
+        "samples_ms": samples,
+        "count": len(samples),
+        "mean_ms": mean(samples),
+        "median_ms": median(samples),
+        "stddev_ms": pstdev(samples),
+        "p90_ms": p90,
+        "outlier_policy": "none",
+    }
+
+
+def benchmark_case(case: CompactCase, warmup: int, iterations: int) -> dict[str, object]:
     out = torch.empty_like(case.tokens)
     args = (
         case.tokens,
@@ -231,29 +303,95 @@ def benchmark_case(case: CompactCase, warmup: int, iterations: int) -> float:
     for _ in range(warmup):
         submission.run_kernel(*args)
 
-    start = torch.cuda.Event(enable_timing=True)
-    end = torch.cuda.Event(enable_timing=True)
-    start.record()
-    for _ in range(iterations):
+    boundaries = [torch.cuda.Event(enable_timing=True) for _ in range(iterations + 1)]
+    boundaries[0].record()
+    for index in range(iterations):
         submission.run_kernel(*args)
-    end.record()
+        boundaries[index + 1].record()
     torch.cuda.synchronize()
-    latency_ms = start.elapsed_time(end) / iterations
+    samples = [
+        float(boundaries[index].elapsed_time(boundaries[index + 1]))
+        for index in range(iterations)
+    ]
+    if any(not math.isfinite(value) or value <= 0 for value in samples):
+        raise RuntimeError("benchmark produced a non-finite or non-positive sample")
+    result = benchmark_statistics(samples)
     print(
-        f"TIME {case.name}: {latency_ms:.8f} ms "
+        f"TIME {case.name}: {result['mean_ms']:.8f} ms mean "
         f"warmup={warmup} iters={iterations}",
         flush=True,
     )
-    return latency_ms
+    return result
 
 
 def remote_case_specs() -> tuple[tuple[str, int, int, int, int, int, int], ...]:
-    # Published remote dimensions and timing policy from the evaluator table.
-    return (
-        ("remote-case-1", 2048, 8192, 16, 2272, 5, 30),
-        ("remote-case-2", 7168, 2048, 32, 4544, 5, 20),
-        ("remote-case-3", 7168, 2048, 64, 9088, 5, 20),
+    return contract_case_specs(REMOTE_CONTRACT)
+
+
+def environment_fingerprint() -> tuple[str, dict[str, object]]:
+    import tilelang
+
+    commit = subprocess.run(
+        ("git", "rev-parse", "HEAD"),
+        cwd=ROOT.parents[1],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        check=False,
     )
+    if commit.returncode != 0:
+        raise RuntimeError("cannot capture source commit for hardware evidence")
+    components = {
+        "python": platform.python_version(),
+        "torch": torch.__version__,
+        "tilelang": tilelang.__version__,
+        "device": torch.cuda.get_device_name(0),
+        "submission_source": SUBMISSION_SOURCE.as_posix(),
+        "submission_sha256": hashlib.sha256(SUBMISSION_SOURCE.read_bytes()).hexdigest(),
+        "contract_fingerprint": contract_fingerprint(REMOTE_CONTRACT),
+        "source_commit": commit.stdout.strip(),
+    }
+    digest = hashlib.sha256(
+        json.dumps(components, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    ).hexdigest()
+    return "sha256:" + digest, components
+
+
+def thermal_clock_notes() -> str:
+    result = subprocess.run(
+        ("mx-smi",),
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        text=True,
+        check=False,
+        timeout=30,
+    )
+    if result.returncode != 0:
+        return f"mx-smi query failed with exit {result.returncode}"
+    lines = [
+        line.strip()
+        for line in result.stdout.splitlines()
+        if "Kernel Mode Driver Version" in line
+        or "MACA Version" in line
+        or "MetaX C500" in line
+        or ("W / 350W" in line and "C" in line and "P" in line)
+    ]
+    return " | ".join(lines) or "mx-smi returned no parseable C500 thermal/clock row"
+
+
+def write_report(reference: str, report: dict[str, object]) -> Path:
+    repository = ROOT.parents[1]
+    destination = (repository / reference).resolve()
+    if Path(reference).is_absolute() or not destination.is_relative_to(repository):
+        raise RuntimeError("--report-json must be repository-relative")
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    temporary = destination.with_name(f".{destination.name}.tmp")
+    temporary.write_text(
+        json.dumps(report, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    temporary.replace(destination)
+    return destination
 
 
 def main() -> None:
@@ -276,14 +414,21 @@ def main() -> None:
         action="store_true",
         help="run correctness and exact published warmup/iteration timing",
     )
+    parser.add_argument(
+        "--report-json",
+        help="write a repository-relative hardware evidence report",
+    )
     args = parser.parse_args()
 
     if args.benchmark_remote:
         args.remote_shapes = True
+    if args.report_json and not args.benchmark_remote:
+        parser.error("--report-json requires --benchmark-remote complete evidence")
 
     if not torch.cuda.is_available():
         raise RuntimeError("the submission ABI test requires an active C500")
 
+    case_results: list[dict[str, object]] = []
     if not args.fuzz_only:
         check_case(
             make_case(
@@ -310,9 +455,38 @@ def main() -> None:
                     f"group_sum={sum(sizes)}",
                     flush=True,
                 )
-                check_case(case)
-                if args.benchmark_remote:
+                correctness, out = check_case(case)
+                workspace = submission._get_workspace(case.tokens, intermediate)
+                parameter = case_parameter_fingerprint(
+                    contract=REMOTE_CONTRACT,
+                    case=case,
+                    out=out,
+                    workspace=workspace,
+                    warmup=warmup,
+                    iterations=iterations,
+                    routing_generator=(
+                        f"torch.randint uniform expert assignments; seed={81394 + case_id}"
+                    ),
+                    route_weight_generator="torch.rand FP16; tensor generator seed=81394",
+                    case_cache_lifecycle=(
+                        "one process; correctness compilation precedes timing; "
+                        "kernel/workspace caches persist; allocator cache emptied after case"
+                    ),
+                    compiler_path="submission.run_kernel -> tilelang.jit specialization cache",
+                )
+                benchmark = (
                     benchmark_case(case, warmup, iterations)
+                    if args.benchmark_remote
+                    else None
+                )
+                case_results.append(
+                    {
+                        "case_id": name,
+                        "correctness": correctness,
+                        "benchmark": benchmark,
+                        "parameter_fingerprint": parameter,
+                    }
+                )
                 del case
                 gc.collect()
                 torch.cuda.empty_cache()
@@ -361,6 +535,42 @@ def main() -> None:
         )
         for case in fuzz_cases:
             check_case(case)
+
+    if args.report_json:
+        environment, components = environment_fingerprint()
+        report = {
+            "schema_version": "1.0",
+            "report_type": "c500-routed-moe-submission-local-parity",
+            "evidence_kind": "hardware",
+            "support_level": "measured",
+            "recorded_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z"),
+            "contract_fingerprint": contract_fingerprint(REMOTE_CONTRACT),
+            "submission_abi_fingerprint": submission_abi_fingerprint(REMOTE_CONTRACT),
+            "environment_fingerprint": environment,
+            "environment": components,
+            "source_commit": components["source_commit"],
+            "thermal_clock_notes": thermal_clock_notes(),
+            "timing_protocol": (
+                "per published case: correctness/compile cache check, published warmup, "
+                "then contiguous run_kernel calls with adjacent CUDA-event boundaries; "
+                "all per-call samples retained and no outliers removed"
+            ),
+            "case_order": [item[0] for item in remote_case_specs()],
+            "cases": case_results,
+            "scoring": {
+                "per_case_metrics": True,
+                "aggregate_status": "unknown",
+                "aggregate_value": None,
+            },
+            "parity": local_parity_summary(REMOTE_CONTRACT),
+            "evidence_boundary": (
+                "Real C500 measurements for local routing fixtures; not exact remote-equivalent "
+                "while routing, offset sentinel, cache lifecycle, aggregate scoring, strides, "
+                "workspace policy, and online toolchain remain unresolved."
+            ),
+        }
+        destination = write_report(args.report_json, report)
+        print(f"REPORT {destination.relative_to(ROOT.parents[1]).as_posix()}", flush=True)
 
 
 if __name__ == "__main__":

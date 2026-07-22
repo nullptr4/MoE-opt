@@ -55,12 +55,27 @@ scripts/run-moe.sh
 MOE_AUTOTUNE_MODE=full scripts/run-moe.sh
 ```
 
-调优报告和原始候选记录位于仓库根目录的 `reports/` 与 `logs/`。OJ 的
-独立入口是 `submission.py`，其 padded-token ABI 对拍使用：
+调优报告和原始候选记录位于仓库根目录的 `reports/` 与 `logs/`。正式
+`custom_fusedmoe.RoutedMoEKernel` 是带调用方 `up_logits` 的 compact 11-tensor
+ABI；OJ 独立入口 `submission.run_kernel` 是私有 workspace 的 compact
+group_sum 10-argument ABI。padded scheduling metadata 不代表 padded data storage。
+本地 smoke/remote-dimension 对拍使用：
 
 ```bash
-scripts/test-moe-submission.sh --public-shape
+scripts/test-moe-submission.sh --remote-shapes
+scripts/test-moe-submission.sh --benchmark-remote \
+  --report-json data/benchmarks/c500-64g/remote-submission-parity.json
 ```
+
+三组 published dimensions/timing 是 `(H,I,E,group_sum,warmup,iterations)`：
+`(2048,8192,16,2272,5,30)`、`(7168,2048,32,4544,5,20)`、
+`(7168,2048,64,9088,5,20)`。单一事实源是 `remote_contract.json`，运行
+`python ../../scripts/check_moe_remote_contract.py` 可验证 canonical contract/ABI
+fingerprint。当前 `group_sizes`/route weights 是确定性的本地随机 fixture；远程
+routing、offset sentinel、stride/contiguity、workspace policy、case cache lifecycle、
+评分聚合与 exact toolchain 仍未知，因此即使三组本地 C500 correctness 通过也只能称
+`LOCAL_PROXY_ONLY`，不能称 submit-ready、remote-equivalent 或 remote SOTA。旧
+`moe_test_configs.json` Large/Small 仍是正式 kernel guard/proxy，不是远程 workload。
 
 可用环境变量：`MOE_AUTOTUNE=0` 关闭实测调优，`MOE_AUTOHEURISTIC=0`
 关闭 shape 启发式但保留 autotune，`TILELANG_AUTO_TUNING_DISABLE_CACHE=1`

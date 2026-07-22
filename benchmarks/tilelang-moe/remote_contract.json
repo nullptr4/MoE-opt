@@ -1,0 +1,165 @@
+{
+  "schema_version": "1.0",
+  "contract_id": "metax-c500-routed-moe-remote",
+  "contract_version": "2026-07-22.1",
+  "accessed_at": "2026-07-22",
+  "canonical_owner": "contracts/c500-routed-moe-remote-v1.json",
+  "sources": {
+    "official-routed-moe-tutorial": {
+      "kind": "official_material",
+      "locator": "/data/赛题/基于国产软件栈大模型推理前沿算子优化/赛题一moe教程",
+      "title": "Fused MoE GEMM 提交说明",
+      "version": "git:49bd20d721ffb0bb9d2d59521fb773ac350352fe",
+      "accessed_at": "2026-07-22",
+      "support_level": "official",
+      "license": "repository LICENSE applies; no source code copied into this manifest",
+      "applies_to": "ten-argument run_kernel name/order and high-level routed-MoE semantics",
+      "limitations": "the tutorial example uses padded rows and FP32 route weights and therefore does not establish the current remote storage/dtype details"
+    },
+    "published-remote-evaluator-table": {
+      "kind": "remote_platform_capture",
+      "locator": "/data/MoE-opt/reports/2026-07-21-moe-remote-compact-range-alignment.md",
+      "title": "Remote evaluator published case table and timing counts",
+      "version": "target-git:471f10424209842210b62c5866cb127a02ca792a",
+      "accessed_at": "2026-07-22",
+      "support_level": "remotely_observed",
+      "license": "factual evaluator metadata; screenshot itself is not redistributed",
+      "applies_to": "three case dimensions, FP16/INT32 ranges and per-case warmup/iteration counts",
+      "limitations": "the private testcase_config.py, raw routing tensors, scoring implementation and exact toolchain inventory are unavailable"
+    },
+    "cited-tilelang-benchmark": {
+      "kind": "upstream_source",
+      "locator": "tilelang-metax commit ee6db4376484f2f7270183c01fd0d90f794965cb",
+      "title": "Cited routed-MoE benchmark implementation",
+      "version": "ee6db4376484f2f7270183c01fd0d90f794965cb",
+      "accessed_at": "2026-07-21",
+      "support_level": "official",
+      "license": "upstream repository license; formulas are described, code is not copied",
+      "applies_to": "derivation of compact-row address translation and one candidate metadata formula",
+      "limitations": "upstream benchmark behavior is not proof that the private remote evaluator uses identical routing, offsets, lifecycle or compiler"
+    },
+    "target-local-mirror": {
+      "kind": "local_implementation",
+      "locator": "/data/MoE-opt/benchmarks/tilelang-moe/test_moe_submission.py",
+      "title": "Local compact remote-shape mirror",
+      "version": "target-git:471f10424209842210b62c5866cb127a02ca792a",
+      "accessed_at": "2026-07-22",
+      "support_level": "local_assumption",
+      "license": "project source",
+      "applies_to": "deterministic fixture routing, metadata construction, cache order and local C500 replay",
+      "limitations": "local random_group_sizes and metadata construction are not remote observations"
+    },
+    "online-exit11-incidents": {
+      "kind": "remote_platform_incident",
+      "locator": "/data/MoE-opt/reports/2026-07-21-moe-online-compact-padded-compatibility-baseline.md",
+      "title": "Two online native crash / exit 11 observations",
+      "version": "target-git:471f10424209842210b62c5866cb127a02ca792a",
+      "accessed_at": "2026-07-22",
+      "support_level": "remotely_observed",
+      "license": "project incident record",
+      "applies_to": "OJCHAL v1 symptom and exit code for two exact submission hashes",
+      "limitations": "no Python exception body, core dump, failing tensor metadata or exact package inventory was supplied"
+    },
+    "published-container-image": {
+      "kind": "official_material",
+      "locator": "/data/赛题/README.md",
+      "title": "Competition image family",
+      "version": "git:49bd20d721ffb0bb9d2d59521fb773ac350352fe",
+      "accessed_at": "2026-07-22",
+      "support_level": "published",
+      "license": "repository LICENSE applies",
+      "applies_to": "published image family: PyTorch-Agent / 2.8.0 / Python 3.12 / MACA 3.7.1.5",
+      "limitations": "does not identify exact OJ TileLang/compiler/runtime commits or wrapper configuration"
+    }
+  },
+  "fields": {
+    "abi.entrypoint": {"status": "published", "value": "run_kernel", "source_ids": ["official-routed-moe-tutorial"], "note": "Remote submission entrypoint.", "close_with": null},
+    "abi.argument_count": {"status": "published", "value": 10, "source_ids": ["official-routed-moe-tutorial"], "note": "The remote wrapper supplies ten arguments; workspace is not an argument.", "close_with": null},
+    "abi.argument_order": {"status": "published", "value": ["stacked_expert_tokens", "gate_w", "up_w", "down_w", "routed_expert_weights", "group_sizes", "group_offsets", "group_padded_offsets", "group_idx_for_bx", "out"], "source_ids": ["official-routed-moe-tutorial"], "note": "Argument names and order are fixed.", "close_with": null},
+    "abi.output_semantics": {"status": "published", "value": "write supplied out tensor in place; no returned tensor", "source_ids": ["official-routed-moe-tutorial"], "note": "Submission must mutate out.", "close_with": null},
+    "abi.formal_kernel": {"status": "local_assumption", "value": "RoutedMoEKernel eleven-tensor call including caller workspace", "source_ids": ["target-local-mirror"], "note": "This is the local formal research ABI, not the remote ABI.", "close_with": "Only an explicit remote platform statement could make the formal ABI remotely applicable."},
+
+    "workload.case_order": {"status": "published", "value": ["remote-case-1", "remote-case-2", "remote-case-3"], "source_ids": ["published-remote-evaluator-table"], "note": "Display order of the three published cases.", "close_with": null},
+    "cases.remote-case-1.hidden": {"status": "published", "value": 2048, "source_ids": ["published-remote-evaluator-table"], "note": "Published H.", "close_with": null},
+    "cases.remote-case-1.intermediate": {"status": "published", "value": 8192, "source_ids": ["published-remote-evaluator-table"], "note": "Published I.", "close_with": null},
+    "cases.remote-case-1.experts": {"status": "published", "value": 16, "source_ids": ["published-remote-evaluator-table"], "note": "Published E.", "close_with": null},
+    "cases.remote-case-1.group_sum": {"status": "published", "value": 2272, "source_ids": ["published-remote-evaluator-table"], "note": "Published compact row count.", "close_with": null},
+    "cases.remote-case-1.warmup": {"status": "published", "value": 5, "source_ids": ["published-remote-evaluator-table"], "note": "Published warmup count.", "close_with": null},
+    "cases.remote-case-1.iterations": {"status": "published", "value": 30, "source_ids": ["published-remote-evaluator-table"], "note": "Published timed iteration count.", "close_with": null},
+    "cases.remote-case-2.hidden": {"status": "published", "value": 7168, "source_ids": ["published-remote-evaluator-table"], "note": "Published H.", "close_with": null},
+    "cases.remote-case-2.intermediate": {"status": "published", "value": 2048, "source_ids": ["published-remote-evaluator-table"], "note": "Published I.", "close_with": null},
+    "cases.remote-case-2.experts": {"status": "published", "value": 32, "source_ids": ["published-remote-evaluator-table"], "note": "Published E.", "close_with": null},
+    "cases.remote-case-2.group_sum": {"status": "published", "value": 4544, "source_ids": ["published-remote-evaluator-table"], "note": "Published compact row count.", "close_with": null},
+    "cases.remote-case-2.warmup": {"status": "published", "value": 5, "source_ids": ["published-remote-evaluator-table"], "note": "Published warmup count.", "close_with": null},
+    "cases.remote-case-2.iterations": {"status": "published", "value": 20, "source_ids": ["published-remote-evaluator-table"], "note": "Published timed iteration count.", "close_with": null},
+    "cases.remote-case-3.hidden": {"status": "published", "value": 7168, "source_ids": ["published-remote-evaluator-table"], "note": "Published H.", "close_with": null},
+    "cases.remote-case-3.intermediate": {"status": "published", "value": 2048, "source_ids": ["published-remote-evaluator-table"], "note": "Published I.", "close_with": null},
+    "cases.remote-case-3.experts": {"status": "published", "value": 64, "source_ids": ["published-remote-evaluator-table"], "note": "Published E.", "close_with": null},
+    "cases.remote-case-3.group_sum": {"status": "published", "value": 9088, "source_ids": ["published-remote-evaluator-table"], "note": "Published compact row count.", "close_with": null},
+    "cases.remote-case-3.warmup": {"status": "published", "value": 5, "source_ids": ["published-remote-evaluator-table"], "note": "Published warmup count.", "close_with": null},
+    "cases.remote-case-3.iterations": {"status": "published", "value": 20, "source_ids": ["published-remote-evaluator-table"], "note": "Published timed iteration count.", "close_with": null},
+
+    "tensor.stacked_expert_tokens.shape": {"status": "published", "value": ["group_sum", "hidden"], "source_ids": ["published-remote-evaluator-table"], "note": "Compact input shape expression.", "close_with": null},
+    "tensor.gate_w.shape": {"status": "published", "value": ["experts", "intermediate", "hidden"], "source_ids": ["published-remote-evaluator-table"], "note": "Gate weight shape expression.", "close_with": null},
+    "tensor.up_w.shape": {"status": "published", "value": ["experts", "intermediate", "hidden"], "source_ids": ["published-remote-evaluator-table"], "note": "Up weight shape expression.", "close_with": null},
+    "tensor.down_w.shape": {"status": "published", "value": ["experts", "hidden", "intermediate"], "source_ids": ["published-remote-evaluator-table"], "note": "Down weight shape expression.", "close_with": null},
+    "tensor.routed_expert_weights.shape": {"status": "published", "value": ["group_sum"], "source_ids": ["published-remote-evaluator-table"], "note": "One route weight per compact row.", "close_with": null},
+    "tensor.out.shape": {"status": "published", "value": ["group_sum", "hidden"], "source_ids": ["published-remote-evaluator-table"], "note": "Compact output shape expression.", "close_with": null},
+    "tensor.data_dtype": {"status": "published", "value": "float16", "source_ids": ["published-remote-evaluator-table"], "note": "Input, weights, route weights, private workspace and output are FP16 in the published table.", "close_with": null},
+    "tensor.metadata_dtype": {"status": "published", "value": "int32", "source_ids": ["published-remote-evaluator-table"], "note": "All group metadata is INT32.", "close_with": null},
+    "tensor.stride_requirements": {"status": "unknown", "value": null, "source_ids": [], "note": "The available table gives shapes and dtypes but no stride contract.", "close_with": "Obtain testcase_config.py or a remote tensor metadata dump containing shape, stride and contiguity for every argument."},
+    "tensor.contiguity_requirements": {"status": "unknown", "value": null, "source_ids": [], "note": "Local fixtures allocate contiguous tensors, but remote contiguity is not stated.", "close_with": "Obtain an authoritative remote wrapper assertion or tensor metadata dump."},
+
+    "storage.data_rows": {"status": "published", "value": "group_sum", "source_ids": ["published-remote-evaluator-table"], "note": "Input storage is compact.", "close_with": null},
+    "storage.workspace_rows": {"status": "derived", "value": "group_sum", "source_ids": ["published-remote-evaluator-table", "cited-tilelang-benchmark"], "note": "A valid private intermediate needs one compact row per input route; the remote wrapper does not pass it.", "close_with": "A remote wrapper/source dump would promote this derivation."},
+    "storage.output_rows": {"status": "published", "value": "group_sum", "source_ids": ["published-remote-evaluator-table"], "note": "Output storage is compact.", "close_with": null},
+    "workspace.policy": {"status": "unknown", "value": null, "source_ids": [], "note": "The ten-argument ABI implies no supplied workspace, but allocation, reuse and cache policy are private to the submission/evaluator interaction.", "close_with": "Obtain the exact remote wrapper lifecycle or a platform statement about permitted private allocation and caching."},
+
+    "metadata.block_token": {"status": "published", "value": 128, "source_ids": ["published-remote-evaluator-table"], "note": "Scheduling block size.", "close_with": null},
+    "metadata.group_sizes.length": {"status": "derived", "value": "experts", "source_ids": ["official-routed-moe-tutorial", "cited-tilelang-benchmark"], "note": "One count per expert.", "close_with": "Remote tensor metadata would promote this derivation."},
+    "metadata.group_offsets.formula": {"status": "derived", "value": "exclusive_prefix_sum(group_sizes)", "source_ids": ["cited-tilelang-benchmark"], "note": "Compact row starts used by the cited benchmark.", "close_with": "Obtain remote testcase_config.py or raw tensors."},
+    "metadata.group_padded_offsets.formula": {"status": "derived", "value": "prefix_sum(ceil((group_size + 1) / 128) * 128)", "source_ids": ["cited-tilelang-benchmark"], "note": "Current cited-source derivation; it is not independently observed in the private evaluator.", "close_with": "Obtain remote testcase_config.py or hashes of its metadata tensors."},
+    "metadata.block_count.formula": {"status": "derived", "value": "ceil(group_sum / 128) + experts", "source_ids": ["cited-tilelang-benchmark"], "note": "Cited benchmark launch-grid formula.", "close_with": "Obtain remote testcase_config.py or a remote group_idx_for_bx length dump."},
+    "metadata.group_idx_for_bx.formula": {"status": "derived", "value": "last expert whose padded offset is <= bx * 128", "source_ids": ["cited-tilelang-benchmark"], "note": "Cited scheduling map.", "close_with": "Obtain remote testcase_config.py or raw metadata hashes."},
+    "metadata.offset_sentinel": {"status": "unknown", "value": null, "source_ids": [], "note": "Local code accepts E and E+1 offset lengths; the remote convention is not published.", "close_with": "Obtain exact remote shapes for group_offsets and group_padded_offsets."},
+
+    "routing.group_sizes_generation": {"status": "unknown", "value": null, "source_ids": [], "note": "The private routing generator and RNG sequence are unavailable.", "close_with": "Obtain testcase_config.py or per-case group_sizes values/hashes from the remote evaluator."},
+    "routing.assignment_distribution": {"status": "unknown", "value": null, "source_ids": [], "note": "Published dimensions do not establish uniform, top-k, balanced or model-derived routing.", "close_with": "Obtain the remote routing algorithm and seed or the exact group_sizes arrays."},
+    "routing.route_weight_generation": {"status": "unknown", "value": null, "source_ids": [], "note": "Only route-weight dtype/length are published.", "close_with": "Obtain the remote route-weight generator, seed and distribution."},
+    "routing.local_fixture_generator": {"status": "local_assumption", "value": "torch.randint uniform expert assignments with per-case seed 81394 + ordinal; torch.rand FP16 route weights with seed 81394", "source_ids": ["target-local-mirror"], "note": "Deterministic local replay only; it is not remote evidence.", "close_with": "Replace with hashes from authoritative remote routing tensors."},
+
+    "correctness.atol": {"status": "remotely_observed", "value": 0.01, "source_ids": ["published-remote-evaluator-table"], "note": "Tolerance mirrored from the current evaluator capture/local report.", "close_with": "A text export of the remote correctness policy would strengthen this observation."},
+    "correctness.rtol": {"status": "remotely_observed", "value": 0.01, "source_ids": ["published-remote-evaluator-table"], "note": "Tolerance mirrored from the current evaluator capture/local report.", "close_with": "A text export of the remote correctness policy would strengthen this observation."},
+    "correctness.equal_nan": {"status": "local_assumption", "value": false, "source_ids": ["target-local-mirror"], "note": "Fail-closed local policy; the remote NaN rule is not published.", "close_with": "Obtain the exact remote correctness predicate."},
+
+    "execution.case_cache_lifecycle": {"status": "unknown", "value": null, "source_ids": [], "note": "It is unknown whether cases share a process, module cache, compiler cache or workspace cache.", "close_with": "Obtain the remote runner source or a trace showing process boundaries and cache reset operations."},
+    "execution.local_case_cache_lifecycle": {"status": "local_assumption", "value": "one process; correctness compiles each specialization before timing; module kernel/workspace caches persist across cases; torch allocator cache is emptied between cases", "source_ids": ["target-local-mirror"], "note": "Current local driver lifecycle.", "close_with": "Match an authoritative remote lifecycle trace."},
+    "execution.timing_scope": {"status": "remotely_observed", "value": "run_kernel invocation only", "source_ids": ["published-remote-evaluator-table"], "note": "The published table reports kernel entry timing; exact event/tool implementation is still unavailable.", "close_with": "Obtain the evaluator timing source."},
+
+    "scoring.per_case_metrics": {"status": "published", "value": true, "source_ids": ["published-remote-evaluator-table"], "note": "The evaluator table exposes per-case timing rows.", "close_with": null},
+    "scoring.aggregate": {"status": "unknown", "value": null, "source_ids": [], "note": "No published arithmetic/geometric/weighted aggregation rule is available.", "close_with": "Obtain the official scoring formula or evaluator source."},
+
+    "toolchain.published_image_family": {"status": "published", "value": "PyTorch-Agent / 2.8.0 / Python 3.12 / MACA 3.7.1.5", "source_ids": ["published-container-image"], "note": "Competition material names the shared image family.", "close_with": null},
+    "toolchain.exact_online_inventory": {"status": "unknown", "value": null, "source_ids": [], "note": "Exact TileLang, TVM, compiler, driver, wrapper and package commits for OJ are unavailable.", "close_with": "Obtain an online environment manifest with exact versions/commits and evaluator wrapper hash."}
+  },
+  "incidents": [
+    {
+      "incident_id": "online-exit11-h17-assumption-adaptation",
+      "observed_at": "2026-07-21",
+      "submission_sha256": "dd21d0940706ddb30023819d69c2a1405bf88a00433915ff330e03763114388b",
+      "symptom": "OJCHAL v1 followed by native Python traceback-handler segmentation fault",
+      "exit_code": 11,
+      "root_cause_status": "unknown",
+      "evidence_source_ids": ["online-exit11-incidents"]
+    },
+    {
+      "incident_id": "online-exit11-pre-assumption-submission",
+      "observed_at": "2026-07-21",
+      "submission_sha256": "c44f7f4dcffe67d63a7ce1eed76c5570ac73654b76e6fb55fbf4721db64a1b9d",
+      "symptom": "OJCHAL v1 followed by the same native Python traceback-handler segmentation fault",
+      "exit_code": 11,
+      "root_cause_status": "unknown",
+      "evidence_source_ids": ["online-exit11-incidents"]
+    }
+  ]
+}

@@ -1,0 +1,792 @@
+{
+  "case_order": [
+    "remote-case-1",
+    "remote-case-2",
+    "remote-case-3"
+  ],
+  "cases": [
+    {
+      "benchmark": {
+        "count": 30,
+        "mean_ms": 14.798361587524415,
+        "median_ms": 14.792960166931152,
+        "outlier_policy": "none",
+        "p90_ms": 14.829030609130859,
+        "samples_ms": [
+          14.840319633483887,
+          14.78553581237793,
+          14.831104278564453,
+          14.785792350769043,
+          14.78553581237793,
+          14.800895690917969,
+          14.77836799621582,
+          14.796031951904297,
+          14.784000396728516,
+          14.795007705688477,
+          14.792192459106445,
+          14.828800201416016,
+          14.805503845214844,
+          14.78707218170166,
+          14.79372787475586,
+          14.78707218170166,
+          14.783231735229492,
+          14.78451156616211,
+          14.80345630645752,
+          14.782976150512695,
+          14.797056198120117,
+          14.823936462402344,
+          14.808320045471191,
+          14.790911674499512,
+          14.833919525146484,
+          14.786815643310547,
+          14.790399551391602,
+          14.793984413146973,
+          14.791935920715332,
+          14.8024320602417
+        ],
+        "stddev_ms": 0.016605748017906725
+      },
+      "case_id": "remote-case-1",
+      "correctness": {
+        "atol": 0.01,
+        "equal_nan": false,
+        "max_abs_error": 0.001953125,
+        "max_rel_error": 0.01373291015625,
+        "mismatch_count": 0,
+        "rtol": 0.01,
+        "total_values": 4653056
+      },
+      "parameter_fingerprint": {
+        "abi_name": "submission-compact-ten-argument",
+        "applicability": "local_proxy",
+        "argument_count": 10,
+        "argument_order": [
+          "stacked_expert_tokens",
+          "gate_w",
+          "up_w",
+          "down_w",
+          "routed_expert_weights",
+          "group_sizes",
+          "group_offsets",
+          "group_padded_offsets",
+          "group_idx_for_bx",
+          "out"
+        ],
+        "cache_compiler": {
+          "case_cache_lifecycle": "one process; correctness compilation precedes timing; kernel/workspace caches persist; allocator cache emptied after case",
+          "compiler_path": "submission.run_kernel -> tilelang.jit specialization cache"
+        },
+        "contract_fingerprint": "sha256:76213668b712444f98522210534bd01faba7b1d4c09bee17f44ff9fe76c6b1d8",
+        "entrypoint": "run_kernel",
+        "experts": 16,
+        "group_sizes": {
+          "generator": "torch.randint uniform expert assignments; seed=81395",
+          "hash": "sha256:3c516490edce208797b11b42d905bae2425aeec5404d3d7a865db62fe72d4b2f",
+          "length": 16,
+          "max": 174,
+          "mean": 142.0,
+          "min": 123,
+          "sum": 2272,
+          "zero_count": 0
+        },
+        "group_sum": 2272,
+        "hidden": 2048,
+        "intermediate": 8192,
+        "metadata": {
+          "block_count": 34,
+          "block_count_formula": "ceil(group_sum / 128) + experts",
+          "block_token": 128,
+          "group_idx_for_bx_formula": "last expert whose padded offset is <= bx * 128",
+          "group_idx_for_bx_hash": "sha256:131741dcf474e7b831ef11462eae419eb6e84af0baf21953d4debd6326f8d9f5"
+        },
+        "offsets": {
+          "length": 16,
+          "padded_formula": "prefix_sum(ceil((group_size + 1) / 128) * 128)",
+          "padded_hash": "sha256:e1b52168d11c9e3de4020804080b6dad1547deb0f916c38939acb63fde9c975b",
+          "raw_formula": "exclusive_prefix_sum(group_sizes)",
+          "raw_hash": "sha256:9950914db1769395994a2a5cd910b09b7efe72a9889d1c8147f9a0cc43bf0d66",
+          "sentinel": "absent"
+        },
+        "parameter_fingerprint": "sha256:3ca0ab258385cc1e961be8f43e7ff107462126a71bf68f258da0c4b43d86f8ea",
+        "remote_case_id": "remote-case-1",
+        "schema_version": "1.0",
+        "submission_abi_fingerprint": "sha256:f4151e2be522b52490ef26bf2c204e1e0b66bb2fff69f84950de01be124f8fa2",
+        "tensors": {
+          "down_w": {
+            "contiguous": true,
+            "dtype": "float16",
+            "shape": [
+              16,
+              2048,
+              8192
+            ],
+            "strides": [
+              16777216,
+              8192,
+              1
+            ]
+          },
+          "gate_w": {
+            "contiguous": true,
+            "dtype": "float16",
+            "shape": [
+              16,
+              8192,
+              2048
+            ],
+            "strides": [
+              16777216,
+              2048,
+              1
+            ]
+          },
+          "group_idx_for_bx": {
+            "contiguous": true,
+            "dtype": "int32",
+            "shape": [
+              34
+            ],
+            "strides": [
+              1
+            ]
+          },
+          "group_offsets": {
+            "contiguous": true,
+            "dtype": "int32",
+            "shape": [
+              16
+            ],
+            "strides": [
+              1
+            ]
+          },
+          "group_padded_offsets": {
+            "contiguous": true,
+            "dtype": "int32",
+            "shape": [
+              16
+            ],
+            "strides": [
+              1
+            ]
+          },
+          "group_sizes": {
+            "contiguous": true,
+            "dtype": "int32",
+            "shape": [
+              16
+            ],
+            "strides": [
+              1
+            ]
+          },
+          "out": {
+            "contiguous": true,
+            "dtype": "float16",
+            "shape": [
+              2272,
+              2048
+            ],
+            "strides": [
+              2048,
+              1
+            ]
+          },
+          "private_up_logits_workspace": {
+            "contiguous": true,
+            "dtype": "float16",
+            "shape": [
+              2272,
+              8192
+            ],
+            "strides": [
+              8192,
+              1
+            ]
+          },
+          "routed_expert_weights": {
+            "contiguous": true,
+            "dtype": "float16",
+            "shape": [
+              2272
+            ],
+            "strides": [
+              1
+            ]
+          },
+          "stacked_expert_tokens": {
+            "contiguous": true,
+            "dtype": "float16",
+            "shape": [
+              2272,
+              2048
+            ],
+            "strides": [
+              2048,
+              1
+            ]
+          },
+          "up_w": {
+            "contiguous": true,
+            "dtype": "float16",
+            "shape": [
+              16,
+              8192,
+              2048
+            ],
+            "strides": [
+              16777216,
+              2048,
+              1
+            ]
+          }
+        },
+        "timing": {
+          "iterations": 30,
+          "warmup": 5
+        },
+        "workload_case_id": "remote-case-1",
+        "workload_class": "published_dimensions_local_routing_fixture",
+        "workspace_policy": {
+          "data_rows": "group_sum",
+          "output_rows": "group_sum",
+          "route_weight_generator": "torch.rand FP16; tensor generator seed=81394",
+          "workspace_owner": "private_submission_cache",
+          "workspace_rows": "group_sum"
+        }
+      }
+    },
+    {
+      "benchmark": {
+        "count": 20,
+        "mean_ms": 25.380467319488524,
+        "median_ms": 25.386112213134766,
+        "outlier_policy": "none",
+        "p90_ms": 25.397607040405273,
+        "samples_ms": [
+          25.385984420776367,
+          25.376768112182617,
+          25.397504806518555,
+          25.388032913208008,
+          25.357824325561523,
+          25.377792358398438,
+          25.39468765258789,
+          25.3703670501709,
+          25.396991729736328,
+          25.39366340637207,
+          25.366016387939453,
+          25.390592575073242,
+          25.398527145385742,
+          25.40287971496582,
+          25.386240005493164,
+          25.336320877075195,
+          25.3887996673584,
+          25.370624542236328,
+          25.344768524169922,
+          25.384960174560547
+        ],
+        "stddev_ms": 0.017671837436656995
+      },
+      "case_id": "remote-case-2",
+      "correctness": {
+        "atol": 0.01,
+        "equal_nan": false,
+        "max_abs_error": 0.001953125,
+        "max_rel_error": 0.02841949462890625,
+        "mismatch_count": 0,
+        "rtol": 0.01,
+        "total_values": 32571392
+      },
+      "parameter_fingerprint": {
+        "abi_name": "submission-compact-ten-argument",
+        "applicability": "local_proxy",
+        "argument_count": 10,
+        "argument_order": [
+          "stacked_expert_tokens",
+          "gate_w",
+          "up_w",
+          "down_w",
+          "routed_expert_weights",
+          "group_sizes",
+          "group_offsets",
+          "group_padded_offsets",
+          "group_idx_for_bx",
+          "out"
+        ],
+        "cache_compiler": {
+          "case_cache_lifecycle": "one process; correctness compilation precedes timing; kernel/workspace caches persist; allocator cache emptied after case",
+          "compiler_path": "submission.run_kernel -> tilelang.jit specialization cache"
+        },
+        "contract_fingerprint": "sha256:76213668b712444f98522210534bd01faba7b1d4c09bee17f44ff9fe76c6b1d8",
+        "entrypoint": "run_kernel",
+        "experts": 32,
+        "group_sizes": {
+          "generator": "torch.randint uniform expert assignments; seed=81396",
+          "hash": "sha256:2314a67b505659e05de48828223dae1b494510370837a4a1685b6c83b77d5412",
+          "length": 32,
+          "max": 164,
+          "mean": 142.0,
+          "min": 117,
+          "sum": 4544,
+          "zero_count": 0
+        },
+        "group_sum": 4544,
+        "hidden": 7168,
+        "intermediate": 2048,
+        "metadata": {
+          "block_count": 68,
+          "block_count_formula": "ceil(group_sum / 128) + experts",
+          "block_token": 128,
+          "group_idx_for_bx_formula": "last expert whose padded offset is <= bx * 128",
+          "group_idx_for_bx_hash": "sha256:efd3a5cb0bf66ae4c3ff820361245b4ed04728274e430a83a738058d47990c81"
+        },
+        "offsets": {
+          "length": 32,
+          "padded_formula": "prefix_sum(ceil((group_size + 1) / 128) * 128)",
+          "padded_hash": "sha256:75fcbb7bcb142fc34e8e9d3e5ff7001d107aeaf54d5514607197ec36fe253829",
+          "raw_formula": "exclusive_prefix_sum(group_sizes)",
+          "raw_hash": "sha256:997a98fa8c935d09522e1840a37c37310405b318f7d43f52f9a6103185bec9e8",
+          "sentinel": "absent"
+        },
+        "parameter_fingerprint": "sha256:328cd7395f340814328cf7cbfed041092bf385cbf945152e5657847e9533b76f",
+        "remote_case_id": "remote-case-2",
+        "schema_version": "1.0",
+        "submission_abi_fingerprint": "sha256:f4151e2be522b52490ef26bf2c204e1e0b66bb2fff69f84950de01be124f8fa2",
+        "tensors": {
+          "down_w": {
+            "contiguous": true,
+            "dtype": "float16",
+            "shape": [
+              32,
+              7168,
+              2048
+            ],
+            "strides": [
+              14680064,
+              2048,
+              1
+            ]
+          },
+          "gate_w": {
+            "contiguous": true,
+            "dtype": "float16",
+            "shape": [
+              32,
+              2048,
+              7168
+            ],
+            "strides": [
+              14680064,
+              7168,
+              1
+            ]
+          },
+          "group_idx_for_bx": {
+            "contiguous": true,
+            "dtype": "int32",
+            "shape": [
+              68
+            ],
+            "strides": [
+              1
+            ]
+          },
+          "group_offsets": {
+            "contiguous": true,
+            "dtype": "int32",
+            "shape": [
+              32
+            ],
+            "strides": [
+              1
+            ]
+          },
+          "group_padded_offsets": {
+            "contiguous": true,
+            "dtype": "int32",
+            "shape": [
+              32
+            ],
+            "strides": [
+              1
+            ]
+          },
+          "group_sizes": {
+            "contiguous": true,
+            "dtype": "int32",
+            "shape": [
+              32
+            ],
+            "strides": [
+              1
+            ]
+          },
+          "out": {
+            "contiguous": true,
+            "dtype": "float16",
+            "shape": [
+              4544,
+              7168
+            ],
+            "strides": [
+              7168,
+              1
+            ]
+          },
+          "private_up_logits_workspace": {
+            "contiguous": true,
+            "dtype": "float16",
+            "shape": [
+              4544,
+              2048
+            ],
+            "strides": [
+              2048,
+              1
+            ]
+          },
+          "routed_expert_weights": {
+            "contiguous": true,
+            "dtype": "float16",
+            "shape": [
+              4544
+            ],
+            "strides": [
+              1
+            ]
+          },
+          "stacked_expert_tokens": {
+            "contiguous": true,
+            "dtype": "float16",
+            "shape": [
+              4544,
+              7168
+            ],
+            "strides": [
+              7168,
+              1
+            ]
+          },
+          "up_w": {
+            "contiguous": true,
+            "dtype": "float16",
+            "shape": [
+              32,
+              2048,
+              7168
+            ],
+            "strides": [
+              14680064,
+              7168,
+              1
+            ]
+          }
+        },
+        "timing": {
+          "iterations": 20,
+          "warmup": 5
+        },
+        "workload_case_id": "remote-case-2",
+        "workload_class": "published_dimensions_local_routing_fixture",
+        "workspace_policy": {
+          "data_rows": "group_sum",
+          "output_rows": "group_sum",
+          "route_weight_generator": "torch.rand FP16; tensor generator seed=81394",
+          "workspace_owner": "private_submission_cache",
+          "workspace_rows": "group_sum"
+        }
+      }
+    },
+    {
+      "benchmark": {
+        "count": 20,
+        "mean_ms": 48.98018589019775,
+        "median_ms": 48.98470497131348,
+        "outlier_policy": "none",
+        "p90_ms": 49.02338638305664,
+        "samples_ms": [
+          48.94847869873047,
+          49.01785659790039,
+          49.00505447387695,
+          48.97459030151367,
+          48.98227310180664,
+          48.98662567138672,
+          48.95232009887695,
+          49.031681060791016,
+          49.03654479980469,
+          48.94694519042969,
+          49.022464752197266,
+          49.00249481201172,
+          48.982784271240234,
+          48.93388748168945,
+          48.928001403808594,
+          49.003265380859375,
+          48.99148941040039,
+          48.94489669799805,
+          48.99046325683594,
+          48.921600341796875
+        ],
+        "stddev_ms": 0.03422856521490191
+      },
+      "case_id": "remote-case-3",
+      "correctness": {
+        "atol": 0.01,
+        "equal_nan": false,
+        "max_abs_error": 0.001953125,
+        "max_rel_error": 0.02899169921875,
+        "mismatch_count": 0,
+        "rtol": 0.01,
+        "total_values": 65142784
+      },
+      "parameter_fingerprint": {
+        "abi_name": "submission-compact-ten-argument",
+        "applicability": "local_proxy",
+        "argument_count": 10,
+        "argument_order": [
+          "stacked_expert_tokens",
+          "gate_w",
+          "up_w",
+          "down_w",
+          "routed_expert_weights",
+          "group_sizes",
+          "group_offsets",
+          "group_padded_offsets",
+          "group_idx_for_bx",
+          "out"
+        ],
+        "cache_compiler": {
+          "case_cache_lifecycle": "one process; correctness compilation precedes timing; kernel/workspace caches persist; allocator cache emptied after case",
+          "compiler_path": "submission.run_kernel -> tilelang.jit specialization cache"
+        },
+        "contract_fingerprint": "sha256:76213668b712444f98522210534bd01faba7b1d4c09bee17f44ff9fe76c6b1d8",
+        "entrypoint": "run_kernel",
+        "experts": 64,
+        "group_sizes": {
+          "generator": "torch.randint uniform expert assignments; seed=81397",
+          "hash": "sha256:38ec28436477e8a22212287b0d0aed2d0eeac8ec3d9834e125149aba1e30d9f2",
+          "length": 64,
+          "max": 174,
+          "mean": 142.0,
+          "min": 116,
+          "sum": 9088,
+          "zero_count": 0
+        },
+        "group_sum": 9088,
+        "hidden": 7168,
+        "intermediate": 2048,
+        "metadata": {
+          "block_count": 135,
+          "block_count_formula": "ceil(group_sum / 128) + experts",
+          "block_token": 128,
+          "group_idx_for_bx_formula": "last expert whose padded offset is <= bx * 128",
+          "group_idx_for_bx_hash": "sha256:7d2b35d21066643c72cccecee221591377b6f27350a34cac2e3e9657ead03ffc"
+        },
+        "offsets": {
+          "length": 64,
+          "padded_formula": "prefix_sum(ceil((group_size + 1) / 128) * 128)",
+          "padded_hash": "sha256:dff059f768192d3d136266613c0e7c2769bb24885eca11538b4cbda7fd00d263",
+          "raw_formula": "exclusive_prefix_sum(group_sizes)",
+          "raw_hash": "sha256:813b0fca66b38ba67c70bbf134057cededd7fd86015f3f279175f601f277a935",
+          "sentinel": "absent"
+        },
+        "parameter_fingerprint": "sha256:cd6a103c432e9d6557ef5aae92380b09e7e60feea929887f0cd9517022a06e27",
+        "remote_case_id": "remote-case-3",
+        "schema_version": "1.0",
+        "submission_abi_fingerprint": "sha256:f4151e2be522b52490ef26bf2c204e1e0b66bb2fff69f84950de01be124f8fa2",
+        "tensors": {
+          "down_w": {
+            "contiguous": true,
+            "dtype": "float16",
+            "shape": [
+              64,
+              7168,
+              2048
+            ],
+            "strides": [
+              14680064,
+              2048,
+              1
+            ]
+          },
+          "gate_w": {
+            "contiguous": true,
+            "dtype": "float16",
+            "shape": [
+              64,
+              2048,
+              7168
+            ],
+            "strides": [
+              14680064,
+              7168,
+              1
+            ]
+          },
+          "group_idx_for_bx": {
+            "contiguous": true,
+            "dtype": "int32",
+            "shape": [
+              135
+            ],
+            "strides": [
+              1
+            ]
+          },
+          "group_offsets": {
+            "contiguous": true,
+            "dtype": "int32",
+            "shape": [
+              64
+            ],
+            "strides": [
+              1
+            ]
+          },
+          "group_padded_offsets": {
+            "contiguous": true,
+            "dtype": "int32",
+            "shape": [
+              64
+            ],
+            "strides": [
+              1
+            ]
+          },
+          "group_sizes": {
+            "contiguous": true,
+            "dtype": "int32",
+            "shape": [
+              64
+            ],
+            "strides": [
+              1
+            ]
+          },
+          "out": {
+            "contiguous": true,
+            "dtype": "float16",
+            "shape": [
+              9088,
+              7168
+            ],
+            "strides": [
+              7168,
+              1
+            ]
+          },
+          "private_up_logits_workspace": {
+            "contiguous": true,
+            "dtype": "float16",
+            "shape": [
+              9088,
+              2048
+            ],
+            "strides": [
+              2048,
+              1
+            ]
+          },
+          "routed_expert_weights": {
+            "contiguous": true,
+            "dtype": "float16",
+            "shape": [
+              9088
+            ],
+            "strides": [
+              1
+            ]
+          },
+          "stacked_expert_tokens": {
+            "contiguous": true,
+            "dtype": "float16",
+            "shape": [
+              9088,
+              7168
+            ],
+            "strides": [
+              7168,
+              1
+            ]
+          },
+          "up_w": {
+            "contiguous": true,
+            "dtype": "float16",
+            "shape": [
+              64,
+              2048,
+              7168
+            ],
+            "strides": [
+              14680064,
+              7168,
+              1
+            ]
+          }
+        },
+        "timing": {
+          "iterations": 20,
+          "warmup": 5
+        },
+        "workload_case_id": "remote-case-3",
+        "workload_class": "published_dimensions_local_routing_fixture",
+        "workspace_policy": {
+          "data_rows": "group_sum",
+          "output_rows": "group_sum",
+          "route_weight_generator": "torch.rand FP16; tensor generator seed=81394",
+          "workspace_owner": "private_submission_cache",
+          "workspace_rows": "group_sum"
+        }
+      }
+    }
+  ],
+  "contract_fingerprint": "sha256:76213668b712444f98522210534bd01faba7b1d4c09bee17f44ff9fe76c6b1d8",
+  "environment": {
+    "contract_fingerprint": "sha256:76213668b712444f98522210534bd01faba7b1d4c09bee17f44ff9fe76c6b1d8",
+    "device": "MetaX C500",
+    "python": "3.12.11",
+    "source_commit": "471f10424209842210b62c5866cb127a02ca792a",
+    "submission_sha256": "729a48729eded5dc6b2e6003a0970e10f00a04bd64a42f40f22ad3c533bf0214",
+    "submission_source": "/data/MoE-opt/benchmarks/tilelang-moe/submission.py",
+    "tilelang": "0.1.12+maca.gitec48829b",
+    "torch": "2.8.0+metax3.7.1.3"
+  },
+  "environment_fingerprint": "sha256:615713047ba7798155037554ae8fd1d67c2ecc42c325c10328754cb79c45f9e5",
+  "evidence_boundary": "Real C500 measurements for local routing fixtures; not exact remote-equivalent while routing, offset sentinel, cache lifecycle, aggregate scoring, strides, workspace policy, and online toolchain remain unresolved.",
+  "evidence_kind": "hardware",
+  "parity": {
+    "aggregate_status": "unknown",
+    "conclusion": "Published dimensions and local fixture mechanics are exercised, but unresolved remote fields prohibit submit-ready or remote-SOTA claims.",
+    "mismatch_fields": [],
+    "remote_equivalent": false,
+    "status": "LOCAL_PROXY_ONLY",
+    "unresolved_remote_fields": [
+      "abi.formal_kernel",
+      "correctness.equal_nan",
+      "execution.case_cache_lifecycle",
+      "execution.local_case_cache_lifecycle",
+      "metadata.offset_sentinel",
+      "routing.assignment_distribution",
+      "routing.group_sizes_generation",
+      "routing.local_fixture_generator",
+      "routing.route_weight_generation",
+      "scoring.aggregate",
+      "tensor.contiguity_requirements",
+      "tensor.stride_requirements",
+      "toolchain.exact_online_inventory",
+      "workspace.policy"
+    ]
+  },
+  "recorded_at": "2026-07-22T09:50:23.711085Z",
+  "report_type": "c500-routed-moe-submission-local-parity",
+  "schema_version": "1.0",
+  "scoring": {
+    "aggregate_status": "unknown",
+    "aggregate_value": null,
+    "per_case_metrics": true
+  },
+  "source_commit": "471f10424209842210b62c5866cb127a02ca792a",
+  "submission_abi_fingerprint": "sha256:f4151e2be522b52490ef26bf2c204e1e0b66bb2fff69f84950de01be124f8fa2",
+  "support_level": "measured",
+  "thermal_clock_notes": "| MX-SMI 2.3.1                       Kernel Mode Driver Version: 3.8.30           | | | MACA Version: 3.7.1.5              BIOS Version: 1.33.5.0                       | | | 0     MetaX C500 | 0           Off | 0000:35:00.0        | 98%         Disabled | | | 133W / 350W      | 39C          P9 | 3478/65536 MiB      | Available            |",
+  "timing_protocol": "per published case: correctness/compile cache check, published warmup, then contiguous run_kernel calls with adjacent CUDA-event boundaries; all per-call samples retained and no outliers removed"
+}

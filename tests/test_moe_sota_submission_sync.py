@@ -27,6 +27,14 @@ class MoeSotaSubmissionSyncTest(unittest.TestCase):
             destination = root / relative
             destination.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(ROOT / relative, destination)
+        remote_relative = Path(manifest["remote_contract"]["source_path"])
+        remote_destination = root / remote_relative
+        remote_destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(ROOT / remote_relative, remote_destination)
+        shutil.copy2(
+            ROOT / remote_relative.parent / "remote_contract_tools.py",
+            remote_destination.parent / "remote_contract_tools.py",
+        )
         manifest_path = root / MANIFEST
         manifest_path.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(ROOT / MANIFEST, manifest_path)
@@ -62,6 +70,15 @@ class MoeSotaSubmissionSyncTest(unittest.TestCase):
         manifest_path.write_text(json.dumps(manifest))
         errors = check_sync(root)
         self.assertTrue(any("missing synchronized mechanism" in error for error in errors), errors)
+
+    def test_rejects_remote_contract_change_without_manifest_update(self):
+        temporary, root = self.make_repository_copy()
+        self.addCleanup(temporary.cleanup)
+        manifest = json.loads((root / MANIFEST).read_text())
+        contract = root / manifest["remote_contract"]["source_path"]
+        contract.write_text(contract.read_text() + "\n")
+        errors = check_sync(root)
+        self.assertTrue(any("mirror SHA" in error for error in errors), errors)
 
 
 if __name__ == "__main__":
