@@ -58,6 +58,20 @@ def main() -> None:
         help="serialize stage-1 gate/up through one shared weight tile (shipping default)",
     )
     parser.add_argument("--min-blocks-per-sm", type=int, default=None, help="stage-1 launch-bounds occupancy hint")
+    parser.add_argument(
+        "--compact-metadata-grid",
+        action="store_true",
+        help="candidate-only: use exact per-expert block counts for the host metadata grid",
+    )
+    parser.add_argument(
+        "--combine-gate-up",
+        action="store_true",
+        help="candidate-only: one physical 2*BN FC1 GEMM plus SwiGLU epilogue",
+    )
+    parser.add_argument(
+        "--candidate-id",
+        help="noncanonical experiment identifier recorded with a manual candidate",
+    )
     parser.add_argument("--mode", choices=("functional", "performance", "all"), default="all")
     parser.add_argument("--shape", choices=("large", "small", "all"), default="all")
     parser.add_argument("--warmup", type=int, default=10, help="performance warmup iterations")
@@ -78,6 +92,11 @@ def main() -> None:
         args.s2_stages,
     )
     if args.experiment:
+        if args.combine_gate_up:
+            parser.error(
+                "--experiment fixes the complete canonical schedule and cannot be combined "
+                "with --combine-gate-up"
+            )
         if any(value is not None for value in explicit_stage_values):
             parser.error("--experiment cannot be combined with explicit --s1/--s2 tile or stage flags")
         if (
@@ -122,6 +141,10 @@ def main() -> None:
         "single_weight_buffer": args.single_weight_buffer,
         "min_blocks_per_sm": args.min_blocks_per_sm,
     }
+    if args.compact_metadata_grid:
+        schedule["compact_metadata_grid"] = True
+    if args.combine_gate_up:
+        schedule["combine_gate_up"] = True
     if args.experiment:
         canonical_schedule = canonical_experiment_schedule(args.experiment)
         if schedule != canonical_schedule:
@@ -155,7 +178,9 @@ def main() -> None:
         f"swizzle_down={(args.swizzle_order_down or args.swizzle_order)}"
         f"{(args.swizzle_panel_down if args.swizzle_panel_down is not None else args.swizzle_panel)} "
         f"gemm_policy={args.gemm_policy} gemm_policy_down={args.gemm_policy_down or args.gemm_policy} "
-        f"single_weight_buffer={args.single_weight_buffer} min_blocks_per_sm={args.min_blocks_per_sm}",
+        f"single_weight_buffer={args.single_weight_buffer} min_blocks_per_sm={args.min_blocks_per_sm} "
+        f"compact_metadata_grid={args.compact_metadata_grid} combine_gate_up={args.combine_gate_up} "
+        f"candidate_id={args.candidate_id}",
         flush=True,
     )
 
@@ -188,9 +213,16 @@ def main() -> None:
             single_weight_buffer=args.single_weight_buffer,
             min_blocks_per_sm=args.min_blocks_per_sm,
         )
+        routed_kernel.combine_gate_up = args.combine_gate_up
         # The sample benchmark's group metadata is always formed in 128-token
         # units; kernel block_token is a compute tile, not a metadata stride.
-        moe = benchmark.MoE(config, routed_kernel, weights, padding_M=128)
+        moe = benchmark.MoE(
+            config,
+            routed_kernel,
+            weights,
+            padding_M=128,
+            compact_metadata_grid=args.compact_metadata_grid,
+        )
         return moe(input_tensor)
 
     benchmark.custom_kernel = candidate_kernel
@@ -220,7 +252,7 @@ def main() -> None:
             "record_type": "moe-benchmark-process",
             "recorded_at": datetime.now(timezone.utc).isoformat(),
             "pid": os.getpid(),
-            "experiment": args.experiment,
+            "experiment": args.experiment or args.candidate_id,
             "schedule": schedule,
             "benchmark": {
                 "warmup": args.warmup,

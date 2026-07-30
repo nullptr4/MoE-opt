@@ -30,6 +30,9 @@ def _moe_forward_kernel(
     block_token = 128
     block_dhidden = 128
     block_dexpert = 128
+    # The C500-validated E3 schedule keeps FC1 at BK=128 but uses BK=64 for
+    # FC2.  This only changes the internal K tiling, not the OJ ABI.
+    block_dexpert_down = 64
     threads = 256
 
     input_shape = (total_padded_tokens, hidden)
@@ -122,8 +125,8 @@ def _moe_forward_kernel(
         # Stage 2.  The intermediate is already padded by expert, while the
         # routed weight remains compact and is indexed through group_offsets.
         with T.Kernel(num_blocks_m, T.ceildiv(hidden, block_dhidden), threads=threads) as (bx, by):
-            up_local = T.alloc_fragment((block_token, block_dexpert), dtype=dtype)
-            down_shared = T.alloc_shared((block_dhidden, block_dexpert), dtype=dtype)
+            up_local = T.alloc_fragment((block_token, block_dexpert_down), dtype=dtype)
+            down_shared = T.alloc_shared((block_dhidden, block_dexpert_down), dtype=dtype)
             out_local = T.alloc_fragment((block_token, block_dhidden), dtype=accum_dtype)
 
             T.use_swizzle(panel_size=16, order="row")
@@ -138,11 +141,11 @@ def _moe_forward_kernel(
 
             T.clear(out_local)
 
-            for k in T.Pipelined(T.ceildiv(intermediate, block_dexpert), num_stages=1):
+            for k in T.Pipelined(T.ceildiv(intermediate, block_dexpert_down), num_stages=1):
                 T.copy(
                     up_logits[
                         block_start : block_start + block_token,
-                        k * block_dexpert : (k + 1) * block_dexpert,
+                        k * block_dexpert_down : (k + 1) * block_dexpert_down,
                     ],
                     up_local,
                 )
@@ -150,7 +153,7 @@ def _moe_forward_kernel(
                     down_w[
                         expert_id,
                         by * block_dhidden : (by + 1) * block_dhidden,
-                        k * block_dexpert : (k + 1) * block_dexpert,
+                        k * block_dexpert_down : (k + 1) * block_dexpert_down,
                     ],
                     down_shared,
                 )

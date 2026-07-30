@@ -10,3 +10,7 @@ profiler/**/raw/** filter=lfs diff=lfs merge=lfs -text
 # Generated compiler evidence and replay patches are archived byte-for-byte.
 data/profiler/**/stage1-generated-code/**/*.cu -whitespace
 data/benchmarks/**/stage1-*-submission.patch -whitespace
+
+# mcProfiler emits CRLF CSV and fixed-format text/PDF payloads with intentional
+# trailing spaces. Preserve these generated artifacts byte-for-byte.
+mcProfilerOutput/** -whitespace

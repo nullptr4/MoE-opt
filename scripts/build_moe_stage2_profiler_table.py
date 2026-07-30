@@ -7,7 +7,6 @@ import argparse
 import hashlib
 import json
 import re
-import subprocess
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -49,13 +48,6 @@ def numeric(value: Any) -> float:
 
 def load_json(root: Path, relative_path: str) -> dict[str, Any]:
     return json.loads((root / relative_path).read_text())
-
-
-def git_blob_sha256(root: Path, relative_path: str) -> str:
-    content = subprocess.check_output(
-        ["git", "-C", str(root), "show", f"HEAD:{relative_path}"]
-    )
-    return hashlib.sha256(content).hexdigest()
 
 
 def parse_e2e_log(root: Path, relative_path: str) -> dict[str, float]:
@@ -703,14 +695,8 @@ def build_table(root: Path) -> dict[str, Any]:
         "guardrails": {
             "submission_path": "benchmarks/tilelang-moe/submission.py",
             "submission_sha256": sha256(root / "benchmarks/tilelang-moe/submission.py"),
-            "submission_head_sha256": git_blob_sha256(
-                root, "benchmarks/tilelang-moe/submission.py"
-            ),
             "autotune_path": "data/autotune/c500-32g/results.jsonl",
             "autotune_sha256": sha256(root / "data/autotune/c500-32g/results.jsonl"),
-            "autotune_head_sha256": git_blob_sha256(
-                root, "data/autotune/c500-32g/results.jsonl"
-            ),
         },
         "sources": [sources[path] for path in sorted(sources)],
         "report": DEFAULT_REPORT,

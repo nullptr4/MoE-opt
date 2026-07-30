@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "record_type": "moe-stage2-profiler-decision-table",
-  "generated_at": "2026-07-16T02:33:59.687878+00:00",
+  "generated_at": "2026-07-20T05:42:53.540303+00:00",
   "host_id": "c500-32g",
   "methodology": {
     "workload": "Large public performance shape",
@@ -1243,11 +1243,9 @@
   },
   "guardrails": {
     "submission_path": "benchmarks/tilelang-moe/submission.py",
-    "submission_sha256": "74b765a2e257c51e24392f25ee0136c4154561b33011ac9efbdc7e4acbe79672",
-    "submission_head_sha256": "74b765a2e257c51e24392f25ee0136c4154561b33011ac9efbdc7e4acbe79672",
+    "submission_sha256": "c72122bb2bc3b7bc1352738eef634ac73341fd6d4340016582d13e5515abd0d6",
     "autotune_path": "data/autotune/c500-32g/results.jsonl",
-    "autotune_sha256": "af1273e82efa84039e0e0754a17097fcc5be997f0cb45f6832282a50003130e7",
-    "autotune_head_sha256": "af1273e82efa84039e0e0754a17097fcc5be997f0cb45f6832282a50003130e7"
+    "autotune_sha256": "af1273e82efa84039e0e0754a17097fcc5be997f0cb45f6832282a50003130e7"
   },
   "sources": [
     {
@@ -1257,13 +1255,13 @@
     },
     {
       "path": "benchmarks/tilelang-moe/custom_fusedmoe.py",
-      "sha256": "99588a2dc83249ce43751282ac00a51702f01194c6cef6f37a3fbc2bea5e78ae",
-      "bytes": 27324
+      "sha256": "e4a8cc3f9cc93eaf2885486067562ad1037522aa16320b2b91367663e8ced14f",
+      "bytes": 32321
     },
     {
       "path": "benchmarks/tilelang-moe/submission.py",
-      "sha256": "74b765a2e257c51e24392f25ee0136c4154561b33011ac9efbdc7e4acbe79672",
-      "bytes": 8841
+      "sha256": "c72122bb2bc3b7bc1352738eef634ac73341fd6d4340016582d13e5515abd0d6",
+      "bytes": 9049
     },
     {
       "path": "config/moe_stage1_profiler_large_workload.json",
@@ -1402,13 +1400,13 @@
     },
     {
       "path": "scripts/build_moe_stage2_profiler_table.py",
-      "sha256": "c76aeb8d67113433e709cea69127b48e30128cabd45e15b46941c890ae45a429",
-      "bytes": 35404
+      "sha256": "c99fb337e5bddec3236f8642fe6401d18eb533e0f75947094ba91ced1ee877d0",
+      "bytes": 34905
     },
     {
       "path": "scripts/validate_moe_stage2_profiler.py",
-      "sha256": "3171c52e8aedb2fe757e16ed06a07a17792b30b855af8812affd1c164d029285",
-      "bytes": 8221
+      "sha256": "c53a188f6a31138d5d3d343b04dd4e00cd0d6ec36eb90acf36ac9074194698cd",
+      "bytes": 8118
     }
   ],
   "report": "reports/2026-07-16-moe-stage2-profiler-decision-table.md"

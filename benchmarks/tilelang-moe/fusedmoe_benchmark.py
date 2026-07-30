@@ -46,12 +46,18 @@ class MoEGate(nn.Module):
 
 class MoE(nn.Module):
     def __init__(
-        self, config: Dict, routed_kernel, weights: Dict, padding_M: int = 128
+        self,
+        config: Dict,
+        routed_kernel,
+        weights: Dict,
+        padding_M: int = 128,
+        compact_metadata_grid: bool = False,
     ):
         super().__init__()
         self.config = config
         self.routed_kernel = routed_kernel
         self.padding_M = padding_M
+        self.compact_metadata_grid = compact_metadata_grid
         self.experts = nn.ModuleList(
             [
                 Expert(
@@ -130,15 +136,21 @@ class MoE(nn.Module):
         group_sizes = torch.tensor(counts, dtype=torch.int32, device=self.device)
         group_offset = torch.tensor(tokens_per_expert - counts, dtype=torch.int32, device=self.device)
 
-        group_padded_offsets = [0 for _ in range(len(group_sizes))]
-        for i in range(1, len(group_sizes)):
-            group_padded_offsets[i] = group_padded_offsets[i - 1] + math.ceil((counts[i - 1] + 1) / self.padding_M) * self.padding_M
-
         block_token = 128
-        M = (
-            math.ceil(self.config["batch_size"] * self.config["seq_len"] * self.config["n_experts_per_token"] / block_token)
-            + self.config["n_routed_experts"]
-        )
+        group_padded_offsets = [0 for _ in range(len(group_sizes))]
+        if self.compact_metadata_grid:
+            for i in range(1, len(group_sizes)):
+                group_padded_offsets[i] = group_padded_offsets[i - 1] + math.ceil(counts[i - 1] / self.padding_M) * self.padding_M
+            M = sum(math.ceil(count / block_token) for count in counts)
+            if M <= 0:
+                raise ValueError("compact metadata grid requires at least one routed row")
+        else:
+            for i in range(1, len(group_sizes)):
+                group_padded_offsets[i] = group_padded_offsets[i - 1] + math.ceil((counts[i - 1] + 1) / self.padding_M) * self.padding_M
+            M = (
+                math.ceil(self.config["batch_size"] * self.config["seq_len"] * self.config["n_experts_per_token"] / block_token)
+                + self.config["n_routed_experts"]
+            )
         group_idx_for_bx = [0 for _ in range(M)]
 
         for bx in range(M):
@@ -149,6 +161,7 @@ class MoE(nn.Module):
 
         group_padded_offsets = torch.tensor(group_padded_offsets, dtype=torch.int32, device=self.device)
         group_idx_for_bx = torch.tensor(group_idx_for_bx, dtype=torch.int32, device=self.device)
+        self.routed_kernel.metadata_m = M if self.compact_metadata_grid else None
 
         routed_stream = torch.cuda.default_stream()
         torch.cuda.synchronize()
@@ -207,10 +220,14 @@ def custom_kernel(data: Tuple[torch.Tensor, Dict, Dict]) -> torch.Tensor:
         config["d_expert"],
         config["n_routed_experts"],
         group_sum=config["batch_size"] * config["seq_len"] * config["n_experts_per_token"],
-        group_count=config["n_routed_experts"]
+        group_count=config["n_routed_experts"],
+        # C500 five-process validation selected the FC2 BK=64 schedule.
+        s2_bk=64,
     )
 
-    moe = MoE(config, routed_kernel, weights, padding_M=128)
+    # Use exact per-expert metadata tiles so trailing empty CTAs are not
+    # launched.  The kernel retains the same external pre-routed ABI.
+    moe = MoE(config, routed_kernel, weights, padding_M=128, compact_metadata_grid=True)
 
     output = moe(input_tensor)
     # Expose the selected schedule to the functional gate so the shared

@@ -1,0 +1,66 @@
+{
+  "schema_version": 1,
+  "record_type": "moe-benchmark-process",
+  "recorded_at": "2026-07-20T03:21:35.121735+00:00",
+  "pid": 42311,
+  "experiment": "E0",
+  "schedule": {
+    "block_token": 128,
+    "block_dhidden": 128,
+    "block_dexpert": 128,
+    "threads": 256,
+    "num_stages": 1,
+    "num_stages_down": 1,
+    "s1_bn": 128,
+    "s1_bk": 128,
+    "s1_stages": 1,
+    "s2_bn": 128,
+    "s2_bk": 128,
+    "s2_stages": 1,
+    "swizzle_panel": 8,
+    "swizzle_order": "row",
+    "swizzle_panel_down": 16,
+    "swizzle_order_down": "row",
+    "gemm_policy": "full_row",
+    "gemm_policy_down": "full_row",
+    "single_weight_buffer": true,
+    "min_blocks_per_sm": null
+  },
+  "benchmark": {
+    "warmup": 20,
+    "iteration": 100,
+    "shape": "all"
+  },
+  "results": [
+    {
+      "test_type": "performance",
+      "config": {
+        "dhidden": 7168,
+        "dexpert": 2048,
+        "nroutedexperts": 8,
+        "nexpertspertoken": 4,
+        "bs": 4,
+        "seqlen": 8192,
+        "seed": 81394
+      },
+      "warmup": 20,
+      "iteration": 100,
+      "latency_ms": 242.33068359375
+    },
+    {
+      "test_type": "performance",
+      "config": {
+        "dhidden": 3584,
+        "dexpert": 1024,
+        "nroutedexperts": 4,
+        "nexpertspertoken": 2,
+        "bs": 8,
+        "seqlen": 4096,
+        "seed": 81394
+      },
+      "warmup": 20,
+      "iteration": 100,
+      "latency_ms": 38.031064453125
+    }
+  ]
+}

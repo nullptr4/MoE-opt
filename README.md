@@ -14,6 +14,7 @@
 - [MoE 调优报告](reports/2026-07-11-moe-optimization-report.md)：C500 实测候选、失败原因和最终 schedule。
 - [MoE 优化阶段总结](reports/2026-07-16-moe-optimization-summary.md)：当前性能、Stage 0–2 状态、证据边界和下一步实施入口。
 - [MoE 阶段 1 解耦结果](reports/2026-07-15-moe-stage1-decoupling-results.md)：E0–E5、交错确认和 FC1/FC2 profiler 对照。
+- [MoE E0–E7 数据归档总览](reports/2026-07-20-moe-e0-e7-summary.md)：逐项方案、性能结论、原始基准和 mcProfiler 索引。
 - [MoE 调优日志](logs/moe-tuning.md)：每个候选的 functional/performance 结果。
 - [MoE 基线实验规范](docs/MOE_BASELINE_EXPERIMENTS.md)：3 个独立进程、median/MAD/P95 与统一 JSON 产物。
 - [双 C500 数据同步说明](data/README.md)：主机指纹、autotune、autoheuristic 和 mcProfiler 数据布局。
@@ -24,12 +25,12 @@
 
 ## 当前优化状态
 
-截至 2026-07-16，Stage 0 基线固化、Stage 1 FC1/FC2 参数解耦和 Stage 2
-Profiler 决策表均已完成。当前默认继续使用 E0：`FullRow + FC1 row8 + FC2 row16 +
-单 weight shared buffer`。E3 的最终综合改善为 0.8816%，低于预设 1% 晋级线，未进入
-默认实现。Profiler 证据也未满足 FC1 异步流水的进入条件，下一步转向 Stage 4：合并
-FC1 epilogue，并消除 full/tail/empty 路径中的无效工作。完整状态与数据边界见
-[阶段总结](reports/2026-07-16-moe-optimization-summary.md)。
+截至 2026-07-20，默认实现为 C500 五进程验证通过的 E3+E7：`FullRow + FC1 row8 +
+FC2 row16/BK64 + 单 weight shared buffer + exact metadata grid`。相对 E0 的 Large /
+Small 中位数分别提升 1.3110% / 1.3458%，综合提升 1.3157%；官方功能、提交 ABI fuzz
+及 mcProfiler 均已复验。E0–E7 的定义和归档入口见
+[数据归档总览](reports/2026-07-20-moe-e0-e7-summary.md)，最终接受判断见
+[E3+E7 推广报告](reports/2026-07-20-moe-e3e7-promotion.md)。FC1 异步流水仍无进入证据。
 
 ## 仓库结构
 
@@ -71,13 +72,11 @@ python fusedmoe_benchmark.py
 python scripts/check_repository.py
 git diff --check
 ```
-当前默认 schedule 已固化报告中的已验证策略：`FullRow`、stage-1
-`row8`/stage-2 `row16`、gate/up 单 shared weight buffer 和 stage-1
-`T.serial`。运行时的 autotune 只在这组已通过 functional 的 swizzle
-候选中测量；autoheuristic 按公开 shape 选择候选集，不会重新启用报告中
-已排除的深 pipeline、耦合 tile、128/512 threads 或 fast-math 方案。
-阶段 1 只通过显式 E0–E5 实验重新检验解耦后的 FC1/FC2 tile，不扩大
-默认 autotune 搜索空间。
+当前默认 schedule 固化 E3+E7 的已验证策略：`FullRow`、FC1 stage-1
+`row8/BK128`、FC2 stage-1 `row16/BK64`、gate/up 单 shared weight buffer 和 exact
+metadata grid。运行时的 autotune 只在已通过 functional 的 swizzle 候选中测量；
+autoheuristic 不会重新启用已排除的深 pipeline、耦合 tile、128/512 threads 或
+fast-math 方案。E0–E5 显式 preset 仍保留，用于可重复的单变量对照。
 
 需要复现单个候选时：
 

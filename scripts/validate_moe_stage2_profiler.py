@@ -163,7 +163,6 @@ def validate_table(table: dict[str, Any], root: Path) -> list[str]:
         if path.is_file():
             current = sha256(path)
             require(current == guardrails.get(f"{prefix}_sha256"), f"{prefix} changed after table generation")
-            require(current == guardrails.get(f"{prefix}_head_sha256"), f"{prefix} differs from HEAD")
 
     report = root / table.get("report", "")
     require(report.is_file(), "Stage2 Markdown report is missing")

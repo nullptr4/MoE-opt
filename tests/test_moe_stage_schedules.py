@@ -130,6 +130,13 @@ class KernelSignatureTest(unittest.TestCase):
         }
         self.assertTrue(expected <= functions["_moe_autoheuristic_configs"])
         self.assertTrue(expected <= functions["_moe_forward_tilelang_routed"])
+        for internal_specialization in ("metadata_m", "combine_gate_up"):
+            self.assertIn(internal_specialization, functions["_moe_autoheuristic_configs"])
+            self.assertIn(internal_specialization, functions["_moe_forward_tilelang_routed"])
+        self.assertIn(
+            "self.impl = _moe_forward_tilelang_routed(**compile_kwargs)",
+            source,
+        )
 
 
 if __name__ == "__main__":
